@@ -2,7 +2,7 @@ apiVersion: v2
 name: roundcube
 description: A free and open source webmail solution with a desktop-like user interface
 type: application
-version: 0.2.1
+version: 0.2.2
 appVersion: "1.6.11"
 keywords:
   - roundcube
