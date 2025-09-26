@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GitHub Release](https://img.shields.io/github/release/encircle360-oss/helm-charts.svg?style=flat)](https://github.com/encircle360-oss/helm-charts/releases)
 
-A collection of Helm charts for various open-source applications, maintained by encircle360 GmbH and the open source community.
+A collection of Helm charts for various open-source applications, maintained and sponsored by [encircle360 GmbH](https://encircle360.com) together with the open source community, partners and friends.
 
 ## Usage
 
@@ -31,7 +31,7 @@ helm install my-release encircle360-oss/<chart-name>
 
 | Chart | Description | Chart Version | App Version |
 |-------|-------------|---------------|--------------|
-| [roundcube](./charts/roundcube) | A free and open source webmail solution | 0.2.0 | 1.6.11 |
+| [roundcube](./charts/roundcube) | A free and open source webmail solution | 0.2.2 | 1.6.11 |
 
 ## Development
 
@@ -56,15 +56,20 @@ helm install test-release charts/<chart-name> --debug --dry-run
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-## Support
+## Support & Professional Services
 
 - Create an [Issue](https://github.com/encircle360-oss/helm-charts/issues) for bug reports and feature requests
 - Start a [Discussion](https://github.com/encircle360-oss/helm-charts/discussions) for questions and general support
+- For professional support, consulting, or custom development, contact us at **hello@encircle360.com**
 
 ## License
 
 This repository is licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
 
+## Maintainers
+
+This project is maintained and sponsored by **[encircle360 GmbH](https://encircle360.com)**, providing enterprise-grade Kubernetes and cloud-native solutions.
+
 ## Credits
 
-Inspired by community best practices and other successful Helm chart repositories.
+Thanks to all contributors, partners, and the open source community for making this project possible.

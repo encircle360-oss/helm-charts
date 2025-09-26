@@ -1,4 +1,4 @@
-# Contributing to Encircle360 OSS Helm Charts
+# Contributing to encircle360 OSS Helm Charts
 
 We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
 

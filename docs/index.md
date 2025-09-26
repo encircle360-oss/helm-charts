@@ -1,6 +1,6 @@
 # encircle360 OSS Helm Charts
 
-Welcome to the encircle360 OSS Helm Charts repository! This collection provides production-ready open source Helm charts for deploying various applications on Kubernetes, maintained by encircle360 GmbH.
+Welcome to the encircle360 OSS Helm Charts repository! This collection provides production-ready open source Helm charts for deploying various applications on Kubernetes, maintained and sponsored by [encircle360 GmbH](https://encircle360.com) together with the open source community, partners and friends.
 
 ## Available Charts
 
@@ -45,23 +45,29 @@ helm install my-release encircle360/chart-name --set key=value
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](https://github.com/encircle360-oss/helm-charts/blob/main/CONTRIBUTING.md) for details.
+We welcome contributions from the community! Please see our [Contributing Guide](https://github.com/encircle360-oss/helm-charts/blob/main/CONTRIBUTING.md) for details.
 
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](https://github.com/encircle360-oss/helm-charts/blob/main/LICENSE) file for details.
 
-## Maintainer
+## Maintainers & Sponsors
 
-These charts are maintained by **encircle360 GmbH**, providing enterprise-grade open source Helm charts for the community.
+This project is maintained and sponsored by **[encircle360 GmbH](https://encircle360.com)**, providing enterprise-grade Kubernetes and cloud-native solutions. We work together with our community, partners, and friends to deliver high-quality Helm charts.
 
-## Support
+## Support & Professional Services
+
+### Community Support
 
 If you encounter any problems or have questions, please:
 
 1. Check the [documentation](https://encircle360-oss.github.io/helm-charts/)
 2. Search through [existing issues](https://github.com/encircle360-oss/helm-charts/issues)
 3. Open a [new issue](https://github.com/encircle360-oss/helm-charts/issues/new) if needed
+
+### Professional Support
+
+For professional support, consulting, custom development, or enterprise solutions, contact us at **hello@encircle360.com**
 
 ## Chart Sources
 

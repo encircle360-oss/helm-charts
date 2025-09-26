@@ -393,7 +393,9 @@ If users are getting logged out frequently:
 2. Ensure all replicas can access the same session store
 3. Check session timeout settings
 
-## Support
+## Support & Professional Services
+
+### Community Support
 
 For issues and questions about this Helm chart:
 - Open an issue in [GitHub Issues](https://github.com/encircle360-oss/helm-charts/issues)
@@ -402,6 +404,10 @@ For issues and questions about this Helm chart:
 For Roundcube specific issues:
 - Visit the [Roundcube GitHub repository](https://github.com/roundcube/roundcubemail)
 - Check the [Roundcube documentation](https://github.com/roundcube/roundcubemail/wiki)
+
+### Professional Support
+
+For professional support, consulting, custom development, or enterprise solutions, contact **hello@encircle360.com**
 
 ## License
 
