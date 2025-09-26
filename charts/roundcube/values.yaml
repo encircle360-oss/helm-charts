@@ -171,7 +171,7 @@ roundcube:
     #     $config['smtp_server'] = 'tls://smtp.example.com:587';
     #     $config['managesieve_host'] = 'tls://imap.example.com:4190';
     #     $config['managesieve_usetls'] = true;
-    # - name: "company.org"  
+    # - name: "company.org"
     #   config: |
     #     $config['default_host'] = 'ssl://mail.company.org:993';
     #     $config['smtp_server'] = 'tls://mail.company.org:587';
