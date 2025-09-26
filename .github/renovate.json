@@ -1,0 +1,35 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "kubernetes": {
+    "fileMatch": ["charts/.+\\.yaml$"]
+  },
+  "regexManagers": [
+    {
+      "fileMatch": ["charts/.+\\.yaml$"],
+      "matchStrings": [
+        "appVersion: \"(?<currentValue>.*?)\"",
+        "repository: (?<depName>.*?)\\s+tag: \"?(?<currentValue>.*?)\"?"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["major"],
+      "labels": ["renovate/major"]
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["minor"],
+      "labels": ["renovate/minor"]
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["patch"],
+      "labels": ["renovate/patch"]
+    }
+  ]
+}

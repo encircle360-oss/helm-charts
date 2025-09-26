@@ -1,0 +1,205 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "roundcube.fullname" . }}
+  labels:
+    {{- include "roundcube.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "roundcube.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "roundcube.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "roundcube.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          env:
+            - name: ROUNDCUBEMAIL_DEFAULT_HOST
+              value: {{ .Values.roundcube.defaultHost | quote }}
+            - name: ROUNDCUBEMAIL_DEFAULT_PORT
+              value: {{ .Values.roundcube.defaultPort | quote }}
+            - name: ROUNDCUBEMAIL_SMTP_SERVER
+              value: {{ .Values.roundcube.smtpServer | quote }}
+            - name: ROUNDCUBEMAIL_SMTP_PORT
+              value: {{ .Values.roundcube.smtpPort | quote }}
+            - name: ROUNDCUBEMAIL_SMTP_USER
+              value: {{ .Values.roundcube.smtpUser | quote }}
+            - name: ROUNDCUBEMAIL_SMTP_PASS
+              value: {{ .Values.roundcube.smtpPass | quote }}
+            - name: ROUNDCUBEMAIL_PLUGINS
+              value: {{ join "," .Values.roundcube.plugins | quote }}
+            - name: ROUNDCUBEMAIL_SKIN
+              value: {{ .Values.roundcube.skin | quote }}
+            - name: ROUNDCUBEMAIL_UPLOAD_MAX_FILESIZE
+              value: {{ .Values.roundcube.uploadMaxFilesize | quote }}
+            - name: ROUNDCUBEMAIL_DES_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "roundcube.fullname" . }}
+                  key: des-key
+            {{- if ne .Values.database.type "sqlite" }}
+            - name: ROUNDCUBEMAIL_DB_TYPE
+              value: {{ .Values.database.type | quote }}
+            - name: ROUNDCUBEMAIL_DB_HOST
+              value: {{ include "roundcube.databaseHost" . | quote }}
+            - name: ROUNDCUBEMAIL_DB_PORT
+              value: {{ .Values.database.external.port | quote }}
+            - name: ROUNDCUBEMAIL_DB_NAME
+              value: {{ .Values.database.external.name | quote }}
+            - name: ROUNDCUBEMAIL_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "roundcube.databaseSecretName" . }}
+                  key: {{ .Values.database.external.existingSecretUserKey }}
+            - name: ROUNDCUBEMAIL_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "roundcube.databaseSecretName" . }}
+                  key: {{ .Values.database.external.existingSecretPasswordKey }}
+            {{- else }}
+            - name: ROUNDCUBEMAIL_DB_TYPE
+              value: "sqlite"
+            - name: ROUNDCUBEMAIL_DB_DIR
+              value: "/var/roundcube/db"
+            {{- end }}
+            {{- if .Values.redis.enabled }}
+            - name: ROUNDCUBEMAIL_REDIS_HOST
+              value: {{ .Values.redis.host | quote }}
+            - name: ROUNDCUBEMAIL_REDIS_PORT
+              value: {{ .Values.redis.port | quote }}
+            {{- if .Values.redis.password }}
+            - name: ROUNDCUBEMAIL_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.redis.existingSecret | default (include "roundcube.fullname" .) }}
+                  key: {{ .Values.redis.existingSecretPasswordKey }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.memcached.enabled }}
+            - name: ROUNDCUBEMAIL_MEMCACHED_HOST
+              value: {{ .Values.memcached.host | quote }}
+            - name: ROUNDCUBEMAIL_MEMCACHED_PORT
+              value: {{ .Values.memcached.port | quote }}
+            {{- end }}
+            {{- with .Values.roundcube.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          {{- end }}
+          {{- if .Values.startupProbe.enabled }}
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+            successThreshold: {{ .Values.startupProbe.successThreshold }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            {{- if .Values.persistence.enabled }}
+            {{- if eq .Values.database.type "sqlite" }}
+            - name: sqlite
+              mountPath: {{ .Values.persistence.sqlitePath }}
+            {{- end }}
+            - name: temp
+              mountPath: {{ .Values.persistence.tempPath }}
+            - name: logs
+              mountPath: {{ .Values.persistence.logsPath }}
+            {{- end }}
+            {{- if .Values.roundcube.customConfig }}
+            - name: custom-config
+              mountPath: /var/roundcube/config/config.inc.php
+              subPath: config.inc.php
+            {{- end }}
+            {{- with .Values.roundcube.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+        {{- with .Values.sidecarContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      volumes:
+        {{- if .Values.persistence.enabled }}
+        {{- if eq .Values.database.type "sqlite" }}
+        - name: sqlite
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (printf "%s-sqlite" (include "roundcube.fullname" .)) }}
+        {{- end }}
+        - name: temp
+          emptyDir: {}
+        - name: logs
+          emptyDir: {}
+        {{- end }}
+        {{- if .Values.roundcube.customConfig }}
+        - name: custom-config
+          configMap:
+            name: {{ include "roundcube.fullname" . }}-custom
+        {{- end }}
+        {{- with .Values.roundcube.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

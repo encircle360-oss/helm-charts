@@ -1,0 +1,36 @@
+# Test values for Roundcube chart CI
+# This file contains values used for chart testing
+
+roundcube:
+  defaultHost: "ssl://imap.example.com"
+  defaultPort: 993
+  smtpServer: "tls://smtp.example.com"
+  smtpPort: 587
+  desKey: "testdeskey123456789012"
+
+database:
+  type: sqlite
+
+persistence:
+  enabled: true
+  size: 1Gi
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5

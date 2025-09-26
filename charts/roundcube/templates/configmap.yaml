@@ -1,0 +1,11 @@
+{{- if .Values.roundcube.customConfig }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "roundcube.fullname" . }}-custom
+  labels:
+    {{- include "roundcube.labels" . | nindent 4 }}
+data:
+  config.inc.php: |
+{{ .Values.roundcube.customConfig | indent 4 }}
+{{- end }}

@@ -1,0 +1,29 @@
+# General
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.iml
+
+# Helm
+*.tgz
+charts/*/charts/
+charts/*/Chart.lock
+
+# Testing
+.coverage/
+*.log
+test-results/
+
+# Build
+dist/
+build/
+*.tar.gz
+
+# Documentation
+site/
+
+# CI/CD
+.github/workflows/test-*
