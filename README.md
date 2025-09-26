@@ -59,9 +59,28 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ## Support & Professional Services
 
-- Create an [Issue](https://github.com/encircle360-oss/helm-charts/issues) for bug reports and feature requests
-- Start a [Discussion](https://github.com/encircle360-oss/helm-charts/discussions) for questions and general support
-- For professional support, consulting, or custom development, contact us at **hello@encircle360.com**
+### Community Support
+
+- **Chart Issues**: Create an [Issue](https://github.com/encircle360-oss/helm-charts/issues) for Helm chart bugs and feature requests
+- **General Questions**: Start a [Discussion](https://github.com/encircle360-oss/helm-charts/discussions) for questions and general support
+- **Application Bugs**: For bugs within the applications themselves (not chart-related), please report them to the respective upstream project:
+  - Roundcube: [roundcube/roundcubemail](https://github.com/roundcube/roundcubemail/issues)
+
+### Professional Support
+
+For professional support, consulting, custom development, or enterprise solutions, contact us at **hello@encircle360.com**
+
+## Disclaimer
+
+These Helm charts are provided "AS IS" without warranty of any kind, either express or implied, including but not limited to the implied warranties of merchantability, fitness for a particular purpose, or non-infringement.
+
+While we strive to maintain high-quality charts and test them thoroughly, you acknowledge that:
+- You use these charts at your own risk
+- We recommend thorough testing in non-production environments before production deployment
+- Charts may contain bugs or security vulnerabilities
+- We are not liable for any damages or losses resulting from the use of these charts
+
+For production deployments requiring guaranteed support and SLAs, please contact us about our professional services at **hello@encircle360.com**.
 
 ## License
 

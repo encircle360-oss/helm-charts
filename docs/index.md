@@ -64,15 +64,24 @@ This project is maintained and sponsored by **[encircle360 GmbH](https://encircl
 
 ### Community Support
 
-If you encounter any problems or have questions, please:
-
-1. Check the [documentation](https://encircle360-oss.github.io/helm-charts/)
-2. Search through [existing issues](https://github.com/encircle360-oss/helm-charts/issues)
-3. Open a [new issue](https://github.com/encircle360-oss/helm-charts/issues/new) if needed
+- **Chart Issues**: For Helm chart bugs and feature requests, [create an issue](https://github.com/encircle360-oss/helm-charts/issues)
+- **General Questions**: For questions and discussions, use [GitHub Discussions](https://github.com/encircle360-oss/helm-charts/discussions)
+- **Application Bugs**: For bugs within the applications themselves (not chart-related), please report them to the respective upstream project
 
 ### Professional Support
 
 For professional support, consulting, custom development, or enterprise solutions, contact us at **hello@encircle360.com**
+
+## Disclaimer
+
+These Helm charts are provided "AS IS" without warranty of any kind. While we strive to maintain high-quality charts and test them thoroughly:
+
+- You use these charts at your own risk
+- We recommend thorough testing in non-production environments first
+- Charts may contain bugs or security vulnerabilities
+- We are not liable for any damages or losses resulting from the use of these charts
+
+For production deployments requiring guaranteed support and SLAs, please contact us about our professional services.
 
 ## Chart Sources
 
