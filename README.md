@@ -31,7 +31,7 @@ helm install my-release encircle360-oss/<chart-name>
 
 | Chart | Description | Chart Version | App Version |
 |-------|-------------|---------------|--------------|
-| [roundcube](./charts/roundcube) | A free and open source webmail solution | 0.1.0 | 1.6.11 |
+| [roundcube](./charts/roundcube) | A free and open source webmail solution | 0.2.0 | 1.6.11 |
 
 ## Development
 
