@@ -137,6 +137,50 @@ roundcube:
     // Additional custom configuration
 ```
 
+### Multi-Domain Support
+
+Roundcube can serve multiple domains with completely different configurations:
+
+```yaml
+roundcube:
+  multiDomain:
+    enabled: true
+    domains:
+      - name: "mail.example.com"
+        config: |
+          $config['default_host'] = 'ssl://imap.example.com:993';
+          $config['smtp_server'] = 'tls://smtp.example.com:587';
+          $config['managesieve_host'] = 'imap.example.com';
+          $config['managesieve_port'] = 4190;
+          $config['plugins'] = array('managesieve', 'password', 'archive');
+      - name: "mail.company.org"
+        config: |
+          $config['default_host'] = 'ssl://mail.company.org:993';
+          $config['smtp_server'] = 'ssl://mail.company.org:465';
+          $config['smtp_conn_options'] = array(
+            'ssl' => array('verify_peer' => false)
+          );
+          $config['password_algorithm'] = 'sha256-crypt';
+          $config['password_db_dsn'] = 'mysql://user:pass@localhost/users';
+          $config['plugins'] = array('password', 'vacation', 'forward');
+
+ingress:
+  enabled: true
+  hosts:
+    - host: mail.example.com
+      paths:
+        - path: /
+    - host: mail.company.org
+      paths:
+        - path: /
+```
+
+With this configuration:
+- Each domain can have **completely different** settings
+- Full control over IMAP, SMTP, ManageSieve, OAuth, plugins, etc.
+- Users accessing different domains get their specific configuration
+- Fallback to default settings if domain is not configured
+
 {{ template "chart.maintainersSection" . }}
 
 {{ template "chart.sourcesSection" . }}

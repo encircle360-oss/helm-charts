@@ -1,0 +1,65 @@
+# Test values for Multi-Domain setup
+roundcube:
+  multiDomain:
+    enabled: true
+    domains:
+      - name: "mail.example.com"
+        config: |
+          $config['default_host'] = 'ssl://imap.example.com:993';
+          $config['smtp_server'] = 'tls://smtp.example.com:587';
+          $config['managesieve_host'] = 'imap.example.com';
+          $config['managesieve_port'] = 4190;
+          $config['managesieve_usetls'] = true;
+          $config['plugins'] = array('archive', 'zipdownload', 'managesieve');
+      - name: "mail.company.org"
+        config: |
+          $config['default_host'] = 'ssl://mail.company.org:993';
+          $config['smtp_server'] = 'tls://mail.company.org:587';
+          $config['smtp_port'] = 465;
+          $config['smtp_conn_options'] = array(
+            'ssl' => array(
+              'verify_peer' => false,
+              'verify_peer_name' => false,
+            ),
+          );
+          $config['password_algorithm'] = 'sha256-crypt';
+          $config['plugins'] = array('archive', 'zipdownload', 'password');
+      - name: "webmail.internal.local"
+        config: |
+          $config['default_host'] = 'ssl://mailserver.internal.local:993';
+          $config['smtp_server'] = 'tls://mailserver.internal.local:587';
+          $config['ldap_public'] = array(
+            'Addressbook' => array(
+              'hosts' => array('ldap.internal.local'),
+              'base_dn' => 'ou=users,dc=internal,dc=local',
+              'bind_dn' => 'cn=roundcube,dc=internal,dc=local',
+            ),
+          );
+          $config['plugins'] = array('archive', 'zipdownload', 'ldap_addressbook');
+  # Fallback configuration
+  defaultHost: "ssl://imap.example.com"
+  smtpServer: "tls://smtp.example.com"
+
+database:
+  type: sqlite
+
+persistence:
+  enabled: true
+  size: 1Gi
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: mail.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: mail.company.org
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: webmail.internal.local
+      paths:
+        - path: /
+          pathType: Prefix
