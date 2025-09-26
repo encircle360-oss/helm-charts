@@ -160,7 +160,7 @@ spec:
             - name: logs
               mountPath: {{ .Values.persistence.logsPath }}
             {{- end }}
-            {{- if .Values.roundcube.customConfig }}
+            {{- if or .Values.roundcube.customConfig .Values.roundcube.multiDomain.enabled }}
             - name: custom-config
               mountPath: /var/roundcube/config/config.inc.php
               subPath: config.inc.php
@@ -183,7 +183,7 @@ spec:
         - name: logs
           emptyDir: {}
         {{- end }}
-        {{- if .Values.roundcube.customConfig }}
+        {{- if or .Values.roundcube.customConfig .Values.roundcube.multiDomain.enabled }}
         - name: custom-config
           configMap:
             name: {{ include "roundcube.fullname" . }}-custom

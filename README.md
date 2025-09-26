@@ -1,10 +1,10 @@
-# Encircle360 OSS Helm Charts
+# encircle360 OSS Helm Charts
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/encircle360-oss)](https://artifacthub.io/packages/search?repo=encircle360-oss)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GitHub Release](https://img.shields.io/github/release/encircle360-oss/helm-charts.svg?style=flat)](https://github.com/encircle360-oss/helm-charts/releases)
 
-A collection of Helm charts for various open-source applications, maintained by Encircle360 OSS.
+A collection of Helm charts for various open-source applications, maintained by encircle360 GmbH and the open source community.
 
 ## Usage
 
@@ -31,7 +31,7 @@ helm install my-release encircle360-oss/<chart-name>
 
 | Chart | Description | Chart Version | App Version |
 |-------|-------------|---------------|--------------|
-| [roundcube](./charts/roundcube) | A free and open source webmail solution | 0.1.0 | 1.6.11 |
+| [roundcube](./charts/roundcube) | A free and open source webmail solution | 0.2.0 | 1.6.11 |
 
 ## Development
 

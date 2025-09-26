@@ -39,6 +39,15 @@ jobs:
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo update
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install MkDocs dependencies
+        run: |
+          pip install -r requirements.txt
+
       - name: Build chart packages
         run: |
           mkdir -p .deploy
@@ -52,6 +61,15 @@ jobs:
       - name: Create index.yaml
         run: |
           helm repo index .deploy --url https://${{ github.repository_owner }}.github.io/helm-charts/
+
+      - name: Build MkDocs documentation
+        run: |
+          mkdocs build -d .deploy-docs
+
+      - name: Merge Helm packages and docs
+        run: |
+          mv .deploy-docs/* .deploy/
+          rm -rf .deploy-docs
           
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -70,4 +88,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@v4
