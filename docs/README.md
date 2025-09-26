@@ -8,17 +8,17 @@ This directory contains the MkDocs-based documentation for the encircle360 OSS H
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -r docs/requirements.txt
+pip install -r requirements.txt
 ```
 
 2. Serve the documentation locally:
 ```bash
-mkdocs serve -f docs/mkdocs.yml
+mkdocs serve
 ```
 
 3. Build the documentation:
 ```bash
-mkdocs build -f docs/mkdocs.yml
+mkdocs build
 ```
 
 ## Structure
@@ -29,8 +29,6 @@ mkdocs build -f docs/mkdocs.yml
   - `plugins/` - Custom MkDocs plugins
   - `stylesheets/` - Custom CSS styles
   - `overrides/` - Theme overrides
-- `mkdocs.yml` - MkDocs configuration
-- `requirements.txt` - Python dependencies
 
 ## How it Works
 

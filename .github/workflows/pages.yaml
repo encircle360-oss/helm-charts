@@ -46,7 +46,7 @@ jobs:
 
       - name: Install MkDocs dependencies
         run: |
-          pip install -r docs/requirements.txt
+          pip install -r requirements.txt
 
       - name: Build chart packages
         run: |
@@ -64,12 +64,12 @@ jobs:
 
       - name: Build MkDocs documentation
         run: |
-          mkdocs build -f docs/mkdocs.yml -d .deploy
+          mkdocs build -d .deploy-docs
 
-      - name: Move Helm packages to docs
+      - name: Merge Helm packages and docs
         run: |
-          mv .deploy/*.tgz .deploy/charts/ 2>/dev/null || mkdir -p .deploy/charts
-          mv .deploy/index.yaml .deploy/
+          mv .deploy-docs/* .deploy/
+          rm -rf .deploy-docs
           
       - name: Setup Pages
         uses: actions/configure-pages@v4

@@ -27,5 +27,10 @@ site/
 .venv/
 docs/site/
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
 # CI/CD
 .github/workflows/test-*

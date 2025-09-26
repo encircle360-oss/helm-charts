@@ -7,6 +7,8 @@ repo_name: encircle360-oss/helm-charts
 repo_url: https://github.com/encircle360-oss/helm-charts
 edit_uri: edit/main/docs/
 
+docs_dir: docs
+
 theme:
   name: material
   custom_dir: docs/overrides
@@ -59,7 +61,7 @@ plugins:
       fallback_to_build_date: true
   - mkdocs-simple-hooks:
       hooks:
-        on_page_markdown: "docs.docs.plugins.process_chart_readmes:on_page_markdown"
+        on_page_markdown: "plugins.process_chart_readmes:on_page_markdown"
 
 markdown_extensions:
   - admonition
@@ -92,7 +94,7 @@ extra:
       link: https://github.com/encircle360-oss
   
 extra_css:
-  - stylesheets/extra.css
+  - docs/stylesheets/extra.css
 
 nav:
   - Home: index.md
