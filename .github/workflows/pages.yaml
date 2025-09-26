@@ -70,6 +70,8 @@ jobs:
         run: |
           mv .deploy-docs/* .deploy/
           rm -rf .deploy-docs
+          # Copy artifacthub-repo.yml for ArtifactHub discovery
+          cp artifacthub-repo.yml .deploy/
           
       - name: Setup Pages
         uses: actions/configure-pages@v5
