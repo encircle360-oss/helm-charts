@@ -1,0 +1,100 @@
+site_name: encircle360 OSS Helm Charts
+site_url: https://encircle360-oss.github.io/helm-charts/
+site_author: encircle360 GmbH
+site_description: A collection of open source Helm charts maintained by encircle360 GmbH
+
+repo_name: encircle360-oss/helm-charts
+repo_url: https://github.com/encircle360-oss/helm-charts
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  logo: https://avatars.githubusercontent.com/u/186854451
+  favicon: https://avatars.githubusercontent.com/u/186854451
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  features:
+    - content.code.copy
+    - content.action.edit
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+
+plugins:
+  - search
+  - tags
+  - minify:
+      minify_html: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+  - git-revision-date-localized:
+      enable_creation_date: true
+      fallback_to_build_date: true
+  - mkdocs-simple-hooks:
+      hooks:
+        on_page_markdown: "docs.docs.plugins.process_chart_readmes:on_page_markdown"
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - tables
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/encircle360-oss
+  
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Home: index.md
+  - Charts:
+    - Roundcube: charts/roundcube.md

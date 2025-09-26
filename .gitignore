@@ -24,6 +24,8 @@ build/
 
 # Documentation
 site/
+.venv/
+docs/site/
 
 # CI/CD
 .github/workflows/test-*
