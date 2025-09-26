@@ -11,17 +11,17 @@ data:
     <?php
     // Multi-domain configuration
     // This allows different settings per domain
-    
+
     // Default configuration (fallback)
     $config['default_host'] = '{{ .Values.roundcube.defaultHost }}';
     $config['smtp_server'] = '{{ .Values.roundcube.smtpServer }}';
     $config['smtp_port'] = {{ .Values.roundcube.smtpPort }};
     $config['smtp_user'] = '{{ .Values.roundcube.smtpUser }}';
     $config['smtp_pass'] = '{{ .Values.roundcube.smtpPass }}';
-    
+
     // Get current host
     $current_host = $_SERVER['HTTP_HOST'] ?? '';
-    
+
     // Per-domain configuration
     switch($current_host) {
     {{- range .Values.roundcube.multiDomain.domains }}
@@ -35,7 +35,7 @@ data:
             // Use default configuration
             break;
     }
-    
+
     // Common settings for all domains (can be overridden above)
     if (!isset($config['smtp_user'])) {
         $config['smtp_user'] = '%u';
