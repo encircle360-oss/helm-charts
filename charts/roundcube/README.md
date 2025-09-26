@@ -327,7 +327,7 @@ replicaCount: 3
 roundcube:
   defaultHost: "ssl://mail.company.com"
   smtpServer: "tls://mail.company.com"
- 
+
 database:
   type: mysql
   external:
@@ -335,11 +335,11 @@ database:
     name: roundcube_prod
     user: roundcube
     existingSecret: roundcube-db-secret
-   
+
 redis:
   enabled: true
   host: redis.company.local
- 
+
 ingress:
   enabled: true
   className: nginx
