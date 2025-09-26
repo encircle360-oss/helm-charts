@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GitHub Release](https://img.shields.io/github/release/encircle360-oss/helm-charts.svg?style=flat)](https://github.com/encircle360-oss/helm-charts/releases)
 
-A collection of Helm charts for various open-source applications, maintained by Encircle360 OSS.
+A collection of Helm charts for various open-source applications, maintained by encircle360 GmbH and the open source community.
 
 ## Usage
 
