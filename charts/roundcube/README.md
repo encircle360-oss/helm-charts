@@ -1,6 +1,6 @@
 # roundcube
 
-![Version: 0.2.2](https://img.shields.io/badge/Version-0.2.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
+![Version: 0.2.3](https://img.shields.io/badge/Version-0.2.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
 
 A free and open source webmail solution with a desktop-like user interface
 
@@ -408,6 +408,15 @@ For Roundcube specific issues:
 ### Professional Support
 
 For professional support, consulting, custom development, or enterprise solutions, contact **hello@encircle360.com**
+
+## Disclaimer
+
+This Helm chart is provided "AS IS" without warranty of any kind. encircle360 GmbH and the contributors:
+- Make no warranties about the completeness, reliability, or accuracy of this chart
+- Are not liable for any damages arising from the use of this chart
+- Recommend thorough testing in non-production environments before production use
+
+Use this chart at your own risk. For production deployments with SLA requirements, consider our professional support services.
 
 ## License
 
