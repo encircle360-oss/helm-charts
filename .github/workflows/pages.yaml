@@ -52,7 +52,7 @@ jobs:
       - name: Create index.yaml
         run: |
           helm repo index .deploy --url https://${{ github.repository_owner }}.github.io/helm-charts/
-          
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 

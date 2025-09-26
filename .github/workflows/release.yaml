@@ -54,10 +54,10 @@ jobs:
             if [ -f "${chart}Chart.yaml" ]; then
               chart_name=$(basename $chart)
               chart_version=$(grep '^version:' ${chart}Chart.yaml | awk '{print $2}')
-              
+
               # Package chart
               helm package $chart
-              
+
               # Push to OCI registry
               helm push ${chart_name}-${chart_version}.tgz oci://ghcr.io/${{ github.repository_owner }}/charts
             fi

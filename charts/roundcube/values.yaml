@@ -158,6 +158,27 @@ roundcube:
   extraVolumes: []
   # Custom configuration (will be mounted as config.inc.php)
   customConfig: ""
+  # Multi-domain configuration (simplified setup for multiple IMAP servers)
+  # When enabled, will auto-generate config for multiple domains
+  multiDomain:
+    enabled: false
+    # List of domain configurations
+    domains: []
+    # Example:
+    # - name: "example.com"
+    #   config: |
+    #     $config['default_host'] = 'ssl://imap.example.com:993';
+    #     $config['smtp_server'] = 'tls://smtp.example.com:587';
+    #     $config['managesieve_host'] = 'tls://imap.example.com:4190';
+    #     $config['managesieve_usetls'] = true;
+    # - name: "company.org"
+    #   config: |
+    #     $config['default_host'] = 'ssl://mail.company.org:993';
+    #     $config['smtp_server'] = 'tls://mail.company.org:587';
+    #     $config['managesieve_host'] = 'mail.company.org';
+    #     $config['managesieve_port'] = 4190;
+    #     $config['password_algorithm'] = 'sha256-crypt';
+    #     $config['password_db_dsn'] = 'mysql://user:pass@localhost/postfix';
   # DES key for encryption (auto-generated if not set)
   desKey: ""
 

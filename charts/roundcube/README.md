@@ -1,11 +1,10 @@
-{{ template "chart.header" . }}
-{{ template "chart.deprecationWarning" . }}
+# roundcube
 
-{{ template "chart.badgesSection" . }}
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
 
-{{ template "chart.description" . }}
+A free and open source webmail solution with a desktop-like user interface
 
-{{ template "chart.homepageLine" . }}
+**Homepage:** <https://github.com/encircle360-oss/helm-charts/tree/main/charts/roundcube>
 
 ## Introduction
 
@@ -181,13 +180,126 @@ With this configuration:
 - Users accessing different domains get their specific configuration
 - Fallback to default settings if domain is not configured
 
-{{ template "chart.maintainersSection" . }}
+## Maintainers
 
-{{ template "chart.sourcesSection" . }}
+| Name | Email | Url |
+| ---- | ------ | --- |
+| encircle360-oss | <oss@encircle360.com> |  |
 
-{{ template "chart.requirementsSection" . }}
+## Source Code
 
-{{ template "chart.valuesSection" . }}
+* <https://github.com/roundcube/roundcubemail>
+* <https://github.com/encircle360-oss/helm-charts>
+
+## Values
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| affinity | object | `{}` |  |
+| autoscaling.enabled | bool | `false` |  |
+| autoscaling.maxReplicas | int | `10` |  |
+| autoscaling.minReplicas | int | `1` |  |
+| autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
+| database.external.existingSecret | string | `""` |  |
+| database.external.existingSecretPasswordKey | string | `"password"` |  |
+| database.external.existingSecretUserKey | string | `"username"` |  |
+| database.external.host | string | `""` |  |
+| database.external.name | string | `"roundcube"` |  |
+| database.external.password | string | `""` |  |
+| database.external.port | int | `3306` |  |
+| database.external.user | string | `"roundcube"` |  |
+| database.type | string | `"sqlite"` |  |
+| fullnameOverride | string | `""` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.repository | string | `"roundcube/roundcubemail"` |  |
+| image.tag | string | `""` |  |
+| imagePullSecrets | list | `[]` |  |
+| ingress.annotations | object | `{}` |  |
+| ingress.className | string | `""` |  |
+| ingress.enabled | bool | `false` |  |
+| ingress.hosts[0].host | string | `"webmail.example.com"` |  |
+| ingress.hosts[0].paths[0].path | string | `"/"` |  |
+| ingress.hosts[0].paths[0].pathType | string | `"Prefix"` |  |
+| ingress.tls | list | `[]` |  |
+| initContainers | list | `[]` |  |
+| livenessProbe.enabled | bool | `true` |  |
+| livenessProbe.failureThreshold | int | `3` |  |
+| livenessProbe.initialDelaySeconds | int | `30` |  |
+| livenessProbe.periodSeconds | int | `10` |  |
+| livenessProbe.successThreshold | int | `1` |  |
+| livenessProbe.timeoutSeconds | int | `5` |  |
+| memcached.enabled | bool | `false` |  |
+| memcached.host | string | `""` |  |
+| memcached.port | int | `11211` |  |
+| nameOverride | string | `""` |  |
+| nodeSelector | object | `{}` |  |
+| persistence.accessMode | string | `"ReadWriteOnce"` |  |
+| persistence.enabled | bool | `true` |  |
+| persistence.existingClaim | string | `""` |  |
+| persistence.logsPath | string | `"/var/roundcube/logs"` |  |
+| persistence.size | string | `"5Gi"` |  |
+| persistence.sqlitePath | string | `"/var/roundcube/db"` |  |
+| persistence.storageClass | string | `""` |  |
+| persistence.tempPath | string | `"/tmp/roundcube"` |  |
+| podAnnotations | object | `{}` |  |
+| podSecurityContext.fsGroup | int | `33` |  |
+| podSecurityContext.runAsNonRoot | bool | `true` |  |
+| podSecurityContext.runAsUser | int | `33` |  |
+| readinessProbe.enabled | bool | `true` |  |
+| readinessProbe.failureThreshold | int | `3` |  |
+| readinessProbe.initialDelaySeconds | int | `5` |  |
+| readinessProbe.periodSeconds | int | `10` |  |
+| readinessProbe.successThreshold | int | `1` |  |
+| readinessProbe.timeoutSeconds | int | `5` |  |
+| redis.enabled | bool | `false` |  |
+| redis.existingSecret | string | `""` |  |
+| redis.existingSecretPasswordKey | string | `"password"` |  |
+| redis.host | string | `""` |  |
+| redis.password | string | `""` |  |
+| redis.port | int | `6379` |  |
+| replicaCount | int | `1` |  |
+| resources.limits.memory | string | `"512Mi"` |  |
+| resources.requests.cpu | string | `"100m"` |  |
+| resources.requests.memory | string | `"256Mi"` |  |
+| roundcube.customConfig | string | `""` |  |
+| roundcube.defaultHost | string | `"ssl://mail.example.com"` |  |
+| roundcube.defaultPort | int | `993` |  |
+| roundcube.desKey | string | `""` |  |
+| roundcube.extraEnvVars | list | `[]` |  |
+| roundcube.extraVolumeMounts | list | `[]` |  |
+| roundcube.extraVolumes | list | `[]` |  |
+| roundcube.multiDomain.domains | list | `[]` |  |
+| roundcube.multiDomain.enabled | bool | `false` |  |
+| roundcube.plugins[0] | string | `"archive"` |  |
+| roundcube.plugins[1] | string | `"zipdownload"` |  |
+| roundcube.plugins[2] | string | `"managesieve"` |  |
+| roundcube.productName | string | `"Roundcube Webmail"` |  |
+| roundcube.skin | string | `"elastic"` |  |
+| roundcube.smtpPass | string | `"%p"` |  |
+| roundcube.smtpPort | int | `587` |  |
+| roundcube.smtpServer | string | `"tls://mail.example.com"` |  |
+| roundcube.smtpUser | string | `"%u"` |  |
+| roundcube.supportUrl | string | `""` |  |
+| roundcube.uploadMaxFilesize | string | `"25M"` |  |
+| securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| securityContext.readOnlyRootFilesystem | bool | `false` |  |
+| service.annotations | object | `{}` |  |
+| service.port | int | `80` |  |
+| service.targetPort | int | `80` |  |
+| service.type | string | `"ClusterIP"` |  |
+| serviceAccount.annotations | object | `{}` |  |
+| serviceAccount.create | bool | `true` |  |
+| serviceAccount.name | string | `""` |  |
+| sidecarContainers | list | `[]` |  |
+| startupProbe.enabled | bool | `false` |  |
+| startupProbe.failureThreshold | int | `30` |  |
+| startupProbe.initialDelaySeconds | int | `0` |  |
+| startupProbe.periodSeconds | int | `10` |  |
+| startupProbe.successThreshold | int | `1` |  |
+| startupProbe.timeoutSeconds | int | `5` |  |
+| tolerations | list | `[]` |  |
 
 ## Examples
 
