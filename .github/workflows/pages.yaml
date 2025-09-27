@@ -10,6 +10,9 @@ on:
       - 'requirements.txt'
       - 'README.md'
       - 'artifacthub-repo.yml'
+      - 'charts/**/README.md.gotmpl'
+      - 'charts/**/README.md'
+      - 'charts/**/Chart.yaml'
   workflow_dispatch:
 
 permissions:
