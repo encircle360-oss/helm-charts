@@ -3,6 +3,40 @@ entries:
   roundcube:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: Critical bug where plugin configs mounted before composer install caused "Could not delete config.inc.php" errors
+        - kind: changed
+          description: Plugin configs now copied after composer installation via init script to avoid mount conflicts
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/bitnami/postgresql
+        - url: https://artifacthub.io/packages/helm/bitnami/mariadb
+    apiVersion: v2
+    appVersion: 1.6.11
+    created: "2025-09-27T09:27:30.83818092Z"
+    description: A free and open source webmail solution with a desktop-like user
+      interface
+    digest: a350edbd1e250dc295682cbc4a1ec3f8db8ff1bcde9b1ac0a208b9a8700aa9ec
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/roundcube
+    icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/elastic/images/logo.svg
+    keywords:
+    - roundcube
+    - webmail
+    - email
+    - mail
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: roundcube
+    sources:
+    - https://github.com/roundcube/roundcubemail
+    - https://github.com/encircle360-oss/helm-charts
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.3.2/roundcube-0.3.2.tgz
+    version: 0.3.2
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: Direct support for composerPlugins with ROUNDCUBEMAIL_COMPOSER_PLUGINS env var
         - kind: added
@@ -151,4 +185,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-09-27T09:08:59.695433081Z"
+generated: "2025-09-27T09:27:30.838204815Z"
