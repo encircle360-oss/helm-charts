@@ -6,6 +6,8 @@
 
 A collection of Helm charts for various open-source applications, maintained by encircle360 GmbH and the open source community.
 
+**Documentation**: [https://encircle360-oss.github.io/helm-charts/](https://encircle360-oss.github.io/helm-charts/)
+
 ## Usage
 
 ### Add Helm Repository

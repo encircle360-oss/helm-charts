@@ -1,0 +1,68 @@
+site_name: encircle360 OSS Helm Charts
+site_url: https://encircle360-oss.github.io/helm-charts/
+site_description: Production-ready Helm charts for Kubernetes applications
+site_author: encircle360 GmbH
+repo_name: encircle360-oss/helm-charts
+repo_url: https://github.com/encircle360-oss/helm-charts
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: en
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Charts:
+    - Roundcube: charts/roundcube.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/encircle360-oss
+    - icon: fontawesome/solid/globe
+      link: https://encircle360.com

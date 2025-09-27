@@ -1,25 +1,29 @@
-name: Deploy GitHub Pages
+name: Deploy Documentation
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'README.md'
+      - 'charts/**/README.md.gotmpl'
+      - '.github/workflows/pages.yaml'
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  build:
+  deploy-docs:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout main branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -29,45 +33,67 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          version: v3.16.3
+          python-version: '3.x'
 
-      - name: Add dependency repositories
+      - name: Install MkDocs and dependencies
         run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo update
+          pip install mkdocs-material
+          pip install mkdocs-minify-plugin
 
-      - name: Build chart packages
+      - name: Install helm-docs
         run: |
-          mkdir -p .deploy
+          cd /tmp
+          wget https://github.com/norwoodj/helm-docs/releases/download/v1.14.2/helm-docs_1.14.2_Linux_x86_64.tar.gz
+          tar -xzf helm-docs_1.14.2_Linux_x86_64.tar.gz
+          sudo mv helm-docs /usr/local/bin/
+          helm-docs --version
+
+      - name: Generate chart documentation
+        run: |
           for chart in charts/*/; do
             if [ -f "${chart}Chart.yaml" ]; then
-              helm dependency build "$chart"
-              helm package "$chart" -d .deploy
+              echo "Generating docs for $chart"
+              helm-docs -c "$chart"
             fi
           done
 
-      - name: Create index.yaml
+      - name: Copy chart READMEs to docs
         run: |
-          helm repo index .deploy --url https://${{ github.repository_owner }}.github.io/helm-charts/
+          mkdir -p docs/charts
+          for chart in charts/*/; do
+            chart_name=$(basename "$chart")
+            if [ -f "${chart}README.md" ]; then
+              cp "${chart}README.md" "docs/charts/${chart_name}.md"
+            fi
+          done
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
+      - name: Build MkDocs site
+        run: mkdocs build
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.deploy'
+      - name: Checkout gh-pages branch
+        run: |
+          git fetch origin gh-pages
+          git checkout gh-pages
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Clear old documentation (keep index.yaml and .tgz)
+        run: |
+          # Remove old MkDocs files but keep Helm repository files
+          find . -maxdepth 1 ! -name '.git' ! -name 'index.yaml' ! -name '*.tgz' ! -name 'robots.txt' ! -name 'artifacthub-repo.yml' ! -name '.' -exec rm -rf {} + 2>/dev/null || true
+
+      - name: Copy new documentation
+        run: |
+          cp -r site/* .
+          rm -rf site
+
+      - name: Commit and push changes
+        run: |
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Deploy documentation from ${GITHUB_SHA}"
+            git push origin gh-pages
+          fi

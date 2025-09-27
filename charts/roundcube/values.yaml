@@ -146,6 +146,35 @@ roundcube:
     - archive
     - zipdownload
     - managesieve
+  # Composer plugins to install via composer during init
+  # These plugins will be installed in an init container before the main container starts
+  # Example:
+  # composerPlugins:
+  #   - johndoh/contextmenu
+  #   - sblaisot/automatic_addressbook
+  #   - texxasrulez/persistent_login
+  composerPlugins: []
+  # Plugin-specific configuration files
+  # Each plugin can have its own config.inc.php that will be copied after installation
+  # Supports secret interpolation using {{ secret_key }} syntax
+  # Example:
+  # pluginConfigs:
+  #   identity_from_directory: |
+  #     <?php
+  #     $config['identity_from_directory_ldap_host'] = ['ldap://localhost:389'];
+  #     $config['identity_from_directory_ldap_bind_pass'] = '{{ ldap_bind_pass }}';
+  pluginConfigs: {}
+  # Secrets for plugin configuration
+  # Values will be base64 encoded and stored in a Kubernetes Secret
+  # Use {{ secret_key }} in pluginConfigs to reference these secrets
+  # Example:
+  # pluginSecrets:
+  #   ldap_bind_pass: "my-secret-password"
+  #   api_token: "my-api-token"
+  pluginSecrets: {}
+  # Use an existing secret for plugin secrets instead of creating a new one
+  # The secret should contain keys matching the {{ secret_key }} placeholders in pluginConfigs
+  pluginSecretsExistingSecret: ""
   # Skin
   skin: "elastic"
   # Upload max filesize
