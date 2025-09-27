@@ -3,6 +3,38 @@ entries:
   roundcube:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          description: Update documentation to reflect v0.7.0 architecture changes (direct ConfigMap mounts, getenv() for secrets)
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/bitnami/postgresql
+        - url: https://artifacthub.io/packages/helm/bitnami/mariadb
+    apiVersion: v2
+    appVersion: 1.6.11
+    created: "2025-09-27T13:44:12.986699966Z"
+    description: A free and open source webmail solution with a desktop-like user
+      interface
+    digest: a478afa758cb7c4967d05e84524ec7542512b561de8e8b25b04a08cf9b40d6b8
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/roundcube
+    icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/elastic/images/logo.svg
+    keywords:
+    - roundcube
+    - webmail
+    - email
+    - mail
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: roundcube
+    sources:
+    - https://github.com/roundcube/roundcubemail
+    - https://github.com/encircle360-oss/helm-charts
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.7.2/roundcube-0.7.2.tgz
+    version: 0.7.2
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: Sanitize plugin names for Kubernetes resource names (replace underscores with hyphens)
       artifacthub.io/license: Apache-2.0
@@ -547,4 +579,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-09-27T13:42:53.397196002Z"
+generated: "2025-09-27T13:44:12.986810922Z"
