@@ -115,6 +115,13 @@ spec:
             - name: ROUNDCUBEMAIL_MEMCACHED_PORT
               value: {{ .Values.memcached.port | quote }}
             {{- end }}
+            {{- range $key, $value := .Values.roundcube.secretEnvVars }}
+            - name: {{ $key }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "roundcube.fullname" $ }}-env
+                  key: {{ $key }}
+            {{- end }}
             {{- with .Values.roundcube.extraEnvVars }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

@@ -157,7 +157,18 @@ roundcube:
   skin: "elastic"
   # Upload max filesize
   uploadMaxFilesize: "25M"
-  # Extra environment variables
+  # Secret environment variables
+  # These will be stored in a Kubernetes Secret and injected as environment variables
+  # Use this for sensitive values like passwords, API keys, OAuth secrets, etc.
+  # Reference these in pluginConfigs using getenv('VAR_NAME')
+  # Example:
+  # secretEnvVars:
+  #   LDAP_BIND_PASSWORD: "my-secret-password"
+  #   API_KEY: "my-api-key"
+  #   OAUTH_CLIENT_SECRET: "oauth-secret"
+  secretEnvVars: {}
+  # Extra environment variables (for non-sensitive values or external secret references)
+  # For sensitive values, prefer secretEnvVars above
   extraEnvVars: []
   # Extra volume mounts
   extraVolumeMounts: []

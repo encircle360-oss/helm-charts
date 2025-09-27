@@ -1,6 +1,6 @@
 # roundcube
 
-![Version: 0.7.1](https://img.shields.io/badge/Version-0.7.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
+![Version: 0.8.0](https://img.shields.io/badge/Version-0.8.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
 
 A free and open source webmail solution with a desktop-like user interface
 
@@ -193,7 +193,9 @@ This will:
 
 ### Plugin-Specific Configuration with Secrets
 
-For sensitive plugin configuration values (passwords, API tokens, OAuth secrets), use standard Kubernetes Secrets with environment variables:
+For sensitive plugin configuration values (passwords, API tokens, OAuth secrets), use the `secretEnvVars` feature for a fully declarative approach:
+
+**Option 1: Using secretEnvVars (Recommended - Fully Declarative)**
 
 ```yaml
 roundcube:
@@ -206,54 +208,62 @@ roundcube:
       $config['identity_from_directory_ldap_base_dn'] = 'dc=example,dc=com';
       $config['identity_from_directory_ldap_bind_dn'] = 'cn=admin,dc=example,dc=com';
       $config['identity_from_directory_ldap_bind_pass'] = getenv('LDAP_BIND_PASSWORD');
+  secretEnvVars:
+    LDAP_BIND_PASSWORD: "my-secret-password"
+    API_KEY: "my-api-key"
+    OAUTH_CLIENT_SECRET: "oauth-secret"
+```
+
+This will:
+- Automatically create a Kubernetes Secret
+- Inject environment variables into the container
+- Work with SOPS/sealed-secrets by encrypting your `values.yaml` or separate `secrets.yaml`
+- No external Secret creation or Helmfile hooks needed
+
+**Security with SOPS:**
+
+```bash
+# Encrypt your values file with SOPS
+sops -e values.yaml > values.enc.yaml
+
+# Deploy with encrypted values
+helm secrets upgrade my-release ./roundcube -f values.enc.yaml
+```
+
+**Option 2: Using External Secrets (For existing secret management solutions)**
+
+```yaml
+roundcube:
+  pluginConfigs:
+    identity_from_directory: |
+      <?php
+      $config['identity_from_directory_ldap_bind_pass'] = getenv('LDAP_BIND_PASSWORD');
   extraEnvVars:
     - name: LDAP_BIND_PASSWORD
       valueFrom:
         secretKeyRef:
-          name: my-ldap-secret
+          name: my-existing-secret
           key: password
 ```
 
-**Create the Secret separately:**
+You must create the Secret separately (manually or via external-secrets operator):
 
 ```yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: my-ldap-secret
+  name: my-existing-secret
 type: Opaque
 stringData:
   password: my-secret-password
 ```
 
 **Security Benefits**:
-- Follows standard Kubernetes patterns (ConfigMap for config, Secret for secrets)
+- `secretEnvVars`: Fully declarative, works with SOPS/sealed-secrets, no external tools needed
+- `extraEnvVars`: Supports external secret management (External Secrets Operator, Vault, etc.)
 - Secrets separated from configuration
-- Can be encrypted with tools like SOPS, sealed-secrets, or external secret operators
 - Secrets never stored in ConfigMaps
-- Support for any secret management solution via `extraEnvVars`
-
-**Alternative: Using existingSecret with multiple keys:**
-
-```yaml
-roundcube:
-  pluginConfigs:
-    my_plugin: |
-      <?php
-      $config['api_token'] = getenv('API_TOKEN');
-      $config['oauth_secret'] = getenv('OAUTH_SECRET');
-  extraEnvVars:
-    - name: API_TOKEN
-      valueFrom:
-        secretKeyRef:
-          name: my-existing-secret
-          key: api_token
-    - name: OAUTH_SECRET
-      valueFrom:
-        secretKeyRef:
-          name: my-existing-secret
-          key: oauth_secret
-```
+- Environment variables accessible via `getenv()` in PHP
 
 ### Multi-Domain Support
 
@@ -396,6 +406,7 @@ With this configuration:
 | roundcube.plugins[1] | string | `"zipdownload"` |  |
 | roundcube.plugins[2] | string | `"managesieve"` |  |
 | roundcube.productName | string | `"Roundcube Webmail"` |  |
+| roundcube.secretEnvVars | object | `{}` |  |
 | roundcube.skin | string | `"elastic"` |  |
 | roundcube.smtpPass | string | `"%p"` |  |
 | roundcube.smtpPort | int | `587` |  |
