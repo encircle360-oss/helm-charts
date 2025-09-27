@@ -141,11 +141,18 @@ roundcube:
   supportUrl: ""
   # Product name
   productName: "Roundcube Webmail"
-  # Plugins to enable
+  # Plugins to enable (built-in plugins)
   plugins:
     - archive
     - zipdownload
     - managesieve
+  # Additional plugins to install via composer
+  # Format: vendor/package-name
+  composerPlugins: []
+    # Example:
+    # - johndoh/contextmenu
+    # - sblaisot/automatic_addressbook
+    # - texxasrulez/persistent_login
   # Skin
   skin: "elastic"
   # Upload max filesize

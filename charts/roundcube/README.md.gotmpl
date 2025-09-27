@@ -124,6 +124,32 @@ redis:
   password: redispassword
 ```
 
+### Installing Additional Plugins via Composer
+
+Roundcube supports installing additional plugins via composer. You can specify plugins using the `composerPlugins` list:
+
+```yaml
+roundcube:
+  plugins:
+    - archive
+    - zipdownload
+  composerPlugins:
+    - johndoh/contextmenu
+    - sblaisot/automatic_addressbook
+    - texxasrulez/persistent_login
+```
+
+This will:
+- Install the specified plugins via composer during container startup
+- Automatically make them available in Roundcube
+- Work with any plugin available on Packagist
+
+Popular composer plugins include:
+- `johndoh/contextmenu` - Context menu for message list
+- `sblaisot/automatic_addressbook` - Automatically add recipients to address book
+- `texxasrulez/persistent_login` - Stay logged in across sessions
+- `weird-birds/thunderbird_labels` - Thunderbird-style labels
+
 ### Custom Configuration
 
 You can provide custom Roundcube configuration:

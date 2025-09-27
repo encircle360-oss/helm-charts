@@ -1,6 +1,6 @@
 # roundcube
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
+![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
 
 A free and open source webmail solution with a desktop-like user interface
 
@@ -122,6 +122,32 @@ redis:
   port: 6379
   password: redispassword
 ```
+
+### Installing Additional Plugins via Composer
+
+Roundcube supports installing additional plugins via composer. You can specify plugins using the `composerPlugins` list:
+
+```yaml
+roundcube:
+  plugins:
+    - archive
+    - zipdownload
+  composerPlugins:
+    - johndoh/contextmenu
+    - sblaisot/automatic_addressbook
+    - texxasrulez/persistent_login
+```
+
+This will:
+- Install the specified plugins via composer during container startup
+- Automatically make them available in Roundcube
+- Work with any plugin available on Packagist
+
+Popular composer plugins include:
+- `johndoh/contextmenu` - Context menu for message list
+- `sblaisot/automatic_addressbook` - Automatically add recipients to address book
+- `texxasrulez/persistent_login` - Stay logged in across sessions
+- `weird-birds/thunderbird_labels` - Thunderbird-style labels
 
 ### Custom Configuration
 
@@ -291,6 +317,7 @@ With this configuration:
 | resources.limits.memory | string | `"512Mi"` |  |
 | resources.requests.cpu | string | `"100m"` |  |
 | resources.requests.memory | string | `"256Mi"` |  |
+| roundcube.composerPlugins | list | `[]` |  |
 | roundcube.customConfig | string | `""` |  |
 | roundcube.defaultHost | string | `"ssl://mail.example.com"` |  |
 | roundcube.defaultPort | int | `993` |  |

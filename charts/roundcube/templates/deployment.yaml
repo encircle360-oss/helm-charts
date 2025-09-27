@@ -58,6 +58,10 @@ spec:
               value: {{ .Values.roundcube.smtpPass | quote }}
             - name: ROUNDCUBEMAIL_PLUGINS
               value: {{ join "," .Values.roundcube.plugins | quote }}
+            {{- if .Values.roundcube.composerPlugins }}
+            - name: ROUNDCUBEMAIL_COMPOSER_PLUGINS
+              value: {{ join " " .Values.roundcube.composerPlugins | quote }}
+            {{- end }}
             - name: ROUNDCUBEMAIL_SKIN
               value: {{ .Values.roundcube.skin | quote }}
             - name: ROUNDCUBEMAIL_UPLOAD_MAX_FILESIZE

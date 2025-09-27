@@ -2,7 +2,7 @@ apiVersion: v2
 name: roundcube
 description: A free and open source webmail solution with a desktop-like user interface
 type: application
-version: 0.3.0
+version: 0.3.1
 appVersion: "1.6.11"
 keywords:
   - roundcube
@@ -20,6 +20,8 @@ icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/ela
 annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/changes: |
+    - kind: added
+      description: Direct support for composerPlugins with ROUNDCUBEMAIL_COMPOSER_PLUGINS env var
     - kind: added
       description: Plugin-specific configuration support via pluginConfigs map
     - kind: added
