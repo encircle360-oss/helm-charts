@@ -2,7 +2,7 @@ apiVersion: v2
 name: roundcube
 description: A free and open source webmail solution with a desktop-like user interface
 type: application
-version: 0.7.1
+version: 0.7.2
 appVersion: "1.6.11"
 keywords:
   - roundcube
@@ -20,8 +20,8 @@ icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/ela
 annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/changes: |
-    - kind: fixed
-      description: Sanitize plugin names for Kubernetes resource names (replace underscores with hyphens)
+    - kind: changed
+      description: Update documentation to reflect v0.7.0 architecture changes (direct ConfigMap mounts, getenv() for secrets)
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/bitnami/postgresql
     - url: https://artifacthub.io/packages/helm/bitnami/mariadb
