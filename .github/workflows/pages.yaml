@@ -58,9 +58,15 @@ jobs:
             fi
           done
 
-      - name: Create index.yaml
+      - name: Fetch existing index.yaml from gh-pages
         run: |
-          helm repo index .deploy --url https://${{ github.repository_owner }}.github.io/helm-charts/
+          # Download existing index.yaml if it exists
+          curl -sL https://${{ github.repository_owner }}.github.io/helm-charts/index.yaml -o .deploy/index.yaml || echo "No existing index.yaml found"
+      
+      - name: Create/merge index.yaml
+        run: |
+          # Merge with existing index if present, otherwise create new
+          helm repo index .deploy --url https://${{ github.repository_owner }}.github.io/helm-charts/ --merge .deploy/index.yaml
 
       - name: Build MkDocs documentation
         run: |
