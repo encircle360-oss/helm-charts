@@ -4,6 +4,42 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: fixed
+          description: Critical bug where postStart hook failed because pluginConfigs were mounted as files instead of directories
+        - kind: changed
+          description: Mount entire plugin-configs ConfigMap volume instead of individual subPaths
+        - kind: changed
+          description: Hook script now iterates over *.config.inc.php files instead of directories
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/bitnami/postgresql
+        - url: https://artifacthub.io/packages/helm/bitnami/mariadb
+    apiVersion: v2
+    appVersion: 1.6.11
+    created: "2025-09-27T12:13:16.031385123Z"
+    description: A free and open source webmail solution with a desktop-like user
+      interface
+    digest: ddf86db87bb11386ab1ab2a9722a9cd7ac131888c09ef51d76158a56d00a5d96
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/roundcube
+    icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/elastic/images/logo.svg
+    keywords:
+    - roundcube
+    - webmail
+    - email
+    - mail
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: roundcube
+    sources:
+    - https://github.com/roundcube/roundcubemail
+    - https://github.com/encircle360-oss/helm-charts
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.4.2/roundcube-0.4.2.tgz
+    version: 0.4.2
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: fixed
           description: Critical bug where postStart hook could exit with non-zero code causing CrashLoopBackOff
         - kind: changed
           description: Added explicit exit 0 at end of postStart hook to ensure successful completion
@@ -291,4 +327,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-09-27T12:00:03.581956868Z"
+generated: "2025-09-27T12:13:16.031420619Z"
