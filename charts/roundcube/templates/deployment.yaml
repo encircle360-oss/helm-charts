@@ -52,14 +52,16 @@ spec:
                     
                     # Copy plugin configs from temp location to plugin directories
                     if [ -d /tmp/roundcube-plugin-configs ]; then
-                      for plugin_dir in /tmp/roundcube-plugin-configs/*; do
-                        if [ -d "$$plugin_dir" ]; then
-                          plugin_name=$$(basename "$$plugin_dir")
+                      for config_file in /tmp/roundcube-plugin-configs/*.config.inc.php; do
+                        if [ -f "$$config_file" ]; then
+                          # Extract plugin name from filename (remove .config.inc.php suffix)
+                          filename=$$(basename "$$config_file")
+                          plugin_name=$${filename%.config.inc.php}
                           target_dir="/var/www/html/plugins/$$plugin_name"
                           
                           if [ -d "$$target_dir" ]; then
                             echo "Copying config for plugin: $$plugin_name"
-                            config_content=$$(cat "$$plugin_dir/config.inc.php")
+                            config_content=$$(cat "$$config_file")
                             
                             # Interpolate secrets if they exist
                             if [ -d /tmp/roundcube-plugin-secrets ]; then
@@ -220,11 +222,9 @@ spec:
               subPath: config.inc.php
             {{- end }}
             {{- if .Values.roundcube.pluginConfigs }}
-            {{- range $pluginName, $config := .Values.roundcube.pluginConfigs }}
             - name: plugin-configs
-              mountPath: /tmp/roundcube-plugin-configs/{{ $pluginName }}/config.inc.php
-              subPath: {{ $pluginName }}.config.inc.php
-            {{- end }}
+              mountPath: /tmp/roundcube-plugin-configs
+              readOnly: true
             {{- end }}
             {{- if or .Values.roundcube.pluginSecrets .Values.roundcube.pluginSecretsExistingSecret }}
             - name: plugin-secrets

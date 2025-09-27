@@ -2,7 +2,7 @@ apiVersion: v2
 name: roundcube
 description: A free and open source webmail solution with a desktop-like user interface
 type: application
-version: 0.4.1
+version: 0.4.2
 appVersion: "1.6.11"
 keywords:
   - roundcube
@@ -21,9 +21,11 @@ annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/changes: |
     - kind: fixed
-      description: Critical bug where postStart hook could exit with non-zero code causing CrashLoopBackOff
+      description: Critical bug where postStart hook failed because pluginConfigs were mounted as files instead of directories
     - kind: changed
-      description: Added explicit exit 0 at end of postStart hook to ensure successful completion
+      description: Mount entire plugin-configs ConfigMap volume instead of individual subPaths
+    - kind: changed
+      description: Hook script now iterates over *.config.inc.php files instead of directories
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/bitnami/postgresql
     - url: https://artifacthub.io/packages/helm/bitnami/mariadb
