@@ -3,6 +3,42 @@ entries:
   roundcube:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: Add secretEnvVars for declarative secret management without external tools
+        - kind: added
+          description: Automatic Secret creation from values for sensitive environment variables
+        - kind: changed
+          description: Simplified secret workflow - no more manual Secret creation or Helmfile hooks needed
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/bitnami/postgresql
+        - url: https://artifacthub.io/packages/helm/bitnami/mariadb
+    apiVersion: v2
+    appVersion: 1.6.11
+    created: "2025-09-27T14:01:30.937398955Z"
+    description: A free and open source webmail solution with a desktop-like user
+      interface
+    digest: c0310d8a53ab8727e6a1aaf2173054fe7f465f8ee695c536193f043dfb1f924d
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/roundcube
+    icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/elastic/images/logo.svg
+    keywords:
+    - roundcube
+    - webmail
+    - email
+    - mail
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: roundcube
+    sources:
+    - https://github.com/roundcube/roundcubemail
+    - https://github.com/encircle360-oss/helm-charts
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.8.0/roundcube-0.8.0.tgz
+    version: 0.8.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: Update documentation to reflect v0.7.0 architecture changes (direct ConfigMap mounts, getenv() for secrets)
       artifacthub.io/license: Apache-2.0
@@ -579,4 +615,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-09-27T13:44:12.986810922Z"
+generated: "2025-09-27T14:01:30.937526242Z"
