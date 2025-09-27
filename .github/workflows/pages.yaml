@@ -72,6 +72,11 @@ jobs:
         run: |
           cp -r site /tmp/site-build
 
+      - name: Reset any local changes before branch switch
+        run: |
+          git reset --hard HEAD
+          git clean -fd
+
       - name: Checkout gh-pages branch
         run: |
           git fetch origin gh-pages || git checkout --orphan gh-pages
