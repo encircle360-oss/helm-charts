@@ -41,6 +41,10 @@ spec:
               echo "Installing composer plugins..."
               cd /var/www/html
 
+              # Allow roundcube/plugin-installer (required for Roundcube plugins)
+              echo "Configuring composer allow-plugins..."
+              composer config allow-plugins.roundcube/plugin-installer true --no-interaction
+
               {{- range .Values.roundcube.composerPlugins }}
               echo "Installing plugin: {{ . }}"
               composer require {{ . }} --no-interaction --no-progress --optimize-autoloader

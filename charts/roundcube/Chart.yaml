@@ -2,7 +2,7 @@ apiVersion: v2
 name: roundcube
 description: A free and open source webmail solution with a desktop-like user interface
 type: application
-version: 0.6.1
+version: 0.6.2
 appVersion: "1.6.11"
 keywords:
   - roundcube
@@ -21,7 +21,9 @@ annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/changes: |
     - kind: fixed
-      description: Remove invalid --no-dev flag from composer require command in init container
+      description: Configure composer allow-plugins for roundcube/plugin-installer before plugin installation
+    - kind: changed
+      description: Add composer config command to init container to allow plugin-installer
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/bitnami/postgresql
     - url: https://artifacthub.io/packages/helm/bitnami/mariadb
