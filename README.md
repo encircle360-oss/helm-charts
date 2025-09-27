@@ -32,7 +32,7 @@ helm install my-release encircle360-oss/<chart-name>
 
 | Chart | Description | Chart Version | App Version |
 |-------|-------------|---------------|--------------|
-| [roundcube](./charts/roundcube) | A free and open source webmail solution | 0.2.2 | 1.6.11 |
+| [roundcube](./charts/roundcube) | A free and open source webmail solution | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/roundcube/Chart.yaml&query=$.version&label=chart&color=blue) | ![AppVersion](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/roundcube/Chart.yaml&query=$.appVersion&label=app&color=informational) |
 
 ## Development
 
