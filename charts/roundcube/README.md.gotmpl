@@ -188,9 +188,12 @@ roundcube:
 
 This will:
 - Create a ConfigMap with all plugin configurations
-- Mount each config to `/var/www/html/plugins/<plugin-name>/config.inc.php`
+- Mount configs to a temporary location during startup
+- Copy each config to `/var/www/html/plugins/<plugin-name>/config.inc.php` after plugin installation
 - Support multiple plugin configs simultaneously
 - Work alongside the main Roundcube configuration
+
+**Note**: Plugin configs are copied AFTER composer installs plugins to avoid mount conflicts. This ensures composer can properly extract plugin files without encountering read-only mounted files.
 
 ### Multi-Domain Support
 

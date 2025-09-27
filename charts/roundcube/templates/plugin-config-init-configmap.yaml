@@ -1,0 +1,35 @@
+{{- if .Values.roundcube.pluginConfigs }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "roundcube.fullname" . }}-plugin-config-init
+  labels:
+    {{- include "roundcube.labels" . | nindent 4 }}
+data:
+  90-copy-plugin-configs.sh: |
+    #!/bin/bash
+    set -e
+
+    echo "Copying plugin configurations from temporary location..."
+    
+    if [ -d /tmp/roundcube-plugin-configs ]; then
+      for plugin_dir in /tmp/roundcube-plugin-configs/*; do
+        if [ -d "$plugin_dir" ]; then
+          plugin_name=$(basename "$plugin_dir")
+          target_dir="/var/www/html/plugins/$plugin_name"
+          
+          if [ -d "$target_dir" ]; then
+            echo "Copying config for plugin: $plugin_name"
+            cp "$plugin_dir/config.inc.php" "$target_dir/config.inc.php"
+            chown www-data:www-data "$target_dir/config.inc.php"
+            chmod 644 "$target_dir/config.inc.php"
+          else
+            echo "Warning: Plugin directory $target_dir does not exist. Skipping config copy for $plugin_name"
+          fi
+        fi
+      done
+      echo "Plugin configurations copied successfully."
+    else
+      echo "No plugin configurations found in /tmp/roundcube-plugin-configs"
+    fi
+{{- end }}

@@ -172,9 +172,12 @@ spec:
             {{- if .Values.roundcube.pluginConfigs }}
             {{- range $pluginName, $config := .Values.roundcube.pluginConfigs }}
             - name: plugin-configs
-              mountPath: /var/www/html/plugins/{{ $pluginName }}/config.inc.php
+              mountPath: /tmp/roundcube-plugin-configs/{{ $pluginName }}/config.inc.php
               subPath: {{ $pluginName }}.config.inc.php
             {{- end }}
+            - name: plugin-config-init
+              mountPath: /docker-entrypoint.d/90-copy-plugin-configs.sh
+              subPath: 90-copy-plugin-configs.sh
             {{- end }}
             {{- with .Values.roundcube.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
@@ -203,6 +206,10 @@ spec:
         - name: plugin-configs
           configMap:
             name: {{ include "roundcube.fullname" . }}-plugin-configs
+        - name: plugin-config-init
+          configMap:
+            name: {{ include "roundcube.fullname" . }}-plugin-config-init
+            defaultMode: 0755
         {{- end }}
         {{- with .Values.roundcube.extraVolumes }}
         {{- toYaml . | nindent 8 }}

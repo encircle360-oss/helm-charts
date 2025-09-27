@@ -1,6 +1,6 @@
 # roundcube
 
-![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
+![Version: 0.3.2](https://img.shields.io/badge/Version-0.3.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
 
 A free and open source webmail solution with a desktop-like user interface
 
@@ -187,9 +187,12 @@ roundcube:
 
 This will:
 - Create a ConfigMap with all plugin configurations
-- Mount each config to `/var/www/html/plugins/<plugin-name>/config.inc.php`
+- Mount configs to a temporary location during startup
+- Copy each config to `/var/www/html/plugins/<plugin-name>/config.inc.php` after plugin installation
 - Support multiple plugin configs simultaneously
 - Work alongside the main Roundcube configuration
+
+**Note**: Plugin configs are copied AFTER composer installs plugins to avoid mount conflicts. This ensures composer can properly extract plugin files without encountering read-only mounted files.
 
 ### Multi-Domain Support
 
