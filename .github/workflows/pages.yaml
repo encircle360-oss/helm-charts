@@ -52,6 +52,12 @@ jobs:
             if [ -d "$chart" ] && [ -f "$chart/Chart.yaml" ]; then
               echo "Generating README for $chart"
               helm-docs -c "$chart"
+              
+              # Copy generated README to docs directory for MkDocs
+              chart_name=$(basename "$chart")
+              mkdir -p docs/charts
+              cp "$chart/README.md" "docs/charts/${chart_name}.md"
+              echo "Copied README to docs/charts/${chart_name}.md"
             fi
           done
 
