@@ -1,0 +1,12 @@
+{{- range $pluginName, $config := .Values.roundcube.pluginConfigs }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "roundcube.fullname" $ }}-plugin-{{ $pluginName }}
+  labels:
+    {{- include "roundcube.labels" $ | nindent 4 }}
+data:
+  config.inc.php: |
+{{ $config | indent 4 }}
+{{- end }}

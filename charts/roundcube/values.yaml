@@ -165,33 +165,27 @@ roundcube:
   extraVolumes: []
   # Custom configuration (will be mounted as config.inc.php)
   customConfig: ""
-  # Plugin configuration lifecycle hook timeout (seconds)
-  # Maximum time to wait for composer to install plugins before copying configs
-  pluginConfigHookTimeout: 45
   # Plugin-specific configurations
-  # Each plugin can have its own config.inc.php file
+  # Each plugin can have its own config.inc.php file that will be directly mounted
   # Key = plugin name, Value = PHP configuration content
+  # 
+  # IMPORTANT: For secrets, use getenv() in PHP and provide secrets via extraEnvVars
+  # This follows standard Kubernetes patterns (ConfigMap for config, Secret for secrets)
   pluginConfigs: {}
-    # Example:
+    # Example with environment variable for secrets:
     # identity_from_directory: |
     #   <?php
     #   $config['identity_from_directory_ldap_host'] = ['ldap://localhost:389'];
     #   $config['identity_from_directory_ldap_base_dn'] = 'dc=example,dc=com';
-    # persistent_login: |
-    #   <?php
-    #   $config['login_lifetime'] = 30;
-    #   $config['login_secure_cookie'] = true;
-  # Plugin secrets (stored in Kubernetes Secret)
-  # Can be referenced in pluginConfigs using {{ SECRET_KEY_NAME }} syntax
-  # These values will be interpolated at runtime
-  pluginSecrets: {}
-    # Example:
-    # ldap_bind_pass: "my-secret-password"
-    # oauth_client_secret: "oauth-secret-key"
-    # api_token: "some-api-token"
-  # Existing secret with plugin secrets (alternative to pluginSecrets)
-  # If specified, pluginSecrets values will be ignored
-  pluginSecretsExistingSecret: ""
+    #   $config['identity_from_directory_ldap_bind_pass'] = getenv('LDAP_BIND_PASSWORD');
+    # 
+    # Then provide the secret via extraEnvVars:
+    # extraEnvVars:
+    #   - name: LDAP_BIND_PASSWORD
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: my-ldap-secret
+    #         key: password
   # Multi-domain configuration (simplified setup for multiple IMAP servers)
   # When enabled, will auto-generate config for multiple domains
   multiDomain:

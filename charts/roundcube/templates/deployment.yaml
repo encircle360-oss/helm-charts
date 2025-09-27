@@ -29,99 +29,10 @@ spec:
       serviceAccountName: {{ include "roundcube.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.initContainers }}
       initContainers:
-        {{- if .Values.roundcube.composerPlugins }}
-        - name: install-plugins
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/bin/bash", "-c"]
-          args:
-            - |
-              set -e
-              echo "Installing composer plugins..."
-              cd /var/www/html
-
-              # Allow roundcube/plugin-installer (required for Roundcube plugins)
-              echo "Configuring composer allow-plugins..."
-              composer config allow-plugins.roundcube/plugin-installer true --no-interaction
-
-              {{- range .Values.roundcube.composerPlugins }}
-              echo "Installing plugin: {{ . }}"
-              composer require {{ . }} --no-interaction --no-progress --optimize-autoloader
-              {{- end }}
-
-              echo "All plugins installed successfully"
-              echo "Installed plugins:"
-              find /var/www/html/plugins -mindepth 1 -maxdepth 1 -type d -exec basename {} \;
-          volumeMounts:
-            - name: plugins
-              mountPath: /var/www/html/plugins
-          securityContext:
-            runAsUser: 33
-            runAsGroup: 33
-            fsGroup: 33
-        {{- end }}
-        {{- if .Values.roundcube.pluginConfigs }}
-        - name: configure-plugins
-          image: busybox:latest
-          imagePullPolicy: IfNotPresent
-          command: ["/bin/sh", "-c"]
-          args:
-            - |
-              set -e
-              echo "Configuring plugins..."
-
-              for config_file in /tmp/roundcube-plugin-configs/*.config.inc.php; do
-                if [ -f "$$config_file" ]; then
-                  filename=$$(basename "$$config_file")
-                  plugin_name=$${filename%.config.inc.php}
-                  target_dir="/var/www/html/plugins/$$plugin_name"
-
-                  if [ -d "$$target_dir" ]; then
-                    echo "Copying config for plugin: $$plugin_name"
-                    config_content=$$(cat "$$config_file")
-
-                    {{- if or .Values.roundcube.pluginSecrets .Values.roundcube.pluginSecretsExistingSecret }}
-                    if [ -d /tmp/roundcube-plugin-secrets ]; then
-                      for secret_file in /tmp/roundcube-plugin-secrets/*; do
-                        if [ -f "$$secret_file" ]; then
-                          secret_key=$$(basename "$$secret_file")
-                          secret_value=$$(cat "$$secret_file")
-                          config_content=$$(echo "$$config_content" | sed "s|{{ "{{" }} $$secret_key {{ "}}" }}|$$secret_value|g")
-                        fi
-                      done
-                    fi
-                    {{- end }}
-
-                    echo "$$config_content" > "$$target_dir/config.inc.php"
-                    chmod 644 "$$target_dir/config.inc.php"
-                    echo "Config copied successfully for $$plugin_name"
-                  else
-                    echo "Warning: Plugin directory $$target_dir not found, skipping config"
-                  fi
-                fi
-              done
-
-              echo "Plugin configuration complete"
-          volumeMounts:
-            - name: plugins
-              mountPath: /var/www/html/plugins
-            - name: plugin-configs
-              mountPath: /tmp/roundcube-plugin-configs
-              readOnly: true
-            {{- if or .Values.roundcube.pluginSecrets .Values.roundcube.pluginSecretsExistingSecret }}
-            - name: plugin-secrets
-              mountPath: /tmp/roundcube-plugin-secrets
-              readOnly: true
-            {{- end }}
-          securityContext:
-            runAsUser: 33
-            runAsGroup: 33
-            fsGroup: 33
-        {{- end }}
-        {{- with .Values.initContainers }}
         {{- toYaml . | nindent 8 }}
-        {{- end }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -258,18 +169,10 @@ spec:
               mountPath: /var/roundcube/config/config.inc.php
               subPath: config.inc.php
             {{- end }}
-            {{- if .Values.roundcube.composerPlugins }}
-            - name: plugins
-              mountPath: /var/www/html/plugins
-            {{- end }}
-            {{- if .Values.roundcube.pluginConfigs }}
-            - name: plugin-configs
-              mountPath: /tmp/roundcube-plugin-configs
-              readOnly: true
-            {{- end }}
-            {{- if or .Values.roundcube.pluginSecrets .Values.roundcube.pluginSecretsExistingSecret }}
-            - name: plugin-secrets
-              mountPath: /tmp/roundcube-plugin-secrets
+            {{- range $pluginName, $config := .Values.roundcube.pluginConfigs }}
+            - name: plugin-config-{{ $pluginName }}
+              mountPath: /var/www/html/plugins/{{ $pluginName }}/config.inc.php
+              subPath: config.inc.php
               readOnly: true
             {{- end }}
             {{- with .Values.roundcube.extraVolumeMounts }}
@@ -295,19 +198,10 @@ spec:
           configMap:
             name: {{ include "roundcube.fullname" . }}-custom
         {{- end }}
-        {{- if .Values.roundcube.composerPlugins }}
-        - name: plugins
-          emptyDir: {}
-        {{- end }}
-        {{- if .Values.roundcube.pluginConfigs }}
-        - name: plugin-configs
+        {{- range $pluginName, $config := .Values.roundcube.pluginConfigs }}
+        - name: plugin-config-{{ $pluginName }}
           configMap:
-            name: {{ include "roundcube.fullname" . }}-plugin-configs
-        {{- end }}
-        {{- if or .Values.roundcube.pluginSecrets .Values.roundcube.pluginSecretsExistingSecret }}
-        - name: plugin-secrets
-          secret:
-            secretName: {{ .Values.roundcube.pluginSecretsExistingSecret | default (printf "%s-plugin-secrets" (include "roundcube.fullname" .)) }}
+            name: {{ include "roundcube.fullname" $ }}-plugin-{{ $pluginName }}
         {{- end }}
         {{- with .Values.roundcube.extraVolumes }}
         {{- toYaml . | nindent 8 }}
