@@ -85,6 +85,9 @@ spec:
                         fi
                       done
                     fi
+                    
+                    # Ensure hook always succeeds
+                    exit 0
           {{- end }}
           ports:
             - name: http

@@ -2,7 +2,7 @@ apiVersion: v2
 name: roundcube
 description: A free and open source webmail solution with a desktop-like user interface
 type: application
-version: 0.4.0
+version: 0.4.1
 appVersion: "1.6.11"
 keywords:
   - roundcube
@@ -20,14 +20,10 @@ icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/ela
 annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/changes: |
-    - kind: added
-      description: Secret support for plugin configurations via pluginSecrets
-    - kind: added
-      description: Runtime interpolation of secrets in plugin configs using {{ secret_key }} syntax
-    - kind: added
-      description: Support for existing secrets via pluginSecretsExistingSecret
-    - kind: security
-      description: Secrets stored in Kubernetes Secret instead of ConfigMap for sensitive plugin configuration values
+    - kind: fixed
+      description: Critical bug where postStart hook could exit with non-zero code causing CrashLoopBackOff
+    - kind: changed
+      description: Added explicit exit 0 at end of postStart hook to ensure successful completion
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/bitnami/postgresql
     - url: https://artifacthub.io/packages/helm/bitnami/mariadb
