@@ -4,6 +4,40 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: fixed
+          description: Configure composer allow-plugins for roundcube/plugin-installer before plugin installation
+        - kind: changed
+          description: Add composer config command to init container to allow plugin-installer
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/bitnami/postgresql
+        - url: https://artifacthub.io/packages/helm/bitnami/mariadb
+    apiVersion: v2
+    appVersion: 1.6.11
+    created: "2025-09-27T13:16:38.262458421Z"
+    description: A free and open source webmail solution with a desktop-like user
+      interface
+    digest: 90b000db3edf9d64a836a63ae66767a809c49963eab6a654b9eaf4800236f118
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/roundcube
+    icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/elastic/images/logo.svg
+    keywords:
+    - roundcube
+    - webmail
+    - email
+    - mail
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: roundcube
+    sources:
+    - https://github.com/roundcube/roundcubemail
+    - https://github.com/encircle360-oss/helm-charts
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.6.2/roundcube-0.6.2.tgz
+    version: 0.6.2
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: fixed
           description: Remove invalid --no-dev flag from composer require command in init container
       artifacthub.io/license: Apache-2.0
       artifacthub.io/recommendations: |
@@ -439,4 +473,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-09-27T13:10:51.69590207Z"
+generated: "2025-09-27T13:16:38.262590537Z"
