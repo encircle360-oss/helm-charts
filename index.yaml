@@ -4,6 +4,40 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: fixed
+          description: Plugin configs now properly copied using lifecycle postStart hook instead of non-functional docker-entrypoint.d approach
+        - kind: changed
+          description: Switched from docker-entrypoint.d to Kubernetes lifecycle postStart hook for plugin config copy
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/bitnami/postgresql
+        - url: https://artifacthub.io/packages/helm/bitnami/mariadb
+    apiVersion: v2
+    appVersion: 1.6.11
+    created: "2025-09-27T09:38:04.575025948Z"
+    description: A free and open source webmail solution with a desktop-like user
+      interface
+    digest: 7484a6a0bc1b7fec20f2e7a79fd3afa611ce215e0796789a65af5f695ec42a20
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/roundcube
+    icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/elastic/images/logo.svg
+    keywords:
+    - roundcube
+    - webmail
+    - email
+    - mail
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: roundcube
+    sources:
+    - https://github.com/roundcube/roundcubemail
+    - https://github.com/encircle360-oss/helm-charts
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.3.3/roundcube-0.3.3.tgz
+    version: 0.3.3
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: fixed
           description: Critical bug where plugin configs mounted before composer install caused "Could not delete config.inc.php" errors
         - kind: changed
           description: Plugin configs now copied after composer installation via init script to avoid mount conflicts
@@ -185,4 +219,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-09-27T09:27:30.838204815Z"
+generated: "2025-09-27T09:38:04.57505383Z"
