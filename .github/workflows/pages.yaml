@@ -46,18 +46,23 @@ jobs:
           sudo mv helm-docs /usr/local/bin/
           helm-docs --version
 
-      - name: Generate Chart README files
+      - name: Generate Chart README files and copy to docs
         run: |
           for chart in charts/*; do
             if [ -d "$chart" ] && [ -f "$chart/Chart.yaml" ]; then
-              echo "Generating README for $chart"
+              chart_name=$(basename "$chart")
+              echo "Generating README for $chart_name"
               helm-docs -c "$chart"
+              
+              # Copy generated README directly to docs (replacing snippet include)
+              echo "---" > "docs/charts/${chart_name}.md"
+              echo "title: ${chart_name^}" >> "docs/charts/${chart_name}.md"
+              echo "---" >> "docs/charts/${chart_name}.md"
+              echo "" >> "docs/charts/${chart_name}.md"
+              cat "$chart/README.md" >> "docs/charts/${chart_name}.md"
+              echo "Copied README to docs/charts/${chart_name}.md"
             fi
           done
-          
-          # Commit generated READMEs temporarily so they survive branch switch
-          git add charts/*/README.md
-          git commit -m "temp: generated READMEs" || true
 
       - name: Build MkDocs documentation
         run: |
