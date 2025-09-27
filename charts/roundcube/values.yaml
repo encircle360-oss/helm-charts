@@ -158,6 +158,19 @@ roundcube:
   extraVolumes: []
   # Custom configuration (will be mounted as config.inc.php)
   customConfig: ""
+  # Plugin-specific configurations
+  # Each plugin can have its own config.inc.php file
+  # Key = plugin name, Value = PHP configuration content
+  pluginConfigs: {}
+    # Example:
+    # identity_from_directory: |
+    #   <?php
+    #   $config['identity_from_directory_ldap_host'] = ['ldap://localhost:389'];
+    #   $config['identity_from_directory_ldap_base_dn'] = 'dc=example,dc=com';
+    # persistent_login: |
+    #   <?php
+    #   $config['login_lifetime'] = 30;
+    #   $config['login_secure_cookie'] = true;
   # Multi-domain configuration (simplified setup for multiple IMAP servers)
   # When enabled, will auto-generate config for multiple domains
   multiDomain:

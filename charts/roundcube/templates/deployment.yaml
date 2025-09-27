@@ -165,6 +165,13 @@ spec:
               mountPath: /var/roundcube/config/config.inc.php
               subPath: config.inc.php
             {{- end }}
+            {{- if .Values.roundcube.pluginConfigs }}
+            {{- range $pluginName, $config := .Values.roundcube.pluginConfigs }}
+            - name: plugin-configs
+              mountPath: /var/www/html/plugins/{{ $pluginName }}/config.inc.php
+              subPath: {{ $pluginName }}.config.inc.php
+            {{- end }}
+            {{- end }}
             {{- with .Values.roundcube.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -187,6 +194,11 @@ spec:
         - name: custom-config
           configMap:
             name: {{ include "roundcube.fullname" . }}-custom
+        {{- end }}
+        {{- if .Values.roundcube.pluginConfigs }}
+        - name: plugin-configs
+          configMap:
+            name: {{ include "roundcube.fullname" . }}-plugin-configs
         {{- end }}
         {{- with .Values.roundcube.extraVolumes }}
         {{- toYaml . | nindent 8 }}

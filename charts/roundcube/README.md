@@ -1,6 +1,6 @@
 # roundcube
 
-![Version: 0.2.3](https://img.shields.io/badge/Version-0.2.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
 
 A free and open source webmail solution with a desktop-like user interface
 
@@ -135,6 +135,35 @@ roundcube:
     $config['enable_spellcheck'] = true;
     // Additional custom configuration
 ```
+
+### Plugin-Specific Configuration
+
+Many Roundcube plugins require their own `config.inc.php` file in the plugin directory. You can provide plugin-specific configurations using the `pluginConfigs` map:
+
+```yaml
+roundcube:
+  plugins:
+    - identity_from_directory
+    - persistent_login
+  pluginConfigs:
+    identity_from_directory: |
+      <?php
+      $config['identity_from_directory_ldap_host'] = ['ldap://localhost:389'];
+      $config['identity_from_directory_ldap_base_dn'] = 'dc=example,dc=com';
+      $config['identity_from_directory_ldap_bind_dn'] = 'cn=admin,dc=example,dc=com';
+      $config['identity_from_directory_ldap_bind_pass'] = 'secret';
+    persistent_login: |
+      <?php
+      $config['login_lifetime'] = 30;
+      $config['login_secure_cookie'] = true;
+      $config['login_token_expiration'] = 3600;
+```
+
+This will:
+- Create a ConfigMap with all plugin configurations
+- Mount each config to `/var/www/html/plugins/<plugin-name>/config.inc.php`
+- Support multiple plugin configs simultaneously
+- Work alongside the main Roundcube configuration
 
 ### Multi-Domain Support
 
@@ -271,6 +300,7 @@ With this configuration:
 | roundcube.extraVolumes | list | `[]` |  |
 | roundcube.multiDomain.domains | list | `[]` |  |
 | roundcube.multiDomain.enabled | bool | `false` |  |
+| roundcube.pluginConfigs | object | `{}` |  |
 | roundcube.plugins[0] | string | `"archive"` |  |
 | roundcube.plugins[1] | string | `"zipdownload"` |  |
 | roundcube.plugins[2] | string | `"managesieve"` |  |
