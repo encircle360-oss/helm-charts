@@ -2,7 +2,7 @@ apiVersion: v2
 name: roundcube
 description: A free and open source webmail solution with a desktop-like user interface
 type: application
-version: 0.8.0
+version: 0.8.1
 appVersion: "1.6.11"
 keywords:
   - roundcube
@@ -20,12 +20,12 @@ icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/ela
 annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/changes: |
-    - kind: added
-      description: Add secretEnvVars for declarative secret management without external tools
-    - kind: added
-      description: Automatic Secret creation from values for sensitive environment variables
+    - kind: fixed
+      description: CRITICAL - Plugin configs now mounted to temp location to prevent blocking Composer extraction
+    - kind: fixed
+      description: Restored v0.3.3 working implementation with postStart hook for config copying after Composer
     - kind: changed
-      description: Simplified secret workflow - no more manual Secret creation or Helmfile hooks needed
+      description: Reverted from direct plugin directory mounts back to temp mounts + lifecycle hook pattern
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/bitnami/postgresql
     - url: https://artifacthub.io/packages/helm/bitnami/mariadb
