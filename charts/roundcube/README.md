@@ -1,6 +1,6 @@
 # roundcube
 
-![Version: 0.3.3](https://img.shields.io/badge/Version-0.3.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
+![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
 
 A free and open source webmail solution with a desktop-like user interface
 
@@ -195,6 +195,50 @@ This will:
 
 **Note**: Plugin configs are copied using a postStart lifecycle hook that waits 10 seconds for composer to install plugins, then copies configs from the temporary mount location to the actual plugin directories. This ensures composer can properly extract plugin files without encountering read-only mounted files.
 
+### Plugin-Specific Configuration with Secrets
+
+For sensitive plugin configuration values (passwords, API tokens, OAuth secrets), use `pluginSecrets` instead of hardcoding them in `pluginConfigs`:
+
+```yaml
+roundcube:
+  plugins:
+    - identity_from_directory
+  pluginConfigs:
+    identity_from_directory: |
+      <?php
+      $config['identity_from_directory_ldap_host'] = ['ldap://localhost:389'];
+      $config['identity_from_directory_ldap_base_dn'] = 'dc=example,dc=com';
+      $config['identity_from_directory_ldap_bind_dn'] = 'cn=admin,dc=example,dc=com';
+      $config['identity_from_directory_ldap_bind_pass'] = '{{ ldap_bind_pass }}';
+  pluginSecrets:
+    ldap_bind_pass: "my-secret-password"
+```
+
+This will:
+- Store secrets in a Kubernetes Secret (base64 encoded)
+- Mount secrets to `/tmp/roundcube-plugin-secrets/`
+- Interpolate `{{ secret_key }}` placeholders in plugin configs at runtime
+- Replace placeholders with actual secret values before writing to plugin directories
+
+**Security Benefits**:
+- Secrets separated from configuration
+- Can be encrypted with tools like SOPS, sealed-secrets, or external secret operators
+- Secrets never stored in ConfigMaps
+- Support for existing secrets via `pluginSecretsExistingSecret`
+
+**Using Existing Secret**:
+```yaml
+roundcube:
+  pluginSecretsExistingSecret: "my-existing-secret"
+  pluginConfigs:
+    my_plugin: |
+      <?php
+      $config['api_token'] = '{{ api_token }}';
+      $config['oauth_secret'] = '{{ oauth_secret }}';
+```
+
+Your existing secret should contain keys matching the placeholder names (e.g., `api_token`, `oauth_secret`).
+
 ### Multi-Domain Support
 
 Roundcube can serve multiple domains with completely different configurations:
@@ -332,6 +376,8 @@ With this configuration:
 | roundcube.multiDomain.domains | list | `[]` |  |
 | roundcube.multiDomain.enabled | bool | `false` |  |
 | roundcube.pluginConfigs | object | `{}` |  |
+| roundcube.pluginSecrets | object | `{}` |  |
+| roundcube.pluginSecretsExistingSecret | string | `""` |  |
 | roundcube.plugins[0] | string | `"archive"` |  |
 | roundcube.plugins[1] | string | `"zipdownload"` |  |
 | roundcube.plugins[2] | string | `"managesieve"` |  |

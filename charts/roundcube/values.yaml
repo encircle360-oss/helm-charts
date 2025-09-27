@@ -178,6 +178,17 @@ roundcube:
     #   <?php
     #   $config['login_lifetime'] = 30;
     #   $config['login_secure_cookie'] = true;
+  # Plugin secrets (stored in Kubernetes Secret)
+  # Can be referenced in pluginConfigs using {{ SECRET_KEY_NAME }} syntax
+  # These values will be interpolated at runtime
+  pluginSecrets: {}
+    # Example:
+    # ldap_bind_pass: "my-secret-password"
+    # oauth_client_secret: "oauth-secret-key"
+    # api_token: "some-api-token"
+  # Existing secret with plugin secrets (alternative to pluginSecrets)
+  # If specified, pluginSecrets values will be ignored
+  pluginSecretsExistingSecret: ""
   # Multi-domain configuration (simplified setup for multiple IMAP servers)
   # When enabled, will auto-generate config for multiple domains
   multiDomain:

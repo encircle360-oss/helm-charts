@@ -53,18 +53,34 @@ spec:
                     # Copy plugin configs from temp location to plugin directories
                     if [ -d /tmp/roundcube-plugin-configs ]; then
                       for plugin_dir in /tmp/roundcube-plugin-configs/*; do
-                        if [ -d "$plugin_dir" ]; then
-                          plugin_name=$(basename "$plugin_dir")
-                          target_dir="/var/www/html/plugins/$plugin_name"
+                        if [ -d "$$plugin_dir" ]; then
+                          plugin_name=$$(basename "$$plugin_dir")
+                          target_dir="/var/www/html/plugins/$$plugin_name"
                           
-                          if [ -d "$target_dir" ]; then
-                            echo "Copying config for plugin: $plugin_name"
-                            cp "$plugin_dir/config.inc.php" "$target_dir/config.inc.php"
-                            chown www-data:www-data "$target_dir/config.inc.php" 2>/dev/null || true
-                            chmod 644 "$target_dir/config.inc.php" 2>/dev/null || true
-                            echo "Config copied successfully for $plugin_name"
+                          if [ -d "$$target_dir" ]; then
+                            echo "Copying config for plugin: $$plugin_name"
+                            config_content=$$(cat "$$plugin_dir/config.inc.php")
+                            
+                            # Interpolate secrets if they exist
+                            if [ -d /tmp/roundcube-plugin-secrets ]; then
+                              echo "Interpolating secrets for plugin: $$plugin_name"
+                              for secret_file in /tmp/roundcube-plugin-secrets/*; do
+                                if [ -f "$$secret_file" ]; then
+                                  secret_key=$$(basename "$$secret_file")
+                                  secret_value=$$(cat "$$secret_file")
+                                  # Replace {{ "{{" }} SECRET_KEY {{ "}}" }} with actual value
+                                  config_content=$$(echo "$$config_content" | sed "s|{{ "{{" }} $$secret_key {{ "}}" }}|$$secret_value|g")
+                                fi
+                              done
+                            fi
+                            
+                            # Write interpolated config to target
+                            echo "$$config_content" > "$$target_dir/config.inc.php"
+                            chown www-data:www-data "$$target_dir/config.inc.php" 2>/dev/null || true
+                            chmod 644 "$$target_dir/config.inc.php" 2>/dev/null || true
+                            echo "Config copied successfully for $$plugin_name"
                           else
-                            echo "Warning: Plugin directory $target_dir does not exist yet"
+                            echo "Warning: Plugin directory $$target_dir does not exist yet"
                           fi
                         fi
                       done
@@ -207,6 +223,11 @@ spec:
               subPath: {{ $pluginName }}.config.inc.php
             {{- end }}
             {{- end }}
+            {{- if or .Values.roundcube.pluginSecrets .Values.roundcube.pluginSecretsExistingSecret }}
+            - name: plugin-secrets
+              mountPath: /tmp/roundcube-plugin-secrets
+              readOnly: true
+            {{- end }}
             {{- with .Values.roundcube.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -234,6 +255,11 @@ spec:
         - name: plugin-configs
           configMap:
             name: {{ include "roundcube.fullname" . }}-plugin-configs
+        {{- end }}
+        {{- if or .Values.roundcube.pluginSecrets .Values.roundcube.pluginSecretsExistingSecret }}
+        - name: plugin-secrets
+          secret:
+            secretName: {{ .Values.roundcube.pluginSecretsExistingSecret | default (printf "%s-plugin-secrets" (include "roundcube.fullname" .)) }}
         {{- end }}
         {{- with .Values.roundcube.extraVolumes }}
         {{- toYaml . | nindent 8 }}
