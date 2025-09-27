@@ -170,7 +170,8 @@ spec:
               subPath: config.inc.php
             {{- end }}
             {{- range $pluginName, $config := .Values.roundcube.pluginConfigs }}
-            - name: plugin-config-{{ $pluginName }}
+            {{- $sanitizedName := $pluginName | replace "_" "-" }}
+            - name: plugin-config-{{ $sanitizedName }}
               mountPath: /var/www/html/plugins/{{ $pluginName }}/config.inc.php
               subPath: config.inc.php
               readOnly: true
@@ -199,9 +200,10 @@ spec:
             name: {{ include "roundcube.fullname" . }}-custom
         {{- end }}
         {{- range $pluginName, $config := .Values.roundcube.pluginConfigs }}
-        - name: plugin-config-{{ $pluginName }}
+        {{- $sanitizedName := $pluginName | replace "_" "-" }}
+        - name: plugin-config-{{ $sanitizedName }}
           configMap:
-            name: {{ include "roundcube.fullname" $ }}-plugin-{{ $pluginName }}
+            name: {{ include "roundcube.fullname" $ }}-plugin-{{ $sanitizedName }}
         {{- end }}
         {{- with .Values.roundcube.extraVolumes }}
         {{- toYaml . | nindent 8 }}

@@ -2,7 +2,7 @@ apiVersion: v2
 name: roundcube
 description: A free and open source webmail solution with a desktop-like user interface
 type: application
-version: 0.7.0
+version: 0.7.1
 appVersion: "1.6.11"
 keywords:
   - roundcube
@@ -20,18 +20,8 @@ icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/ela
 annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/changes: |
-    - kind: changed
-      description: "BREAKING: Simplified plugin config architecture - removed init containers and postStart hooks"
-    - kind: changed
-      description: Plugin configs now mounted directly via ConfigMaps (no timing issues or race conditions)
-    - kind: changed
-      description: Secrets now provided via standard Kubernetes environment variables using getenv() in PHP
-    - kind: removed
-      description: Removed pluginSecrets and pluginSecretsExistingSecret (use extraEnvVars instead)
-    - kind: removed
-      description: Removed pluginConfigHookTimeout (no longer needed without hooks)
-    - kind: changed
-      description: Each plugin config gets its own ConfigMap for better isolation and debugging
+    - kind: fixed
+      description: Sanitize plugin names for Kubernetes resource names (replace underscores with hyphens)
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/bitnami/postgresql
     - url: https://artifacthub.io/packages/helm/bitnami/mariadb
