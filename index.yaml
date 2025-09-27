@@ -3,6 +3,40 @@ entries:
   roundcube:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: Critical bug where postStart hook could exit with non-zero code causing CrashLoopBackOff
+        - kind: changed
+          description: Added explicit exit 0 at end of postStart hook to ensure successful completion
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/bitnami/postgresql
+        - url: https://artifacthub.io/packages/helm/bitnami/mariadb
+    apiVersion: v2
+    appVersion: 1.6.11
+    created: "2025-09-27T12:00:03.581924528Z"
+    description: A free and open source webmail solution with a desktop-like user
+      interface
+    digest: 6aeefc6dadc591dd36a618df35dad8ffa058b1387ed5203b990899a87757bc2d
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/roundcube
+    icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/elastic/images/logo.svg
+    keywords:
+    - roundcube
+    - webmail
+    - email
+    - mail
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: roundcube
+    sources:
+    - https://github.com/roundcube/roundcubemail
+    - https://github.com/encircle360-oss/helm-charts
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.4.1/roundcube-0.4.1.tgz
+    version: 0.4.1
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: Secret support for plugin configurations via pluginSecrets
         - kind: added
@@ -257,4 +291,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-09-27T11:41:44.654515008Z"
+generated: "2025-09-27T12:00:03.581956868Z"
