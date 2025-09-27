@@ -59,10 +59,19 @@ jobs:
         run: |
           mkdocs build -d site
 
+      - name: Stash generated files before branch switch
+        run: |
+          git add -A
+          git stash push -m "Generated docs from helm-docs and mkdocs"
+
       - name: Checkout gh-pages branch
         run: |
           git fetch origin gh-pages || git checkout --orphan gh-pages
           git checkout gh-pages
+
+      - name: Restore generated files
+        run: |
+          git stash pop || true
 
       - name: Copy docs to gh-pages /docs folder
         run: |
