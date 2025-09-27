@@ -4,6 +4,46 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: added
+          description: Direct support for composerPlugins with ROUNDCUBEMAIL_COMPOSER_PLUGINS env var
+        - kind: added
+          description: Plugin-specific configuration support via pluginConfigs map
+        - kind: added
+          description: Automatic mounting of config.inc.php for each plugin
+        - kind: added
+          description: Multi-domain support with flexible per-domain configuration
+        - kind: added
+          description: Support for ManageSieve, LDAP and other advanced configurations per domain
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/bitnami/postgresql
+        - url: https://artifacthub.io/packages/helm/bitnami/mariadb
+    apiVersion: v2
+    appVersion: 1.6.11
+    created: "2025-09-27T09:08:59.695413756Z"
+    description: A free and open source webmail solution with a desktop-like user
+      interface
+    digest: 2f88333d4c3e641a64c51f7989f27cb5204aa0df2768e03d2553f0fb461125cb
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/roundcube
+    icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/elastic/images/logo.svg
+    keywords:
+    - roundcube
+    - webmail
+    - email
+    - mail
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: roundcube
+    sources:
+    - https://github.com/roundcube/roundcubemail
+    - https://github.com/encircle360-oss/helm-charts
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.3.1/roundcube-0.3.1.tgz
+    version: 0.3.1
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
           description: Plugin-specific configuration support via pluginConfigs map
         - kind: added
           description: Automatic mounting of config.inc.php for each plugin
@@ -111,4 +151,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-09-27T09:00:37.953963749Z"
+generated: "2025-09-27T09:08:59.695433081Z"
