@@ -29,99 +29,101 @@ spec:
       serviceAccountName: {{ include "roundcube.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{- with .Values.initContainers }}
       initContainers:
+        {{- if .Values.roundcube.composerPlugins }}
+        - name: install-plugins
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -e
+              echo "Installing composer plugins..."
+              cd /var/www/html
+
+              {{- range .Values.roundcube.composerPlugins }}
+              echo "Installing plugin: {{ . }}"
+              composer require {{ . }} --no-interaction --no-progress --no-dev --optimize-autoloader
+              {{- end }}
+
+              echo "All plugins installed successfully"
+              echo "Installed plugins:"
+              find /var/www/html/plugins -mindepth 1 -maxdepth 1 -type d -exec basename {} \;
+          volumeMounts:
+            - name: plugins
+              mountPath: /var/www/html/plugins
+          securityContext:
+            runAsUser: 33
+            runAsGroup: 33
+            fsGroup: 33
+        {{- end }}
+        {{- if .Values.roundcube.pluginConfigs }}
+        - name: configure-plugins
+          image: busybox:latest
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              echo "Configuring plugins..."
+
+              for config_file in /tmp/roundcube-plugin-configs/*.config.inc.php; do
+                if [ -f "$$config_file" ]; then
+                  filename=$$(basename "$$config_file")
+                  plugin_name=$${filename%.config.inc.php}
+                  target_dir="/var/www/html/plugins/$$plugin_name"
+
+                  if [ -d "$$target_dir" ]; then
+                    echo "Copying config for plugin: $$plugin_name"
+                    config_content=$$(cat "$$config_file")
+
+                    {{- if or .Values.roundcube.pluginSecrets .Values.roundcube.pluginSecretsExistingSecret }}
+                    if [ -d /tmp/roundcube-plugin-secrets ]; then
+                      for secret_file in /tmp/roundcube-plugin-secrets/*; do
+                        if [ -f "$$secret_file" ]; then
+                          secret_key=$$(basename "$$secret_file")
+                          secret_value=$$(cat "$$secret_file")
+                          config_content=$$(echo "$$config_content" | sed "s|{{ "{{" }} $$secret_key {{ "}}" }}|$$secret_value|g")
+                        fi
+                      done
+                    fi
+                    {{- end }}
+
+                    echo "$$config_content" > "$$target_dir/config.inc.php"
+                    chmod 644 "$$target_dir/config.inc.php"
+                    echo "Config copied successfully for $$plugin_name"
+                  else
+                    echo "Warning: Plugin directory $$target_dir not found, skipping config"
+                  fi
+                fi
+              done
+
+              echo "Plugin configuration complete"
+          volumeMounts:
+            - name: plugins
+              mountPath: /var/www/html/plugins
+            - name: plugin-configs
+              mountPath: /tmp/roundcube-plugin-configs
+              readOnly: true
+            {{- if or .Values.roundcube.pluginSecrets .Values.roundcube.pluginSecretsExistingSecret }}
+            - name: plugin-secrets
+              mountPath: /tmp/roundcube-plugin-secrets
+              readOnly: true
+            {{- end }}
+          securityContext:
+            runAsUser: 33
+            runAsGroup: 33
+            fsGroup: 33
+        {{- end }}
+        {{- with .Values.initContainers }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if .Values.roundcube.pluginConfigs }}
-          lifecycle:
-            postStart:
-              exec:
-                command:
-                  - /bin/bash
-                  - -c
-                  - |
-                    echo "Starting plugin config copy hook (timeout: {{ .Values.roundcube.pluginConfigHookTimeout }}s)"
-                    
-                    # Wait for entrypoint and composer to finish (active wait)
-                    timeout={{ .Values.roundcube.pluginConfigHookTimeout }}
-                    elapsed=0
-                    
-                    {{- if .Values.roundcube.composerPlugins }}
-                    echo "Waiting for composer to install plugins..."
-                    
-                    # Wait for composer lock file to appear and disappear (indicates completion)
-                    while [ $$elapsed -lt $$timeout ]; do
-                      # Check if plugins directory has been populated
-                      plugin_count=$$(find /var/www/html/plugins -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
-                      
-                      if [ $$plugin_count -gt 0 ]; then
-                        echo "Plugin directory populated ($$plugin_count plugins found) after $${elapsed}s"
-                        # Give composer a bit more time to finish writing files
-                        sleep 2
-                        break
-                      fi
-                      
-                      sleep 1
-                      elapsed=$$((elapsed + 1))
-                    done
-                    
-                    if [ $$elapsed -ge $$timeout ]; then
-                      echo "Warning: Timeout waiting for plugins (waited $${elapsed}s)"
-                    fi
-                    {{- else }}
-                    # No composer plugins configured, wait a bit for entrypoint to complete
-                    echo "No composer plugins configured, waiting 5s for entrypoint..."
-                    sleep 5
-                    {{- end }}
-                    
-                    # Copy plugin configs from temp location to plugin directories
-                    if [ -d /tmp/roundcube-plugin-configs ]; then
-                      for config_file in /tmp/roundcube-plugin-configs/*.config.inc.php; do
-                        if [ -f "$$config_file" ]; then
-                          # Extract plugin name from filename (remove .config.inc.php suffix)
-                          filename=$$(basename "$$config_file")
-                          plugin_name=$${filename%.config.inc.php}
-                          target_dir="/var/www/html/plugins/$$plugin_name"
-                          
-                          if [ -d "$$target_dir" ]; then
-                            echo "Copying config for plugin: $$plugin_name"
-                            config_content=$$(cat "$$config_file")
-                            
-                            # Interpolate secrets if they exist
-                            if [ -d /tmp/roundcube-plugin-secrets ]; then
-                              echo "Interpolating secrets for plugin: $$plugin_name"
-                              for secret_file in /tmp/roundcube-plugin-secrets/*; do
-                                if [ -f "$$secret_file" ]; then
-                                  secret_key=$$(basename "$$secret_file")
-                                  secret_value=$$(cat "$$secret_file")
-                                  # Replace {{ "{{" }} SECRET_KEY {{ "}}" }} with actual value
-                                  config_content=$$(echo "$$config_content" | sed "s|{{ "{{" }} $$secret_key {{ "}}" }}|$$secret_value|g")
-                                fi
-                              done
-                            fi
-                            
-                            # Write interpolated config to target
-                            echo "$$config_content" > "$$target_dir/config.inc.php"
-                            chown www-data:www-data "$$target_dir/config.inc.php" 2>/dev/null || true
-                            chmod 644 "$$target_dir/config.inc.php" 2>/dev/null || true
-                            echo "Config copied successfully for $$plugin_name"
-                          else
-                            echo "Warning: Plugin directory $$target_dir does not exist yet"
-                          fi
-                        fi
-                      done
-                    fi
-                    
-                    # Ensure hook always succeeds
-                    exit 0
-          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
@@ -252,6 +254,10 @@ spec:
               mountPath: /var/roundcube/config/config.inc.php
               subPath: config.inc.php
             {{- end }}
+            {{- if .Values.roundcube.composerPlugins }}
+            - name: plugins
+              mountPath: /var/www/html/plugins
+            {{- end }}
             {{- if .Values.roundcube.pluginConfigs }}
             - name: plugin-configs
               mountPath: /tmp/roundcube-plugin-configs
@@ -284,6 +290,10 @@ spec:
         - name: custom-config
           configMap:
             name: {{ include "roundcube.fullname" . }}-custom
+        {{- end }}
+        {{- if .Values.roundcube.composerPlugins }}
+        - name: plugins
+          emptyDir: {}
         {{- end }}
         {{- if .Values.roundcube.pluginConfigs }}
         - name: plugin-configs

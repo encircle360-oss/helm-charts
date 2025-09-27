@@ -1,0 +1,13 @@
+{{- if .Values.roundcube.pluginConfigs }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "roundcube.fullname" . }}-plugin-configs
+  labels:
+    {{- include "roundcube.labels" . | nindent 4 }}
+data:
+  {{- range $pluginName, $config := .Values.roundcube.pluginConfigs }}
+  {{ $pluginName }}.config.inc.php: |
+{{- $config | nindent 4 }}
+  {{- end }}
+{{- end }}
