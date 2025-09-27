@@ -43,7 +43,7 @@ spec:
 
               {{- range .Values.roundcube.composerPlugins }}
               echo "Installing plugin: {{ . }}"
-              composer require {{ . }} --no-interaction --no-progress --no-dev --optimize-autoloader
+              composer require {{ . }} --no-interaction --no-progress --optimize-autoloader
               {{- end }}
 
               echo "All plugins installed successfully"

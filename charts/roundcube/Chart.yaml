@@ -2,7 +2,7 @@ apiVersion: v2
 name: roundcube
 description: A free and open source webmail solution with a desktop-like user interface
 type: application
-version: 0.6.0
+version: 0.6.1
 appVersion: "1.6.11"
 keywords:
   - roundcube
@@ -20,18 +20,8 @@ icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/ela
 annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/changes: |
-    - kind: changed
-      description: Refactored from postStart hook to init containers for robust plugin installation
-    - kind: added
-      description: Install-plugins init container handles composer plugin installation without timeout limits
-    - kind: added
-      description: Configure-plugins init container copies plugin configs after installation completes
-    - kind: changed
-      description: Eliminated postStart hook race conditions and 30s timeout limitation
-    - kind: changed
-      description: Improved logging with separate init container logs for debugging
-    - kind: changed
-      description: Sequential execution ensures plugins are installed before config copy
+    - kind: fixed
+      description: Remove invalid --no-dev flag from composer require command in init container
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/bitnami/postgresql
     - url: https://artifacthub.io/packages/helm/bitnami/mariadb
