@@ -194,7 +194,15 @@ This will:
 - Support multiple plugin configs simultaneously
 - Work alongside the main Roundcube configuration
 
-**Note**: Plugin configs are copied using a postStart lifecycle hook that waits 10 seconds for composer to install plugins, then copies configs from the temporary mount location to the actual plugin directories. This ensures composer can properly extract plugin files without encountering read-only mounted files.
+**Note**: Plugin configs are copied using a postStart lifecycle hook that actively waits for composer to install plugins (default timeout: 45s), then copies configs from the temporary mount location to the actual plugin directories. This ensures composer can properly extract plugin files without encountering read-only mounted files.
+
+**Configuring Hook Timeout**:
+```yaml
+roundcube:
+  pluginConfigHookTimeout: 60  # Increase timeout for slow clusters or many plugins
+```
+
+The hook actively monitors the `/var/www/html/plugins/` directory and proceeds as soon as plugins are installed, avoiding unnecessary delays.
 
 ### Plugin-Specific Configuration with Secrets
 

@@ -1,6 +1,6 @@
 # roundcube
 
-![Version: 0.4.2](https://img.shields.io/badge/Version-0.4.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
+![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
 
 A free and open source webmail solution with a desktop-like user interface
 
@@ -193,7 +193,15 @@ This will:
 - Support multiple plugin configs simultaneously
 - Work alongside the main Roundcube configuration
 
-**Note**: Plugin configs are copied using a postStart lifecycle hook that waits 10 seconds for composer to install plugins, then copies configs from the temporary mount location to the actual plugin directories. This ensures composer can properly extract plugin files without encountering read-only mounted files.
+**Note**: Plugin configs are copied using a postStart lifecycle hook that actively waits for composer to install plugins (default timeout: 45s), then copies configs from the temporary mount location to the actual plugin directories. This ensures composer can properly extract plugin files without encountering read-only mounted files.
+
+**Configuring Hook Timeout**:
+```yaml
+roundcube:
+  pluginConfigHookTimeout: 60  # Increase timeout for slow clusters or many plugins
+```
+
+The hook actively monitors the `/var/www/html/plugins/` directory and proceeds as soon as plugins are installed, avoiding unnecessary delays.
 
 ### Plugin-Specific Configuration with Secrets
 
@@ -375,6 +383,7 @@ With this configuration:
 | roundcube.extraVolumes | list | `[]` |  |
 | roundcube.multiDomain.domains | list | `[]` |  |
 | roundcube.multiDomain.enabled | bool | `false` |  |
+| roundcube.pluginConfigHookTimeout | int | `45` |  |
 | roundcube.pluginConfigs | object | `{}` |  |
 | roundcube.pluginSecrets | object | `{}` |  |
 | roundcube.pluginSecretsExistingSecret | string | `""` |  |

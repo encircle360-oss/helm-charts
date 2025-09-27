@@ -47,8 +47,39 @@ spec:
                   - /bin/bash
                   - -c
                   - |
-                    # Wait for composer to finish installing plugins
-                    sleep 10
+                    echo "Starting plugin config copy hook (timeout: {{ .Values.roundcube.pluginConfigHookTimeout }}s)"
+                    
+                    # Wait for entrypoint and composer to finish (active wait)
+                    timeout={{ .Values.roundcube.pluginConfigHookTimeout }}
+                    elapsed=0
+                    
+                    {{- if .Values.roundcube.composerPlugins }}
+                    echo "Waiting for composer to install plugins..."
+                    
+                    # Wait for composer lock file to appear and disappear (indicates completion)
+                    while [ $$elapsed -lt $$timeout ]; do
+                      # Check if plugins directory has been populated
+                      plugin_count=$$(find /var/www/html/plugins -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
+                      
+                      if [ $$plugin_count -gt 0 ]; then
+                        echo "Plugin directory populated ($$plugin_count plugins found) after $${elapsed}s"
+                        # Give composer a bit more time to finish writing files
+                        sleep 2
+                        break
+                      fi
+                      
+                      sleep 1
+                      elapsed=$$((elapsed + 1))
+                    done
+                    
+                    if [ $$elapsed -ge $$timeout ]; then
+                      echo "Warning: Timeout waiting for plugins (waited $${elapsed}s)"
+                    fi
+                    {{- else }}
+                    # No composer plugins configured, wait a bit for entrypoint to complete
+                    echo "No composer plugins configured, waiting 5s for entrypoint..."
+                    sleep 5
+                    {{- end }}
                     
                     # Copy plugin configs from temp location to plugin directories
                     if [ -d /tmp/roundcube-plugin-configs ]; then

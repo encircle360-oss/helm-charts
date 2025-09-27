@@ -165,6 +165,9 @@ roundcube:
   extraVolumes: []
   # Custom configuration (will be mounted as config.inc.php)
   customConfig: ""
+  # Plugin configuration lifecycle hook timeout (seconds)
+  # Maximum time to wait for composer to install plugins before copying configs
+  pluginConfigHookTimeout: 45
   # Plugin-specific configurations
   # Each plugin can have its own config.inc.php file
   # Key = plugin name, Value = PHP configuration content
