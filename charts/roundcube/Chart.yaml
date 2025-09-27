@@ -30,3 +30,4 @@ annotations:
     - url: https://artifacthub.io/packages/helm/bitnami/postgresql
     - url: https://artifacthub.io/packages/helm/bitnami/mariadb
 
+
