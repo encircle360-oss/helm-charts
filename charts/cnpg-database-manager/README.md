@@ -1,6 +1,6 @@
 # cnpg-database-manager
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
 
 Multi-database and multi-tenant management for CloudNativePG clusters with automatic secret generation and isolation
 
@@ -215,7 +215,45 @@ clusters:
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| clusters | object | `{}` |  |
+| clusters | object | `{}` (no clusters deployed by default) | PostgreSQL cluster configurations. Each key represents a cluster name. |
+
+### Configuration Parameters
+
+The chart uses a dynamic configuration structure where each PostgreSQL cluster is defined under the `clusters` key. Below are the detailed configuration options:
+
+#### Cluster Configuration
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `clusters.<name>.enabled` | bool | Yes | Enable or disable this cluster |
+| `clusters.<name>.instances` | int | Yes | Number of PostgreSQL instances (replicas) |
+| `clusters.<name>.imageName` | string | Yes | PostgreSQL container image with tag |
+| `clusters.<name>.storage.size` | string | Yes | Size of persistent volume (e.g., `50Gi`) |
+| `clusters.<name>.storage.storageClass` | string | No | Storage class name |
+| `clusters.<name>.resources.requests.memory` | string | No | Memory request (e.g., `2Gi`) |
+| `clusters.<name>.resources.requests.cpu` | string | No | CPU request (e.g., `1000m`) |
+| `clusters.<name>.resources.limits.memory` | string | No | Memory limit (e.g., `4Gi`) |
+| `clusters.<name>.resources.limits.cpu` | string | No | CPU limit (e.g., `2000m`) |
+| `clusters.<name>.postgresql.parameters` | object | No | PostgreSQL configuration parameters |
+| `clusters.<name>.monitoring.enabled` | bool | No | Enable Prometheus monitoring |
+| `clusters.<name>.monitoring.podMonitor.enabled` | bool | No | Create PodMonitor resource |
+| `clusters.<name>.backup.enabled` | bool | No | Enable automated backups |
+| `clusters.<name>.backup.schedule` | string | No | Backup schedule (cron format) |
+| `clusters.<name>.backup.retentionPolicy` | string | No | Backup retention policy (e.g., `30d`) |
+| `clusters.<name>.backup.s3.bucket` | string | No | S3 bucket name for backups |
+| `clusters.<name>.backup.s3.endpoint` | string | No | S3 endpoint URL |
+| `clusters.<name>.backup.s3.region` | string | No | S3 region |
+| `clusters.<name>.backup.s3.path` | string | No | Path prefix in bucket |
+| `clusters.<name>.backup.s3.credentials.existingSecret` | string | No | Existing secret with S3 credentials |
+
+#### Database Configuration
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `clusters.<name>.databases[].name` | string | Yes | Database name |
+| `clusters.<name>.databases[].owner` | string | Yes | Database owner/user name |
+| `clusters.<name>.databases[].targetNamespace` | string | No | Target namespace for secret replication |
+| `clusters.<name>.databases[].existingSecret` | string | No | Use existing secret for credentials |
 
 ## How It Works
 

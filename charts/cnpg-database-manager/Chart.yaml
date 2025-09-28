@@ -2,7 +2,7 @@ apiVersion: v2
 name: cnpg-database-manager
 description: Multi-database and multi-tenant management for CloudNativePG clusters with automatic secret generation and isolation
 type: application
-version: 0.1.1
+version: 0.1.2
 appVersion: "1.0"
 keywords:
   - postgresql
@@ -21,9 +21,11 @@ icon: https://avatars.githubusercontent.com/u/100373852
 annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/changes: |
+    - kind: added
+      description: Add comprehensive values.schema.json for validation
+    - kind: added
+      description: Add detailed values documentation with all configuration parameters
     - kind: changed
-      description: Add support and disclaimer sections to documentation
-    - kind: fixed
-      description: Use GitHub avatar for icon instead of external domain
+      description: Improve values.yaml with extensive inline documentation
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg

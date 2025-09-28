@@ -1,32 +1,78 @@
 # CloudNativePG Database Clusters Configuration
 # This chart manages PostgreSQL clusters, databases, and users using CloudNativePG operator
 
-clusters:
-  # Example cluster configuration
+# -- PostgreSQL cluster configurations. Each key represents a cluster name.
+# @default -- `{}` (no clusters deployed by default)
+clusters: {}
+  # Example cluster configuration:
   # main:
+  #   # -- Enable or disable this cluster
   #   enabled: true
+  #   
+  #   # -- Number of PostgreSQL instances in the cluster (replicas)
   #   instances: 3
+  #   
+  #   # -- PostgreSQL container image
   #   imageName: ghcr.io/cloudnative-pg/postgresql:17.2
+  #   
+  #   # -- Storage configuration
   #   storage:
+  #     # -- Size of the persistent volume
   #     size: 50Gi
-  #     storageClass: longhorn
+  #     # -- Storage class name (optional)
+  #     storageClass: ""
+  #   
+  #   # -- Resource limits and requests
+  #   resources:
+  #     requests:
+  #       memory: "2Gi"
+  #       cpu: "1000m"
+  #     limits:
+  #       memory: "4Gi"
+  #       cpu: "2000m"
+  #   
+  #   # -- PostgreSQL configuration parameters
+  #   postgresql:
+  #     parameters:
+  #       max_connections: "100"
+  #       shared_buffers: "256MB"
+  #   
+  #   # -- Monitoring configuration
   #   monitoring:
+  #     # -- Enable Prometheus monitoring
   #     enabled: true
+  #     # -- Enable PodMonitor resource
+  #     podMonitor:
+  #       enabled: true
+  #   
+  #   # -- Backup configuration
   #   backup:
+  #     # -- Enable automated backups
   #     enabled: false
-  #     # s3:
-  #     #   bucket: cnpg-backups
-  #     #   endpoint: s3.amazonaws.com
-  #     #   region: us-east-1
+  #     # -- Backup schedule (cron format)
+  #     schedule: "0 0 * * *"
+  #     # -- Backup retention policy
+  #     retentionPolicy: "30d"
+  #     # -- S3 configuration for backups
+  #     s3:
+  #       bucket: cnpg-backups
+  #       endpoint: s3.amazonaws.com
+  #       region: us-east-1
+  #       path: /backups
+  #       # -- Existing secret with S3 credentials
+  #       credentials:
+  #         existingSecret: ""
+  #   
+  #   # -- Database and user definitions
   #   databases:
-  #     - name: keycloak
+  #     - # -- Database name
+  #       name: keycloak
+  #       # -- Database owner/user name
   #       owner: keycloak_user
-  #       # Optional: Replicate secret to app namespace (namespace must exist)
-  #       targetNamespace: keycloak
-  #       # Optional: Use existing secret instead of generating new password
+  #       # -- Optional: Target namespace for secret replication
+  #       targetNamespace: ""
+  #       # -- Optional: Use existing secret for credentials
   #       existingSecret: ""
   #     - name: paperless
   #       owner: paperless_user
   #       targetNamespace: paperless
-
-  {}
