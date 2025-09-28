@@ -1,5 +1,41 @@
 apiVersion: v1
 entries:
+  cnpg-database-manager:
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: Initial release of cnpg-database-manager chart
+        - kind: added
+          description: Multi-database management for CloudNativePG clusters
+        - kind: added
+          description: Automatic secret generation and replication
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/recommendations: '- url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg'
+    apiVersion: v2
+    appVersion: "1.0"
+    created: "2025-09-28T07:21:36.039531895Z"
+    description: Multi-database and multi-tenant management for CloudNativePG clusters
+      with automatic secret generation and isolation
+    digest: 12fe2c518b49d8991bb541e4be158a1f309740e49bee33e6be2e8e2f0d740843
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager
+    icon: https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/docs/src/images/logo.svg
+    keywords:
+    - postgresql
+    - database
+    - cloudnative-pg
+    - cnpg
+    - multi-tenant
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: cnpg-database-manager
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://cloudnative-pg.io/
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/cnpg-database-manager-0.1.0/cnpg-database-manager-0.1.0.tgz
+    version: 0.1.0
   roundcube:
   - annotations:
       artifacthub.io/changes: |
@@ -651,4 +687,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-09-27T14:15:55.38999514Z"
+generated: "2025-09-28T07:21:36.19274803Z"
