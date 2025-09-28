@@ -17,7 +17,7 @@ sources:
 maintainers:
   - name: encircle360-oss
     email: oss@encircle360.com
-icon: https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/docs/src/images/logo.svg
+icon: https://avatars.githubusercontent.com/u/100373852
 annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/changes: |
