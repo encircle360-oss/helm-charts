@@ -13,6 +13,7 @@ Welcome to the encircle360 OSS Helm Charts repository! This collection provides 
 
 | Chart | Description | Version |
 |-------|-------------|---------|
+| [CNPG Database Manager](charts/cnpg-database-manager.md) | Multi-database and multi-tenant management for CloudNativePG clusters | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/cnpg-database-manager/Chart.yaml&query=$.version&label=version) |
 | [Roundcube](charts/roundcube.md) | A free and open source webmail solution with a desktop-like user interface | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/roundcube/Chart.yaml&query=$.version&label=version) |
 
 ## Installation
@@ -29,6 +30,9 @@ helm repo update
 ```bash
 # Install Roundcube
 helm install my-roundcube encircle360/roundcube
+
+# Install CNPG Database Manager
+helm install my-databases encircle360/cnpg-database-manager
 ```
 
 ## Configuration
