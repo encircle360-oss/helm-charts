@@ -1,0 +1,107 @@
+{{- range $clusterName, $cluster := .Values.clusters }}
+{{- if $cluster.enabled }}
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ $clusterName }}
+  labels:
+    {{- include "cnpg-databases.labels" $ | nindent 4 }}
+    cnpg.io/cluster: {{ $clusterName }}
+spec:
+  instances: {{ $cluster.instances | default 3 }}
+  
+  imageName: {{ $cluster.imageName | default "ghcr.io/cloudnative-pg/postgresql:17.2" }}
+  
+  postgresql:
+    parameters:
+      max_connections: {{ $cluster.maxConnections | default "200" | quote }}
+      shared_buffers: {{ $cluster.sharedBuffers | default "256MB" | quote }}
+      effective_cache_size: {{ $cluster.effectiveCacheSize | default "1GB" | quote }}
+      maintenance_work_mem: {{ $cluster.maintenanceWorkMem | default "64MB" | quote }}
+      checkpoint_completion_target: {{ $cluster.checkpointCompletionTarget | default "0.9" | quote }}
+      wal_buffers: {{ $cluster.walBuffers | default "16MB" | quote }}
+      default_statistics_target: {{ $cluster.defaultStatisticsTarget | default "100" | quote }}
+      random_page_cost: {{ $cluster.randomPageCost | default "1.1" | quote }}
+      effective_io_concurrency: {{ $cluster.effectiveIoConcurrency | default "200" | quote }}
+      work_mem: {{ $cluster.workMem | default "4MB" | quote }}
+      min_wal_size: {{ $cluster.minWalSize | default "1GB" | quote }}
+      max_wal_size: {{ $cluster.maxWalSize | default "4GB" | quote }}
+      {{- with $cluster.parameters }}
+      {{- range $key, $value := . }}
+      {{ $key }}: {{ $value | quote }}
+      {{- end }}
+      {{- end }}
+  
+  storage:
+    size: {{ $cluster.storage.size | default "50Gi" }}
+    {{- if $cluster.storage.storageClass }}
+    storageClass: {{ $cluster.storage.storageClass }}
+    {{- end }}
+  
+  {{- if $cluster.monitoring }}
+  {{- if $cluster.monitoring.enabled }}
+  monitoring:
+    enablePodMonitor: true
+  {{- end }}
+  {{- end }}
+  
+  {{- if $cluster.backup }}
+  {{- if $cluster.backup.enabled }}
+  backup:
+    retentionPolicy: {{ $cluster.backup.retentionPolicy | default "30d" }}
+    {{- if $cluster.backup.s3 }}
+    barmanObjectStore:
+      destinationPath: s3://{{ $cluster.backup.s3.bucket }}/{{ $clusterName }}
+      endpointURL: {{ $cluster.backup.s3.endpoint }}
+      {{- if $cluster.backup.s3.region }}
+      s3Credentials:
+        region:
+          name: {{ $clusterName }}-backup-creds
+          key: AWS_DEFAULT_REGION
+      {{- end }}
+      s3Credentials:
+        accessKeyId:
+          name: {{ $clusterName }}-backup-creds
+          key: AWS_ACCESS_KEY_ID
+        secretAccessKey:
+          name: {{ $clusterName }}-backup-creds
+          key: AWS_SECRET_ACCESS_KEY
+    {{- end }}
+  
+  scheduledBackup:
+    - name: daily-backup
+      schedule: {{ $cluster.backup.schedule | default "0 0 0 * * *" | quote }}
+      backupOwnerReference: self
+  {{- end }}
+  {{- end }}
+  
+  bootstrap:
+    initdb:
+      database: postgres
+      owner: postgres
+      {{- if or $cluster.databases $cluster.initdb }}
+      postInitSQL:
+        {{- if $cluster.databases }}
+        {{- range $database := $cluster.databases }}
+        - CREATE ROLE "{{ $database.owner }}" WITH LOGIN PASSWORD '${{"{{"}}.Secrets.{{ $clusterName }}-{{ $database.owner }}-password.password{{"}}"}}';
+        - GRANT ALL PRIVILEGES ON DATABASE "{{ $database.name }}" TO "{{ $database.owner }}";
+        - ALTER DATABASE "{{ $database.name }}" OWNER TO "{{ $database.owner }}";
+        {{- end }}
+        {{- end }}
+        {{- if $cluster.initdb }}
+        {{- if $cluster.initdb.postInitSQL }}
+        {{- range $cluster.initdb.postInitSQL }}
+        - {{ . }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
+  
+  {{- if $cluster.resources }}
+  resources:
+    {{- toYaml $cluster.resources | nindent 4 }}
+  {{- end }}
+
+{{- end }}
+{{- end }}

@@ -95,4 +95,5 @@ extra:
 nav:
   - Home: index.md
   - Charts:
+    - CNPG Database Manager: charts/cnpg-database-manager.md
     - Roundcube: charts/roundcube.md

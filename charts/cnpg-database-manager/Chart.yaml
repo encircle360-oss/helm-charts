@@ -1,0 +1,31 @@
+apiVersion: v2
+name: cnpg-database-manager
+description: Multi-database and multi-tenant management for CloudNativePG clusters with automatic secret generation and isolation
+type: application
+version: 0.1.0
+appVersion: "1.0"
+keywords:
+  - postgresql
+  - database
+  - cloudnative-pg
+  - cnpg
+  - multi-tenant
+home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager
+sources:
+  - https://github.com/encircle360-oss/helm-charts
+  - https://cloudnative-pg.io/
+maintainers:
+  - name: encircle360-oss
+    email: oss@encircle360.com
+icon: https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/docs/src/images/logo.svg
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/changes: |
+    - kind: added
+      description: Initial release of cnpg-database-manager chart
+    - kind: added
+      description: Multi-database management for CloudNativePG clusters
+    - kind: added
+      description: Automatic secret generation and replication
+  artifacthub.io/recommendations: |
+    - url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg

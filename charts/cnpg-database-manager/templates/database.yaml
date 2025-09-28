@@ -1,0 +1,28 @@
+{{- range $clusterName, $cluster := .Values.clusters }}
+{{- if $cluster.enabled }}
+{{- if $cluster.databases }}
+{{- range $cluster.databases }}
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: {{ $clusterName }}-{{ .name }}
+  labels:
+    {{- include "cnpg-databases.labels" $ | nindent 4 }}
+    cnpg.io/cluster: {{ $clusterName }}
+    cnpg.io/database: {{ .name }}
+spec:
+  cluster:
+    name: {{ $clusterName }}
+  name: {{ .name }}
+  owner: {{ .owner }}
+  {{- if .encoding }}
+  encoding: {{ .encoding }}
+  {{- end }}
+  {{- if .locale }}
+  locale: {{ .locale }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

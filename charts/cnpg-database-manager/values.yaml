@@ -1,0 +1,32 @@
+# CloudNativePG Database Clusters Configuration
+# This chart manages PostgreSQL clusters, databases, and users using CloudNativePG operator
+
+clusters:
+  # Example cluster configuration
+  # main:
+  #   enabled: true
+  #   instances: 3
+  #   imageName: ghcr.io/cloudnative-pg/postgresql:17.2
+  #   storage:
+  #     size: 50Gi
+  #     storageClass: longhorn
+  #   monitoring:
+  #     enabled: true
+  #   backup:
+  #     enabled: false
+  #     # s3:
+  #     #   bucket: cnpg-backups
+  #     #   endpoint: s3.amazonaws.com
+  #     #   region: us-east-1
+  #   databases:
+  #     - name: keycloak
+  #       owner: keycloak_user
+  #       # Optional: Replicate secret to app namespace (namespace must exist)
+  #       targetNamespace: keycloak
+  #       # Optional: Use existing secret instead of generating new password
+  #       existingSecret: ""
+  #     - name: paperless
+  #       owner: paperless_user
+  #       targetNamespace: paperless
+
+  {}
