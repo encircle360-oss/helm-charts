@@ -4,6 +4,50 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: added
+          description: Add prominent "Under Construction" warning to documentation
+        - kind: changed
+          description: Mark chart as NOT production-ready in documentation
+        - kind: fixed
+          description: Correct values documentation to match template implementation
+        - kind: added
+          description: Document 12 PostgreSQL tuning parameters with defaults
+        - kind: added
+          description: Document database encoding and locale parameters
+        - kind: added
+          description: Document initdb.postInitSQL for custom initialization
+        - kind: fixed
+          description: Mark S3 credentials as required when S3 backups enabled
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/recommendations: '- url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg'
+    apiVersion: v2
+    appVersion: "1.0"
+    created: "2025-09-28T08:17:13.565941381Z"
+    description: Multi-database and multi-tenant management for CloudNativePG clusters
+      with automatic secret generation and isolation
+    digest: edb57945989db94e7a069e604b0395781d563fbea97ae886f2488e2e8dfe5124
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager
+    icon: https://avatars.githubusercontent.com/u/100373852
+    keywords:
+    - postgresql
+    - database
+    - cloudnative-pg
+    - cnpg
+    - multi-tenant
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: cnpg-database-manager
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://cloudnative-pg.io/
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/cnpg-database-manager-0.1.3/cnpg-database-manager-0.1.3.tgz
+    version: 0.1.3
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
           description: Add comprehensive values.schema.json for validation
         - kind: added
           description: Add detailed values documentation with all configuration parameters
@@ -755,4 +799,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-09-28T08:05:22.798626414Z"
+generated: "2025-09-28T08:17:13.566016362Z"
