@@ -1,10 +1,14 @@
 # cnpg-database-manager
 
-![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 0.1.3](https://img.shields.io/badge/Version-0.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
 
 Multi-database and multi-tenant management for CloudNativePG clusters with automatic secret generation and isolation
 
 **Homepage:** <https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager>
+
+> **⚠️ UNDER CONSTRUCTION** 
+> This chart is currently under active development and has not been battle-tested in production environments. 
+> **NOT PRODUCTION READY** - Use at your own risk and thoroughly test in non-production environments first.
 
 ## Why This Chart?
 
@@ -14,7 +18,6 @@ The official CloudNativePG `cluster` chart only supports single database per dep
 - **Automatic Secret Generation**: Each database gets isolated credentials
 - **Secret Replication**: Optional secret distribution to application namespaces
 - **Multi-Tenant Ready**: Perfect for consolidating multiple lightweight databases
-- **Production Best Practices**: Follows Kubernetes security patterns
 
 Use this chart when you want to consolidate multiple applications into one PostgreSQL cluster while maintaining security isolation.
 
@@ -223,37 +226,52 @@ The chart uses a dynamic configuration structure where each PostgreSQL cluster i
 
 #### Cluster Configuration
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `clusters.<name>.enabled` | bool | Yes | Enable or disable this cluster |
-| `clusters.<name>.instances` | int | Yes | Number of PostgreSQL instances (replicas) |
-| `clusters.<name>.imageName` | string | Yes | PostgreSQL container image with tag |
-| `clusters.<name>.storage.size` | string | Yes | Size of persistent volume (e.g., `50Gi`) |
-| `clusters.<name>.storage.storageClass` | string | No | Storage class name |
-| `clusters.<name>.resources.requests.memory` | string | No | Memory request (e.g., `2Gi`) |
-| `clusters.<name>.resources.requests.cpu` | string | No | CPU request (e.g., `1000m`) |
-| `clusters.<name>.resources.limits.memory` | string | No | Memory limit (e.g., `4Gi`) |
-| `clusters.<name>.resources.limits.cpu` | string | No | CPU limit (e.g., `2000m`) |
-| `clusters.<name>.postgresql.parameters` | object | No | PostgreSQL configuration parameters |
-| `clusters.<name>.monitoring.enabled` | bool | No | Enable Prometheus monitoring |
-| `clusters.<name>.monitoring.podMonitor.enabled` | bool | No | Create PodMonitor resource |
-| `clusters.<name>.backup.enabled` | bool | No | Enable automated backups |
-| `clusters.<name>.backup.schedule` | string | No | Backup schedule (cron format) |
-| `clusters.<name>.backup.retentionPolicy` | string | No | Backup retention policy (e.g., `30d`) |
-| `clusters.<name>.backup.s3.bucket` | string | No | S3 bucket name for backups |
-| `clusters.<name>.backup.s3.endpoint` | string | No | S3 endpoint URL |
-| `clusters.<name>.backup.s3.region` | string | No | S3 region |
-| `clusters.<name>.backup.s3.path` | string | No | Path prefix in bucket |
-| `clusters.<name>.backup.s3.credentials.existingSecret` | string | No | Existing secret with S3 credentials |
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `clusters.<name>.enabled` | bool | Yes | - | Enable or disable this cluster |
+| `clusters.<name>.instances` | int | Yes | - | Number of PostgreSQL instances (replicas) |
+| `clusters.<name>.imageName` | string | Yes | - | PostgreSQL container image with tag |
+| `clusters.<name>.storage.size` | string | Yes | - | Size of persistent volume (e.g., `50Gi`) |
+| `clusters.<name>.storage.storageClass` | string | No | - | Storage class name |
+| `clusters.<name>.resources.requests.memory` | string | No | - | Memory request (e.g., `2Gi`) |
+| `clusters.<name>.resources.requests.cpu` | string | No | - | CPU request (e.g., `1000m`) |
+| `clusters.<name>.resources.limits.memory` | string | No | - | Memory limit (e.g., `4Gi`) |
+| `clusters.<name>.resources.limits.cpu` | string | No | - | CPU limit (e.g., `2000m`) |
+| `clusters.<name>.maxConnections` | string | No | `"200"` | Maximum number of connections |
+| `clusters.<name>.sharedBuffers` | string | No | `"256MB"` | Shared memory buffers |
+| `clusters.<name>.effectiveCacheSize` | string | No | `"1GB"` | Effective cache size |
+| `clusters.<name>.maintenanceWorkMem` | string | No | `"64MB"` | Maintenance work memory |
+| `clusters.<name>.checkpointCompletionTarget` | string | No | `"0.9"` | Checkpoint completion target |
+| `clusters.<name>.walBuffers` | string | No | `"16MB"` | WAL buffers |
+| `clusters.<name>.defaultStatisticsTarget` | string | No | `"100"` | Default statistics target |
+| `clusters.<name>.randomPageCost` | string | No | `"1.1"` | Random page cost |
+| `clusters.<name>.effectiveIoConcurrency` | string | No | `"200"` | Effective I/O concurrency |
+| `clusters.<name>.workMem` | string | No | `"4MB"` | Work memory per operation |
+| `clusters.<name>.minWalSize` | string | No | `"1GB"` | Minimum WAL size |
+| `clusters.<name>.maxWalSize` | string | No | `"4GB"` | Maximum WAL size |
+| `clusters.<name>.parameters` | object | No | `{}` | Additional custom PostgreSQL parameters |
+| `clusters.<name>.monitoring.enabled` | bool | No | `false` | Enable Prometheus monitoring |
+| `clusters.<name>.backup.enabled` | bool | No | `false` | Enable automated backups |
+| `clusters.<name>.backup.schedule` | string | No | `"0 0 0 * * *"` | Backup schedule (cron format) |
+| `clusters.<name>.backup.retentionPolicy` | string | No | `"30d"` | Backup retention policy |
+| `clusters.<name>.backup.s3.bucket` | string | **Yes** (if S3) | - | S3 bucket name for backups |
+| `clusters.<name>.backup.s3.endpoint` | string | **Yes** (if S3) | - | S3 endpoint URL |
+| `clusters.<name>.backup.s3.region` | string | No | - | S3 region |
+| `clusters.<name>.backup.s3.accessKeyId` | string | **Yes** (if S3) | - | S3 access key ID |
+| `clusters.<name>.backup.s3.secretAccessKey` | string | **Yes** (if S3) | - | S3 secret access key |
+| `clusters.<name>.backup.s3.credentials.existingSecret` | string | No | - | Existing secret (alternative to accessKeyId/secretAccessKey) |
+| `clusters.<name>.initdb.postInitSQL` | array | No | `[]` | Custom SQL statements after init |
 
 #### Database Configuration
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `clusters.<name>.databases[].name` | string | Yes | Database name |
-| `clusters.<name>.databases[].owner` | string | Yes | Database owner/user name |
-| `clusters.<name>.databases[].targetNamespace` | string | No | Target namespace for secret replication |
-| `clusters.<name>.databases[].existingSecret` | string | No | Use existing secret for credentials |
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `clusters.<name>.databases[].name` | string | Yes | - | Database name |
+| `clusters.<name>.databases[].owner` | string | Yes | - | Database owner/user name |
+| `clusters.<name>.databases[].targetNamespace` | string | No | - | Target namespace for secret replication |
+| `clusters.<name>.databases[].existingSecret` | string | No | - | Use existing secret for credentials |
+| `clusters.<name>.databases[].encoding` | string | No | `"UTF8"` | Database encoding |
+| `clusters.<name>.databases[].locale` | string | No | `"C"` | Database locale |
 
 ## How It Works
 
@@ -426,12 +444,15 @@ For professional support, consulting, custom development, or enterprise solution
 
 ## Disclaimer
 
+**⚠️ This chart is under active development and NOT production-ready.**
+
 This Helm chart is provided "AS IS" without warranty of any kind. encircle360 GmbH and the contributors:
 - Make no warranties about the completeness, reliability, or accuracy of this chart
 - Are not liable for any damages arising from the use of this chart
-- Recommend thorough testing in non-production environments before production use
+- **Strongly recommend thorough testing in non-production environments only**
+- Do not recommend this chart for production use at this time
 
-Use this chart at your own risk. For production deployments with SLA requirements, consider our professional support services.
+Use this chart at your own risk. For production-ready PostgreSQL solutions with SLA requirements, contact our professional support services at **hello@encircle360.com**
 
 ## License
 

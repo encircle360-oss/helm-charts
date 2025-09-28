@@ -31,37 +31,58 @@ clusters: {}
   #       memory: "4Gi"
   #       cpu: "2000m"
   #   
-  #   # -- PostgreSQL configuration parameters
-  #   postgresql:
-  #     parameters:
-  #       max_connections: "100"
-  #       shared_buffers: "256MB"
+  #   # -- PostgreSQL tuning parameters (overrides defaults)
+  #   maxConnections: "200"
+  #   sharedBuffers: "256MB"
+  #   effectiveCacheSize: "1GB"
+  #   maintenanceWorkMem: "64MB"
+  #   checkpointCompletionTarget: "0.9"
+  #   walBuffers: "16MB"
+  #   defaultStatisticsTarget: "100"
+  #   randomPageCost: "1.1"
+  #   effectiveIoConcurrency: "200"
+  #   workMem: "4MB"
+  #   minWalSize: "1GB"
+  #   maxWalSize: "4GB"
+  #   
+  #   # -- Additional custom PostgreSQL parameters
+  #   parameters:
+  #     log_statement: "all"
+  #     log_min_duration_statement: "1000"
   #   
   #   # -- Monitoring configuration
   #   monitoring:
   #     # -- Enable Prometheus monitoring
   #     enabled: true
-  #     # -- Enable PodMonitor resource
-  #     podMonitor:
-  #       enabled: true
   #   
   #   # -- Backup configuration
   #   backup:
   #     # -- Enable automated backups
   #     enabled: false
   #     # -- Backup schedule (cron format)
-  #     schedule: "0 0 * * *"
+  #     schedule: "0 0 0 * * *"
   #     # -- Backup retention policy
   #     retentionPolicy: "30d"
   #     # -- S3 configuration for backups
   #     s3:
+  #       # -- S3 bucket name (required when S3 enabled)
   #       bucket: cnpg-backups
+  #       # -- S3 endpoint URL (required when S3 enabled)
   #       endpoint: s3.amazonaws.com
+  #       # -- S3 region (optional)
   #       region: us-east-1
-  #       path: /backups
-  #       # -- Existing secret with S3 credentials
+  #       # -- S3 access key ID (required when S3 enabled)
+  #       accessKeyId: ""
+  #       # -- S3 secret access key (required when S3 enabled)
+  #       secretAccessKey: ""
+  #       # -- Existing secret with S3 credentials (alternative to accessKeyId/secretAccessKey)
   #       credentials:
   #         existingSecret: ""
+  #   
+  #   # -- Custom initdb SQL statements
+  #   initdb:
+  #     postInitSQL:
+  #       - "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;"
   #   
   #   # -- Database and user definitions
   #   databases:
@@ -73,6 +94,10 @@ clusters: {}
   #       targetNamespace: ""
   #       # -- Optional: Use existing secret for credentials
   #       existingSecret: ""
+  #       # -- Optional: Database encoding (default: UTF8)
+  #       encoding: "UTF8"
+  #       # -- Optional: Database locale (default: C)
+  #       locale: "C"
   #     - name: paperless
   #       owner: paperless_user
   #       targetNamespace: paperless

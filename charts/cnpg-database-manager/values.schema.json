@@ -67,17 +67,59 @@
               }
             }
           },
-          "postgresql": {
+          "maxConnections": {
+            "type": "string",
+            "description": "Maximum number of connections"
+          },
+          "sharedBuffers": {
+            "type": "string",
+            "description": "Shared memory buffers"
+          },
+          "effectiveCacheSize": {
+            "type": "string",
+            "description": "Effective cache size"
+          },
+          "maintenanceWorkMem": {
+            "type": "string",
+            "description": "Maintenance work memory"
+          },
+          "checkpointCompletionTarget": {
+            "type": "string",
+            "description": "Checkpoint completion target"
+          },
+          "walBuffers": {
+            "type": "string",
+            "description": "WAL buffers"
+          },
+          "defaultStatisticsTarget": {
+            "type": "string",
+            "description": "Default statistics target"
+          },
+          "randomPageCost": {
+            "type": "string",
+            "description": "Random page cost"
+          },
+          "effectiveIoConcurrency": {
+            "type": "string",
+            "description": "Effective I/O concurrency"
+          },
+          "workMem": {
+            "type": "string",
+            "description": "Work memory per operation"
+          },
+          "minWalSize": {
+            "type": "string",
+            "description": "Minimum WAL size"
+          },
+          "maxWalSize": {
+            "type": "string",
+            "description": "Maximum WAL size"
+          },
+          "parameters": {
             "type": "object",
-            "description": "PostgreSQL configuration",
-            "properties": {
-              "parameters": {
-                "type": "object",
-                "description": "PostgreSQL parameters",
-                "additionalProperties": {
-                  "type": "string"
-                }
-              }
+            "description": "Additional custom PostgreSQL parameters",
+            "additionalProperties": {
+              "type": "string"
             }
           },
           "monitoring": {
@@ -135,6 +177,14 @@
                     "type": "string",
                     "description": "Path prefix in bucket"
                   },
+                  "accessKeyId": {
+                    "type": "string",
+                    "description": "S3 access key ID (required when S3 enabled)"
+                  },
+                  "secretAccessKey": {
+                    "type": "string",
+                    "description": "S3 secret access key (required when S3 enabled)"
+                  },
                   "credentials": {
                     "type": "object",
                     "properties": {
@@ -144,6 +194,19 @@
                       }
                     }
                   }
+                }
+              }
+            }
+          },
+          "initdb": {
+            "type": "object",
+            "description": "Custom initdb configuration",
+            "properties": {
+              "postInitSQL": {
+                "type": "array",
+                "description": "Custom SQL statements to run after initialization",
+                "items": {
+                  "type": "string"
                 }
               }
             }
@@ -171,6 +234,14 @@
                 "existingSecret": {
                   "type": "string",
                   "description": "Use existing secret for credentials"
+                },
+                "encoding": {
+                  "type": "string",
+                  "description": "Database encoding"
+                },
+                "locale": {
+                  "type": "string",
+                  "description": "Database locale"
                 }
               },
               "required": ["name", "owner"]
