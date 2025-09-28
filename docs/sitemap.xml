@@ -2,10 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://encircle360-oss.github.io/helm-charts/docs/</loc>
-         <lastmod>2025-09-27</lastmod>
+         <lastmod>2025-09-28</lastmod>
+    </url>
+    <url>
+         <loc>https://encircle360-oss.github.io/helm-charts/docs/charts/cnpg-database-manager/</loc>
+         <lastmod>2025-09-28</lastmod>
     </url>
     <url>
          <loc>https://encircle360-oss.github.io/helm-charts/docs/charts/roundcube/</loc>
-         <lastmod>2025-09-27</lastmod>
+         <lastmod>2025-09-28</lastmod>
     </url>
 </urlset>
