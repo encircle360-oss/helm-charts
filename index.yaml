@@ -3,6 +3,41 @@ entries:
   cnpg-database-manager:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: Add comprehensive values.schema.json for validation
+        - kind: added
+          description: Add detailed values documentation with all configuration parameters
+        - kind: changed
+          description: Improve values.yaml with extensive inline documentation
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/recommendations: '- url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg'
+    apiVersion: v2
+    appVersion: "1.0"
+    created: "2025-09-28T08:05:22.798584946Z"
+    description: Multi-database and multi-tenant management for CloudNativePG clusters
+      with automatic secret generation and isolation
+    digest: 2c289251e609979ecea99c500f2e01913c12c99f6c7d1f731bbe31e870c8dc2a
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager
+    icon: https://avatars.githubusercontent.com/u/100373852
+    keywords:
+    - postgresql
+    - database
+    - cloudnative-pg
+    - cnpg
+    - multi-tenant
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: cnpg-database-manager
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://cloudnative-pg.io/
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/cnpg-database-manager-0.1.2/cnpg-database-manager-0.1.2.tgz
+    version: 0.1.2
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: Add support and disclaimer sections to documentation
         - kind: fixed
@@ -720,4 +755,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-09-28T07:59:25.071595989Z"
+generated: "2025-09-28T08:05:22.798626414Z"
