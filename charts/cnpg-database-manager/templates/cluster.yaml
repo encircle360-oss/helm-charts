@@ -10,8 +10,24 @@ metadata:
     cnpg.io/cluster: {{ $clusterName }}
 spec:
   instances: {{ $cluster.instances | default 3 }}
-  
+
   imageName: {{ $cluster.imageName | default "ghcr.io/cloudnative-pg/postgresql:17.2" }}
+
+  {{- if $cluster.databases }}
+  managed:
+    roles:
+    {{- $uniqueOwners := dict }}
+    {{- range $database := $cluster.databases }}
+    {{- $_ := set $uniqueOwners $database.owner true }}
+    {{- end }}
+    {{- range $owner, $_ := $uniqueOwners }}
+    - name: {{ $owner | quote }}
+      ensure: present
+      login: true
+      passwordSecret:
+        name: {{ $clusterName }}-{{ include "cnpg-database-manager.sanitizeName" $owner }}-password
+    {{- end }}
+  {{- end }}
   
   postgresql:
     parameters:

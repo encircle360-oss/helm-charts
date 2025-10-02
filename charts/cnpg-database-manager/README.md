@@ -1,6 +1,6 @@
 # cnpg-database-manager
 
-![Version: 0.1.5](https://img.shields.io/badge/Version-0.1.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 0.1.7](https://img.shields.io/badge/Version-0.1.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
 
 Multi-database and multi-tenant management for CloudNativePG clusters with automatic secret generation and isolation
 
@@ -279,11 +279,19 @@ The chart uses a dynamic configuration structure where each PostgreSQL cluster i
 
 For each database defined in `clusters.<name>.databases[]`:
 
-1. **Database Resource**: A CloudNativePG `Database` resource is created
-2. **User/Owner**: A PostgreSQL user is automatically created with the `owner` name
+1. **Managed Roles**: PostgreSQL roles/users are created declaratively via `spec.managed.roles` in the Cluster CRD
+   - Each unique `owner` from all databases becomes a managed role
+   - Roles are deduplicated (multiple databases can share the same owner)
+   - Role passwords are stored in separate secrets (`<cluster>-<owner>-password`)
+
+2. **Database Resource**: A CloudNativePG `Database` resource is created
+   - Database name from `name` field
+   - Owner references the managed role
+   - Database CRD automatically creates the PostgreSQL database
+
 3. **Secret Generation**: A Kubernetes Secret is created with connection details:
    - `username`: The database owner
-   - `password`: Auto-generated secure password
+   - `password`: Auto-generated secure password (persisted across upgrades)
    - `dbname`: Database name
    - `host`: Cluster service endpoint
    - `port`: PostgreSQL port (5432)
@@ -292,9 +300,15 @@ For each database defined in `clusters.<name>.databases[]`:
 
 ### Secret Naming
 
-Secrets follow the naming pattern: `<cluster-name>-<database-name>-app`
+**Database Credentials Secrets**: `<cluster-name>-<database-name>-creds`
+- Example: For cluster `main` and database `keycloak`, the secret is `main-keycloak-creds`
+- Contains full connection details (username, password, host, port, URIs)
 
-Example: For cluster `main` and database `keycloak`, the secret is `main-keycloak-app`
+**Role Password Secrets**: `<cluster-name>-<owner-name>-password`
+- Example: For cluster `main` and owner `keycloak`, the secret is `main-keycloak-password`
+- Type: `kubernetes.io/basic-auth`
+- Used by CloudNativePG's managed roles feature
+- Shared across multiple databases with the same owner
 
 ### Secret Replication
 
