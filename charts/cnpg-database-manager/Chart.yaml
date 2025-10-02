@@ -2,7 +2,7 @@ apiVersion: v2
 name: cnpg-database-manager
 description: Multi-database and multi-tenant management for CloudNativePG clusters with automatic secret generation and isolation
 type: application
-version: 0.1.3
+version: 0.1.4
 appVersion: "1.0"
 keywords:
   - postgresql
@@ -22,19 +22,7 @@ annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/prerelease: true
   artifacthub.io/changes: |
-    - kind: added
-      description: Add prominent "Under Construction" warning to documentation
-    - kind: changed
-      description: Mark chart as NOT production-ready in documentation
     - kind: fixed
-      description: Correct values documentation to match template implementation
-    - kind: added
-      description: Document 12 PostgreSQL tuning parameters with defaults
-    - kind: added
-      description: Document database encoding and locale parameters
-    - kind: added
-      description: Document initdb.postInitSQL for custom initialization
-    - kind: fixed
-      description: Mark S3 credentials as required when S3 backups enabled
+      description: Sanitize database and owner names for Kubernetes resource names (RFC 1123 compliance)
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg
