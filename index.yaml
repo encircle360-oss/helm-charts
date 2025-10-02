@@ -3,6 +3,40 @@ entries:
   cnpg-database-manager:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: Add managed.roles to Cluster spec for declarative role management
+        - kind: added
+          description: Create role password secrets for managed roles
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/recommendations: '- url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg'
+    apiVersion: v2
+    appVersion: "1.0"
+    created: "2025-10-02T23:21:15.181381099Z"
+    description: Multi-database and multi-tenant management for CloudNativePG clusters
+      with automatic secret generation and isolation
+    digest: 633ba87617375e3e9207bd98da4ea771e614dd6865989c633786a8ba6789e57f
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager
+    icon: https://avatars.githubusercontent.com/u/100373852
+    keywords:
+    - postgresql
+    - database
+    - cloudnative-pg
+    - cnpg
+    - multi-tenant
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: cnpg-database-manager
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://cloudnative-pg.io/
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/cnpg-database-manager-0.1.7/cnpg-database-manager-0.1.7.tgz
+    version: 0.1.7
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: Sanitize database and owner names for Kubernetes resource names (RFC 1123 compliance)
         - kind: changed
@@ -871,4 +905,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-10-02T22:50:35.930497932Z"
+generated: "2025-10-02T23:21:15.181457682Z"
