@@ -2,7 +2,7 @@ apiVersion: v2
 name: cnpg-database-manager
 description: Multi-database and multi-tenant management for CloudNativePG clusters with automatic secret generation and isolation
 type: application
-version: 0.1.4
+version: 0.1.6
 appVersion: "1.0"
 keywords:
   - postgresql
@@ -24,5 +24,13 @@ annotations:
   artifacthub.io/changes: |
     - kind: fixed
       description: Sanitize database and owner names for Kubernetes resource names (RFC 1123 compliance)
+    - kind: changed
+      description: Remove automatic database creation from postInitSQL, rely on Database CRD instead
+    - kind: removed
+      description: Remove roles.yaml template (Database CRD handles user creation)
+    - kind: fixed
+      description: Fix password synchronization between original and replicated secrets
+    - kind: changed
+      description: Correct documentation - use targetNamespace instead of secretNamespace
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg

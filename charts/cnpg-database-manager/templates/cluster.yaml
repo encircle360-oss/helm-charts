@@ -80,22 +80,13 @@ spec:
     initdb:
       database: postgres
       owner: postgres
-      {{- if or $cluster.databases $cluster.initdb }}
+      {{- if $cluster.initdb }}
+      {{- if $cluster.initdb.postInitSQL }}
       postInitSQL:
-        {{- if $cluster.databases }}
-        {{- range $database := $cluster.databases }}
-        - CREATE ROLE "{{ $database.owner }}" WITH LOGIN PASSWORD '${{"{{"}}.Secrets.{{ $clusterName }}-{{ $database.owner }}-password.password{{"}}"}}';
-        - GRANT ALL PRIVILEGES ON DATABASE "{{ $database.name }}" TO "{{ $database.owner }}";
-        - ALTER DATABASE "{{ $database.name }}" OWNER TO "{{ $database.owner }}";
-        {{- end }}
-        {{- end }}
-        {{- if $cluster.initdb }}
-        {{- if $cluster.initdb.postInitSQL }}
         {{- range $cluster.initdb.postInitSQL }}
         - {{ . }}
         {{- end }}
-        {{- end }}
-        {{- end }}
+      {{- end }}
       {{- end }}
   
   {{- if $cluster.resources }}

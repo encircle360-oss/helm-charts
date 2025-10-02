@@ -1,6 +1,6 @@
 # cnpg-database-manager
 
-![Version: 0.1.3](https://img.shields.io/badge/Version-0.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 0.1.5](https://img.shields.io/badge/Version-0.1.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
 
 Multi-database and multi-tenant management for CloudNativePG clusters with automatic secret generation and isolation
 
@@ -158,10 +158,10 @@ clusters:
     databases:
       - name: keycloak
         owner: keycloak
-        secretNamespace: keycloak-ns
+        targetNamespace: keycloak-ns
       - name: paperless
         owner: paperless
-        secretNamespace: paperless-ns
+        targetNamespace: paperless-ns
 ```
 
 This automatically replicates database secrets to the application namespaces.
@@ -298,7 +298,7 @@ Example: For cluster `main` and database `keycloak`, the secret is `main-keycloa
 
 ### Secret Replication
 
-If `secretNamespace` is specified for a database, the secret is automatically replicated to that namespace using Kubernetes secret reflection or a custom replication mechanism.
+If `targetNamespace` is specified for a database, the secret is automatically replicated to that namespace.
 
 ## Use Cases
 
@@ -317,16 +317,16 @@ clusters:
     databases:
       - name: auth-service
         owner: auth
-        secretNamespace: auth
+        targetNamespace: auth
       - name: user-service
         owner: users
-        secretNamespace: users
+        targetNamespace: users
       - name: order-service
         owner: orders
-        secretNamespace: orders
+        targetNamespace: orders
       - name: payment-service
         owner: payments
-        secretNamespace: payments
+        targetNamespace: payments
 ```
 
 ### Multi-Tenant SaaS

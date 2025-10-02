@@ -159,10 +159,10 @@ clusters:
     databases:
       - name: keycloak
         owner: keycloak
-        secretNamespace: keycloak-ns
+        targetNamespace: keycloak-ns
       - name: paperless
         owner: paperless
-        secretNamespace: paperless-ns
+        targetNamespace: paperless-ns
 ```
 
 This automatically replicates database secrets to the application namespaces.
@@ -290,7 +290,7 @@ Example: For cluster `main` and database `keycloak`, the secret is `main-keycloa
 
 ### Secret Replication
 
-If `secretNamespace` is specified for a database, the secret is automatically replicated to that namespace using Kubernetes secret reflection or a custom replication mechanism.
+If `targetNamespace` is specified for a database, the secret is automatically replicated to that namespace.
 
 ## Use Cases
 
@@ -309,16 +309,16 @@ clusters:
     databases:
       - name: auth-service
         owner: auth
-        secretNamespace: auth
+        targetNamespace: auth
       - name: user-service
         owner: users
-        secretNamespace: users
+        targetNamespace: users
       - name: order-service
         owner: orders
-        secretNamespace: orders
+        targetNamespace: orders
       - name: payment-service
         owner: payments
-        secretNamespace: payments
+        targetNamespace: payments
 ```
 
 ### Multi-Tenant SaaS
