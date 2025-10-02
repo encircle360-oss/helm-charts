@@ -47,3 +47,11 @@ Selector labels
 app.kubernetes.io/name: {{ include "cnpg-databases.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Sanitize name for Kubernetes resource names (RFC 1123)
+Replaces underscores with hyphens and converts to lowercase
+*/}}
+{{- define "cnpg-database-manager.sanitizeName" -}}
+{{- . | replace "_" "-" | lower -}}
+{{- end -}}

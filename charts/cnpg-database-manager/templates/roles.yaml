@@ -6,7 +6,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ $clusterName }}-{{ $database.owner }}-password
+  name: {{ $clusterName }}-{{ include "cnpg-database-manager.sanitizeName" $database.owner }}-password
   labels:
     {{- include "cnpg-databases.labels" $ | nindent 4 }}
     cnpg.io/cluster: {{ $clusterName }}

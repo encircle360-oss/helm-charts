@@ -6,7 +6,7 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
-  name: {{ $clusterName }}-{{ .name }}
+  name: {{ $clusterName }}-{{ include "cnpg-database-manager.sanitizeName" .name }}
   labels:
     {{- include "cnpg-databases.labels" $ | nindent 4 }}
     cnpg.io/cluster: {{ $clusterName }}
