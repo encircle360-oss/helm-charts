@@ -1,6 +1,28 @@
 # CloudNativePG Database Clusters Configuration
 # This chart manages PostgreSQL clusters, databases, and users using CloudNativePG operator
 
+# -- Image catalog configurations. Defines reusable container image references.
+# @default -- `{}` (no catalogs deployed by default)
+imageCatalogs: {}
+  # Example image catalog:
+  # postgresql:
+  #   # -- Enable or disable this catalog
+  #   enabled: true
+  #   # -- Catalog kind: ImageCatalog (namespaced) or ClusterImageCatalog (cluster-scoped)
+  #   kind: ImageCatalog
+  #   # -- Custom labels
+  #   labels: {}
+  #   # -- Custom annotations
+  #   annotations: {}
+  #   # -- List of PostgreSQL images by major version
+  #   images:
+  #     - major: 15
+  #       image: ghcr.io/cloudnative-pg/postgresql:15.6
+  #     - major: 16
+  #       image: ghcr.io/cloudnative-pg/postgresql:16.2
+  #     - major: 17
+  #       image: ghcr.io/cloudnative-pg/postgresql:17.2
+
 # -- PostgreSQL cluster configurations. Each key represents a cluster name.
 # @default -- `{}` (no clusters deployed by default)
 clusters: {}
@@ -12,8 +34,15 @@ clusters: {}
   #   # -- Number of PostgreSQL instances in the cluster (replicas)
   #   instances: 3
   #   
-  #   # -- PostgreSQL container image
+  #   # -- PostgreSQL container image (direct reference)
   #   imageName: ghcr.io/cloudnative-pg/postgresql:17.2
+  #
+  #   # -- OR: Use ImageCatalog reference instead of imageName
+  #   imageCatalogRef:
+  #     apiGroup: postgresql.cnpg.io
+  #     kind: ImageCatalog
+  #     name: postgresql
+  #     major: 17
   #   
   #   # -- Storage configuration
   #   storage:
@@ -54,6 +83,26 @@ clusters: {}
   #   monitoring:
   #     # -- Enable Prometheus monitoring
   #     enabled: true
+  #     # -- Prometheus alert rules
+  #     prometheusRule:
+  #       # -- Enable PrometheusRule resource
+  #       enabled: true
+  #       # -- Custom labels for PrometheusRule
+  #       labels: {}
+  #       # -- Custom annotations for PrometheusRule
+  #       annotations: {}
+  #       # -- Evaluation interval
+  #       interval: ""
+  #       # -- Custom alert rules (overrides defaults if specified)
+  #       rules: []
+  #         # - alert: CustomAlert
+  #         #   annotations:
+  #         #     summary: "Custom alert"
+  #         #   expr: |
+  #         #     metric > threshold
+  #         #   for: 5m
+  #         #   labels:
+  #         #     severity: warning
   #   
   #   # -- Backup configuration
   #   backup:
@@ -63,12 +112,36 @@ clusters: {}
   #     schedule: "0 0 0 * * *"
   #     # -- Backup retention policy
   #     retentionPolicy: "30d"
+  #
+  #     # -- Direct destinationPath (overrides provider-specific paths)
+  #     destinationPath: ""
+  #
+  #     # -- Backup method: barmanObjectStore (default) or volumeSnapshot
+  #     method: ""
+  #
+  #     # -- Volume snapshot configuration (for CSI-compatible storage)
+  #     volumeSnapshot:
+  #       # -- VolumeSnapshot class name (required for volumeSnapshot method)
+  #       className: ""
+  #       # -- Online backup (true, default) or offline backup (false)
+  #       online: true
+  #       # -- Online backup configuration
+  #       onlineConfiguration:
+  #         # -- Force immediate checkpoint before snapshot
+  #         immediateCheckpoint: false
+  #         # -- Wait for WAL archiving before completing backup
+  #         waitForArchive: true
+  #       # -- Snapshot ownership: none (default), backup, cluster
+  #       snapshotOwnerReference: ""
+  #
   #     # -- S3 configuration for backups
   #     s3:
   #       # -- S3 bucket name (required when S3 enabled)
   #       bucket: cnpg-backups
-  #       # -- S3 endpoint URL (required when S3 enabled)
-  #       endpoint: s3.amazonaws.com
+  #       # -- Path prefix in bucket (default: cluster name)
+  #       path: ""
+  #       # -- S3 endpoint URL (optional, defaults to AWS)
+  #       endpoint: ""
   #       # -- S3 region (optional)
   #       region: us-east-1
   #       # -- S3 access key ID (required when S3 enabled)
@@ -78,6 +151,34 @@ clusters: {}
   #       # -- Existing secret with S3 credentials (alternative to accessKeyId/secretAccessKey)
   #       credentials:
   #         existingSecret: ""
+  #
+  #     # -- Azure Blob Storage configuration for backups
+  #     azure:
+  #       # -- Azure Blob Storage destination path (e.g., https://account.blob.core.windows.net/container/path)
+  #       destinationPath: ""
+  #       # -- Azure endpoint URL (optional, for compatible providers)
+  #       endpointURL: ""
+  #       # -- Use Azure AD Workload Identity (recommended)
+  #       inheritFromAzureAD: false
+  #       # -- Azure connection string (alternative to account+key)
+  #       connectionString: ""
+  #       # -- Azure storage account name
+  #       storageAccount: ""
+  #       # -- Azure storage account key
+  #       storageKey: ""
+  #       # -- Azure SAS token (alternative to storage key)
+  #       storageSasToken: ""
+  #
+  #     # -- Google Cloud Storage configuration for backups
+  #     gcs:
+  #       # -- GCS bucket name (required when GCS enabled)
+  #       bucket: cnpg-backups
+  #       # -- Path prefix in bucket (default: cluster name)
+  #       path: ""
+  #       # -- Use GKE Workload Identity (recommended)
+  #       gkeEnvironment: false
+  #       # -- Application credentials JSON (alternative to Workload Identity)
+  #       applicationCredentials: ""
   #   
   #   # -- Custom initdb SQL statements
   #   initdb:
@@ -101,3 +202,107 @@ clusters: {}
   #     - name: paperless
   #       owner: paperless_user
   #       targetNamespace: paperless
+  #
+  #   # -- Connection pooling configuration (PgBouncer)
+  #   poolers: []
+  #     # - # -- Pooler name
+  #       name: rw
+  #       # -- Pooler type: rw (read-write), ro (read-only), r (read-any)
+  #       type: rw
+  #       # -- Number of pooler instances
+  #       instances: 3
+  #       # -- Pool mode: session or transaction
+  #       poolMode: transaction
+  #       # -- PgBouncer parameters
+  #       parameters:
+  #         max_client_conn: "1000"
+  #         default_pool_size: "25"
+  #         min_pool_size: "5"
+  #         reserve_pool_size: "5"
+  #       # -- Monitoring configuration
+  #       monitoring:
+  #         enablePodMonitor: true
+  #       # -- Pod template for resources and affinity
+  #       template:
+  #         spec:
+  #           containers:
+  #           - name: pgbouncer
+  #             resources:
+  #               requests:
+  #                 cpu: "500m"
+  #                 memory: "512Mi"
+  #               limits:
+  #                 cpu: "1"
+  #                 memory: "1Gi"
+  #     # - name: ro
+  #       type: ro
+  #       instances: 5
+  #       poolMode: transaction
+  #       parameters:
+  #         max_client_conn: "2000"
+  #         default_pool_size: "50"
+  #       # -- Additional CloudNativePG Pooler spec fields (for advanced use cases)
+  #       additionalPoolerSpec: {}
+  #         # Example: Custom service type
+  #         # serviceTemplate:
+  #         #   spec:
+  #         #     type: LoadBalancer
+  #
+  #   # -- Recovery configuration for disaster recovery
+  #   recovery:
+  #     # -- Enable recovery mode (bootstrap from backup/object store)
+  #     enabled: false
+  #     # -- Recovery source (external cluster name for object store recovery)
+  #     source: ""
+  #     # -- Backup reference for recovery
+  #     backup:
+  #       name: ""  # Backup CRD name
+  #     # -- Point-in-Time Recovery target
+  #     recoveryTarget:
+  #       # -- Target time for PITR (RFC 3339 format: "2023-11-05T14:30:00Z")
+  #       targetTime: ""
+  #       # -- Stop before (true) or at (false) target
+  #       exclusive: false
+  #       # -- Transaction ID target (requires backupID)
+  #       targetXID: ""
+  #       # -- Named restore point (requires backupID)
+  #       targetName: ""
+  #       # -- Log Sequence Number target
+  #       targetLSN: ""
+  #       # -- Recover to earliest consistent state (requires backupID)
+  #       targetImmediate: false
+  #       # -- Specific backup ID (format: YYYYMMDDTHHMMSS)
+  #       backupID: ""
+  #     # -- Database name after recovery
+  #     database: ""
+  #     # -- Owner after recovery
+  #     owner: ""
+  #     # -- Secret for credentials after recovery
+  #     secret:
+  #       name: ""
+  #
+  #   # -- External clusters for recovery/replication
+  #   externalClusters: []
+  #     # - name: source-cluster
+  #       # -- Barman object store configuration
+  #       barmanObjectStore:
+  #         destinationPath: "s3://backups/"
+  #         endpointURL: "https://s3.amazonaws.com"
+  #         s3Credentials:
+  #           accessKeyId:
+  #             name: backup-creds
+  #             key: ACCESS_KEY_ID
+  #           secretAccessKey:
+  #             name: backup-creds
+  #             key: ACCESS_SECRET_KEY
+  #         wal:
+  #           maxParallel: 8
+  #       # OR: Connection parameters for pg_basebackup
+  #       # connectionParameters:
+  #       #   host: source-db.example.com
+  #       #   port: "5432"
+  #       #   user: streaming_replica
+  #       #   dbname: postgres
+  #       # password:
+  #       #   name: source-db-replica-user
+  #       #   key: password

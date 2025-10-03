@@ -2,7 +2,7 @@ apiVersion: v2
 name: cnpg-database-manager
 description: Multi-database and multi-tenant management for CloudNativePG clusters with automatic secret generation and isolation
 type: application
-version: 0.2.1
+version: 0.3.0
 appVersion: "1.0"
 keywords:
   - postgresql
@@ -10,6 +10,9 @@ keywords:
   - cloudnative-pg
   - cnpg
   - multi-tenant
+  - pgbouncer
+  - backup
+  - recovery
 home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager
 sources:
   - https://github.com/encircle360-oss/helm-charts
@@ -23,8 +26,22 @@ annotations:
   artifacthub.io/prerelease: true
   artifacthub.io/changes: |
     - kind: added
-      description: Add additionalClusterSpec field for flexible CloudNativePG Cluster configuration
+      description: Connection pooling support via CloudNativePG Pooler CRD (PgBouncer)
     - kind: added
-      description: Support any CloudNativePG feature without chart updates (affinity, certificates, walStorage, etc.)
+      description: Disaster recovery with Point-in-Time Recovery (PITR) and externalClusters support
+    - kind: added
+      description: PrometheusRule CRD integration with 5 default alert rules for monitoring
+    - kind: added
+      description: Azure Blob Storage and Google Cloud Storage backup providers
+    - kind: added
+      description: ImageCatalog and ClusterImageCatalog support for centralized image management
+    - kind: added
+      description: Volume snapshot backups for CSI-compatible storage providers
+    - kind: changed
+      description: Backup configuration now supports multiple providers (S3, Azure, GCS, VolumeSnapshot)
+    - kind: changed
+      description: imageName is now optional when using imageCatalogRef
+    - kind: fixed
+      description: S3 credentials structure in backup configuration
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg

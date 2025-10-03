@@ -3,6 +3,51 @@
   "title": "CNPG Database Manager Helm Values",
   "type": "object",
   "properties": {
+    "imageCatalogs": {
+      "type": "object",
+      "description": "Image catalog configurations. Each key represents a catalog name.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Enable or disable this catalog"
+          },
+          "kind": {
+            "type": "string",
+            "description": "Catalog kind: ImageCatalog or ClusterImageCatalog",
+            "enum": ["ImageCatalog", "ClusterImageCatalog"]
+          },
+          "labels": {
+            "type": "object",
+            "description": "Custom labels"
+          },
+          "annotations": {
+            "type": "object",
+            "description": "Custom annotations"
+          },
+          "images": {
+            "type": "array",
+            "description": "List of PostgreSQL images by major version",
+            "items": {
+              "type": "object",
+              "properties": {
+                "major": {
+                  "type": "integer",
+                  "description": "PostgreSQL major version"
+                },
+                "image": {
+                  "type": "string",
+                  "description": "Container image URL"
+                }
+              },
+              "required": ["major", "image"]
+            }
+          }
+        },
+        "required": ["enabled", "images"]
+      }
+    },
     "clusters": {
       "type": "object",
       "description": "PostgreSQL cluster configurations. Each key represents a cluster name.",
@@ -22,6 +67,30 @@
             "type": "string",
             "description": "PostgreSQL container image",
             "pattern": "^.+:.+$"
+          },
+          "imageCatalogRef": {
+            "type": "object",
+            "description": "ImageCatalog reference for automatic image management",
+            "properties": {
+              "apiGroup": {
+                "type": "string",
+                "description": "API group (postgresql.cnpg.io)"
+              },
+              "kind": {
+                "type": "string",
+                "description": "Catalog kind",
+                "enum": ["ImageCatalog", "ClusterImageCatalog"]
+              },
+              "name": {
+                "type": "string",
+                "description": "Catalog name"
+              },
+              "major": {
+                "type": "integer",
+                "description": "PostgreSQL major version"
+              }
+            },
+            "required": ["kind", "name", "major"]
           },
           "storage": {
             "type": "object",
@@ -138,6 +207,35 @@
                     "description": "Enable PodMonitor resource"
                   }
                 }
+              },
+              "prometheusRule": {
+                "type": "object",
+                "description": "PrometheusRule configuration",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "description": "Enable PrometheusRule resource"
+                  },
+                  "labels": {
+                    "type": "object",
+                    "description": "Custom labels for PrometheusRule"
+                  },
+                  "annotations": {
+                    "type": "object",
+                    "description": "Custom annotations for PrometheusRule"
+                  },
+                  "interval": {
+                    "type": "string",
+                    "description": "Evaluation interval"
+                  },
+                  "rules": {
+                    "type": "array",
+                    "description": "Custom alert rules",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                }
               }
             }
           },
@@ -156,6 +254,66 @@
               "retentionPolicy": {
                 "type": "string",
                 "description": "Backup retention policy"
+              },
+              "destinationPath": {
+                "type": "string",
+                "description": "Direct destination path (overrides provider-specific paths)"
+              },
+              "method": {
+                "type": "string",
+                "description": "Backup method",
+                "enum": ["barmanObjectStore", "volumeSnapshot"]
+              },
+              "online": {
+                "type": "boolean",
+                "description": "Online backup mode for scheduled backups"
+              },
+              "onlineConfiguration": {
+                "type": "object",
+                "description": "Online backup configuration for scheduled backups",
+                "properties": {
+                  "immediateCheckpoint": {
+                    "type": "boolean",
+                    "description": "Force immediate checkpoint"
+                  },
+                  "waitForArchive": {
+                    "type": "boolean",
+                    "description": "Wait for WAL archiving"
+                  }
+                }
+              },
+              "volumeSnapshot": {
+                "type": "object",
+                "description": "Volume snapshot configuration",
+                "properties": {
+                  "className": {
+                    "type": "string",
+                    "description": "VolumeSnapshot class name"
+                  },
+                  "online": {
+                    "type": "boolean",
+                    "description": "Online or offline backup"
+                  },
+                  "onlineConfiguration": {
+                    "type": "object",
+                    "description": "Online snapshot configuration",
+                    "properties": {
+                      "immediateCheckpoint": {
+                        "type": "boolean",
+                        "description": "Force immediate checkpoint"
+                      },
+                      "waitForArchive": {
+                        "type": "boolean",
+                        "description": "Wait for WAL archiving"
+                      }
+                    }
+                  },
+                  "snapshotOwnerReference": {
+                    "type": "string",
+                    "description": "Snapshot ownership",
+                    "enum": ["none", "backup", "cluster"]
+                  }
+                }
               },
               "s3": {
                 "type": "object",
@@ -193,6 +351,62 @@
                         "description": "Existing secret with S3 credentials"
                       }
                     }
+                  }
+                }
+              },
+              "azure": {
+                "type": "object",
+                "description": "Azure Blob Storage configuration for backups",
+                "properties": {
+                  "destinationPath": {
+                    "type": "string",
+                    "description": "Azure Blob Storage destination path"
+                  },
+                  "endpointURL": {
+                    "type": "string",
+                    "description": "Azure endpoint URL"
+                  },
+                  "inheritFromAzureAD": {
+                    "type": "boolean",
+                    "description": "Use Azure AD Workload Identity"
+                  },
+                  "connectionString": {
+                    "type": "string",
+                    "description": "Azure connection string"
+                  },
+                  "storageAccount": {
+                    "type": "string",
+                    "description": "Azure storage account name"
+                  },
+                  "storageKey": {
+                    "type": "string",
+                    "description": "Azure storage account key"
+                  },
+                  "storageSasToken": {
+                    "type": "string",
+                    "description": "Azure SAS token"
+                  }
+                }
+              },
+              "gcs": {
+                "type": "object",
+                "description": "Google Cloud Storage configuration for backups",
+                "properties": {
+                  "bucket": {
+                    "type": "string",
+                    "description": "GCS bucket name"
+                  },
+                  "path": {
+                    "type": "string",
+                    "description": "Path prefix in bucket"
+                  },
+                  "gkeEnvironment": {
+                    "type": "boolean",
+                    "description": "Use GKE Workload Identity"
+                  },
+                  "applicationCredentials": {
+                    "type": "string",
+                    "description": "Application credentials JSON"
                   }
                 }
               }
@@ -247,9 +461,206 @@
             "type": "object",
             "description": "Additional CloudNativePG Cluster spec fields to merge into the Cluster CRD. Allows using any CloudNativePG feature without chart updates.",
             "additionalProperties": true
+          },
+          "poolers": {
+            "type": "array",
+            "description": "Connection pooling configuration (PgBouncer)",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Pooler name",
+                  "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Pooler type",
+                  "enum": ["rw", "ro", "r"]
+                },
+                "instances": {
+                  "type": "integer",
+                  "description": "Number of pooler instances",
+                  "minimum": 1
+                },
+                "poolMode": {
+                  "type": "string",
+                  "description": "Pool mode",
+                  "enum": ["session", "transaction"]
+                },
+                "parameters": {
+                  "type": "object",
+                  "description": "PgBouncer parameters",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "pg_hba": {
+                  "type": "array",
+                  "description": "PostgreSQL host-based authentication rules",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "paused": {
+                  "type": "boolean",
+                  "description": "Pause pooler connections"
+                },
+                "authQuery": {
+                  "type": "string",
+                  "description": "Custom authentication query"
+                },
+                "authQuerySecret": {
+                  "type": "object",
+                  "description": "Secret containing auth query credentials",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "deploymentStrategy": {
+                  "type": "object",
+                  "description": "Kubernetes deployment strategy"
+                },
+                "monitoring": {
+                  "type": "object",
+                  "description": "Monitoring configuration",
+                  "properties": {
+                    "enablePodMonitor": {
+                      "type": "boolean",
+                      "description": "Enable PodMonitor"
+                    },
+                    "podMonitorRelabelings": {
+                      "type": "array",
+                      "description": "PodMonitor relabelings"
+                    },
+                    "podMonitorMetricRelabelings": {
+                      "type": "array",
+                      "description": "PodMonitor metric relabelings"
+                    }
+                  }
+                },
+                "serviceTemplate": {
+                  "type": "object",
+                  "description": "Service template customization"
+                },
+                "template": {
+                  "type": "object",
+                  "description": "Pod template customization"
+                },
+                "additionalPoolerSpec": {
+                  "type": "object",
+                  "description": "Additional CloudNativePG Pooler spec fields to merge into the Pooler CRD",
+                  "additionalProperties": true
+                }
+              },
+              "required": ["name"]
+            }
+          },
+          "recovery": {
+            "type": "object",
+            "description": "Recovery configuration for disaster recovery",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "description": "Enable recovery mode"
+              },
+              "source": {
+                "type": "string",
+                "description": "External cluster name for object store recovery"
+              },
+              "backup": {
+                "type": "object",
+                "description": "Backup reference for recovery",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Backup CRD name"
+                  }
+                }
+              },
+              "recoveryTarget": {
+                "type": "object",
+                "description": "Point-in-Time Recovery target",
+                "properties": {
+                  "targetTime": {
+                    "type": "string",
+                    "description": "Target time (RFC 3339 format)"
+                  },
+                  "exclusive": {
+                    "type": "boolean",
+                    "description": "Stop before (true) or at (false) target"
+                  },
+                  "targetXID": {
+                    "type": "string",
+                    "description": "Transaction ID target"
+                  },
+                  "targetName": {
+                    "type": "string",
+                    "description": "Named restore point"
+                  },
+                  "targetLSN": {
+                    "type": "string",
+                    "description": "Log Sequence Number target"
+                  },
+                  "targetImmediate": {
+                    "type": "boolean",
+                    "description": "Recover to earliest consistent state"
+                  },
+                  "backupID": {
+                    "type": "string",
+                    "description": "Specific backup ID"
+                  }
+                }
+              },
+              "database": {
+                "type": "string",
+                "description": "Database name after recovery"
+              },
+              "owner": {
+                "type": "string",
+                "description": "Owner after recovery"
+              },
+              "secret": {
+                "type": "object",
+                "description": "Secret for credentials after recovery",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "externalClusters": {
+            "type": "array",
+            "description": "External clusters for recovery/replication",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "External cluster name"
+                },
+                "barmanObjectStore": {
+                  "type": "object",
+                  "description": "Barman object store configuration"
+                },
+                "connectionParameters": {
+                  "type": "object",
+                  "description": "Connection parameters for pg_basebackup"
+                },
+                "password": {
+                  "type": "object",
+                  "description": "Password secret reference"
+                }
+              },
+              "required": ["name"]
+            }
           }
         },
-        "required": ["enabled", "instances", "imageName", "storage", "databases"]
+        "required": ["enabled", "instances", "storage", "databases"]
       }
     }
   }

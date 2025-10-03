@@ -11,7 +11,12 @@ metadata:
 spec:
   instances: {{ $cluster.instances | default 3 }}
 
+  {{- if $cluster.imageCatalogRef }}
+  imageCatalogRef:
+    {{- toYaml $cluster.imageCatalogRef | nindent 4 }}
+  {{- else }}
   imageName: {{ $cluster.imageName | default "ghcr.io/cloudnative-pg/postgresql:17.2" }}
+  {{- end }}
 
   {{- if $cluster.databases }}
   managed:
@@ -28,7 +33,7 @@ spec:
         name: {{ $clusterName }}-{{ include "cnpg-database-manager.sanitizeName" $owner }}-password
     {{- end }}
   {{- end }}
-  
+
   postgresql:
     parameters:
       max_connections: {{ $cluster.maxConnections | default "200" | quote }}
@@ -48,50 +53,185 @@ spec:
       {{ $key }}: {{ $value | quote }}
       {{- end }}
       {{- end }}
-  
+
   storage:
     size: {{ $cluster.storage.size | default "50Gi" }}
     {{- if $cluster.storage.storageClass }}
     storageClass: {{ $cluster.storage.storageClass }}
     {{- end }}
-  
+
   {{- if $cluster.monitoring }}
   {{- if $cluster.monitoring.enabled }}
   monitoring:
     enablePodMonitor: true
   {{- end }}
   {{- end }}
-  
+
   {{- if $cluster.backup }}
   {{- if $cluster.backup.enabled }}
   backup:
     retentionPolicy: {{ $cluster.backup.retentionPolicy | default "30d" }}
-    {{- if $cluster.backup.s3 }}
+    {{- if $cluster.backup.volumeSnapshot }}
+    volumeSnapshot:
+      {{- if $cluster.backup.volumeSnapshot.className }}
+      className: {{ $cluster.backup.volumeSnapshot.className }}
+      {{- end }}
+      {{- if hasKey $cluster.backup.volumeSnapshot "online" }}
+      online: {{ $cluster.backup.volumeSnapshot.online }}
+      {{- end }}
+      {{- if $cluster.backup.volumeSnapshot.onlineConfiguration }}
+      onlineConfiguration:
+        {{- if hasKey $cluster.backup.volumeSnapshot.onlineConfiguration "immediateCheckpoint" }}
+        immediateCheckpoint: {{ $cluster.backup.volumeSnapshot.onlineConfiguration.immediateCheckpoint }}
+        {{- end }}
+        {{- if hasKey $cluster.backup.volumeSnapshot.onlineConfiguration "waitForArchive" }}
+        waitForArchive: {{ $cluster.backup.volumeSnapshot.onlineConfiguration.waitForArchive }}
+        {{- end }}
+      {{- end }}
+      {{- if $cluster.backup.volumeSnapshot.snapshotOwnerReference }}
+      snapshotOwnerReference: {{ $cluster.backup.volumeSnapshot.snapshotOwnerReference }}
+      {{- end }}
+    {{- end }}
+    {{- if or $cluster.backup.s3 $cluster.backup.azure $cluster.backup.gcs $cluster.backup.destinationPath }}
     barmanObjectStore:
-      destinationPath: s3://{{ $cluster.backup.s3.bucket }}/{{ $clusterName }}
+      {{- if $cluster.backup.destinationPath }}
+      destinationPath: {{ $cluster.backup.destinationPath }}
+      {{- else if $cluster.backup.s3 }}
+      destinationPath: s3://{{ $cluster.backup.s3.bucket }}/{{ $cluster.backup.s3.path | default $clusterName }}
+      {{- else if $cluster.backup.azure }}
+      destinationPath: {{ $cluster.backup.azure.destinationPath }}
+      {{- else if $cluster.backup.gcs }}
+      destinationPath: gs://{{ $cluster.backup.gcs.bucket }}/{{ $cluster.backup.gcs.path | default $clusterName }}
+      {{- end }}
+
+      {{- if $cluster.backup.s3 }}
+      {{- if $cluster.backup.s3.endpoint }}
       endpointURL: {{ $cluster.backup.s3.endpoint }}
-      {{- if $cluster.backup.s3.region }}
+      {{- end }}
       s3Credentials:
+        {{- if $cluster.backup.s3.region }}
         region:
           name: {{ $clusterName }}-backup-creds
           key: AWS_DEFAULT_REGION
-      {{- end }}
-      s3Credentials:
+        {{- end }}
         accessKeyId:
           name: {{ $clusterName }}-backup-creds
-          key: AWS_ACCESS_KEY_ID
+          key: ACCESS_KEY_ID
         secretAccessKey:
           name: {{ $clusterName }}-backup-creds
           key: AWS_SECRET_ACCESS_KEY
+      {{- end }}
+
+      {{- if $cluster.backup.azure }}
+      {{- if $cluster.backup.azure.endpointURL }}
+      endpointURL: {{ $cluster.backup.azure.endpointURL }}
+      {{- end }}
+      azureCredentials:
+        {{- if $cluster.backup.azure.inheritFromAzureAD }}
+        inheritFromAzureAD: {{ $cluster.backup.azure.inheritFromAzureAD }}
+        {{- else }}
+        {{- if $cluster.backup.azure.connectionString }}
+        connectionString:
+          name: {{ $clusterName }}-backup-creds
+          key: AZURE_CONNECTION_STRING
+        {{- else if $cluster.backup.azure.storageAccount }}
+        storageAccount:
+          name: {{ $clusterName }}-backup-creds
+          key: AZURE_STORAGE_ACCOUNT
+        {{- if $cluster.backup.azure.storageKey }}
+        storageKey:
+          name: {{ $clusterName }}-backup-creds
+          key: AZURE_STORAGE_KEY
+        {{- else if $cluster.backup.azure.storageSasToken }}
+        storageSasToken:
+          name: {{ $clusterName }}-backup-creds
+          key: AZURE_STORAGE_SAS_TOKEN
+        {{- end }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
+
+      {{- if $cluster.backup.gcs }}
+      googleCredentials:
+        {{- if $cluster.backup.gcs.gkeEnvironment }}
+        gkeEnvironment: {{ $cluster.backup.gcs.gkeEnvironment }}
+        {{- else if $cluster.backup.gcs.applicationCredentials }}
+        applicationCredentials:
+          name: {{ $clusterName }}-backup-creds
+          key: GOOGLE_APPLICATION_CREDENTIALS
+        {{- end }}
+      {{- end }}
     {{- end }}
-  
+
+  {{- if $cluster.backup.schedule }}
   scheduledBackup:
     - name: daily-backup
-      schedule: {{ $cluster.backup.schedule | default "0 0 0 * * *" | quote }}
+      schedule: {{ $cluster.backup.schedule | quote }}
       backupOwnerReference: self
+      {{- if $cluster.backup.method }}
+      method: {{ $cluster.backup.method }}
+      {{- end }}
+      {{- if $cluster.backup.online }}
+      online: {{ $cluster.backup.online }}
+      {{- end }}
+      {{- if $cluster.backup.onlineConfiguration }}
+      onlineConfiguration:
+        {{- toYaml $cluster.backup.onlineConfiguration | nindent 8 }}
+      {{- end }}
   {{- end }}
   {{- end }}
-  
+  {{- end }}
+
+  {{- if and $cluster.recovery $cluster.recovery.enabled }}
+  bootstrap:
+    recovery:
+      {{- if $cluster.recovery.backup }}
+      {{- if $cluster.recovery.backup.name }}
+      backup:
+        name: {{ $cluster.recovery.backup.name }}
+      {{- end }}
+      {{- end }}
+
+      {{- if $cluster.recovery.source }}
+      source: {{ $cluster.recovery.source }}
+      {{- end }}
+
+      {{- if $cluster.recovery.recoveryTarget }}
+      recoveryTarget:
+        {{- if $cluster.recovery.recoveryTarget.targetTime }}
+        targetTime: {{ $cluster.recovery.recoveryTarget.targetTime | quote }}
+        {{- end }}
+        {{- if hasKey $cluster.recovery.recoveryTarget "exclusive" }}
+        exclusive: {{ $cluster.recovery.recoveryTarget.exclusive }}
+        {{- end }}
+        {{- if $cluster.recovery.recoveryTarget.targetXID }}
+        targetXID: {{ $cluster.recovery.recoveryTarget.targetXID | quote }}
+        {{- end }}
+        {{- if $cluster.recovery.recoveryTarget.targetName }}
+        targetName: {{ $cluster.recovery.recoveryTarget.targetName | quote }}
+        {{- end }}
+        {{- if $cluster.recovery.recoveryTarget.targetLSN }}
+        targetLSN: {{ $cluster.recovery.recoveryTarget.targetLSN | quote }}
+        {{- end }}
+        {{- if $cluster.recovery.recoveryTarget.targetImmediate }}
+        targetImmediate: {{ $cluster.recovery.recoveryTarget.targetImmediate }}
+        {{- end }}
+        {{- if $cluster.recovery.recoveryTarget.backupID }}
+        backupID: {{ $cluster.recovery.recoveryTarget.backupID | quote }}
+        {{- end }}
+      {{- end }}
+
+      {{- if $cluster.recovery.database }}
+      database: {{ $cluster.recovery.database }}
+      {{- end }}
+      {{- if $cluster.recovery.owner }}
+      owner: {{ $cluster.recovery.owner }}
+      {{- end }}
+      {{- if $cluster.recovery.secret }}
+      secret:
+        {{- toYaml $cluster.recovery.secret | nindent 8 }}
+      {{- end }}
+  {{- else }}
   bootstrap:
     initdb:
       database: postgres
@@ -104,10 +244,16 @@ spec:
         {{- end }}
       {{- end }}
       {{- end }}
-  
+  {{- end }}
+
   {{- if $cluster.resources }}
   resources:
     {{- toYaml $cluster.resources | nindent 4 }}
+  {{- end }}
+
+  {{- if $cluster.externalClusters }}
+  externalClusters:
+    {{- toYaml $cluster.externalClusters | nindent 4 }}
   {{- end }}
 
   {{- if $cluster.additionalClusterSpec }}

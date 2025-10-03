@@ -1,0 +1,87 @@
+{{- range $clusterName, $cluster := .Values.clusters }}
+{{- if $cluster.enabled }}
+{{- if $cluster.poolers }}
+{{- range $pooler := $cluster.poolers }}
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Pooler
+metadata:
+  name: {{ $clusterName }}-pooler-{{ $pooler.name }}
+  labels:
+    {{- include "cnpg-databases.labels" $ | nindent 4 }}
+    cnpg.io/cluster: {{ $clusterName }}
+    cnpg.io/pooler: {{ $pooler.name }}
+spec:
+  cluster:
+    name: {{ $clusterName }}
+
+  instances: {{ $pooler.instances | default 1 }}
+
+  type: {{ $pooler.type | default "rw" }}
+
+  {{- if $pooler.deploymentStrategy }}
+  deploymentStrategy:
+    {{- toYaml $pooler.deploymentStrategy | nindent 4 }}
+  {{- end }}
+
+  pgbouncer:
+    poolMode: {{ $pooler.poolMode | default "session" }}
+
+    {{- if $pooler.authQuerySecret }}
+    authQuerySecret:
+      {{- toYaml $pooler.authQuerySecret | nindent 6 }}
+    {{- end }}
+
+    {{- if $pooler.authQuery }}
+    authQuery: {{ $pooler.authQuery | quote }}
+    {{- end }}
+
+    {{- if $pooler.parameters }}
+    parameters:
+      {{- toYaml $pooler.parameters | nindent 6 }}
+    {{- end }}
+
+    {{- if $pooler.pg_hba }}
+    pg_hba:
+      {{- toYaml $pooler.pg_hba | nindent 6 }}
+    {{- end }}
+
+    {{- if hasKey $pooler "paused" }}
+    paused: {{ $pooler.paused }}
+    {{- end }}
+
+  {{- if $pooler.monitoring }}
+  monitoring:
+    {{- if hasKey $pooler.monitoring "enablePodMonitor" }}
+    enablePodMonitor: {{ $pooler.monitoring.enablePodMonitor }}
+    {{- end }}
+
+    {{- if $pooler.monitoring.podMonitorMetricRelabelings }}
+    podMonitorMetricRelabelings:
+      {{- toYaml $pooler.monitoring.podMonitorMetricRelabelings | nindent 6 }}
+    {{- end }}
+
+    {{- if $pooler.monitoring.podMonitorRelabelings }}
+    podMonitorRelabelings:
+      {{- toYaml $pooler.monitoring.podMonitorRelabelings | nindent 6 }}
+    {{- end }}
+  {{- end }}
+
+  {{- if $pooler.serviceTemplate }}
+  serviceTemplate:
+    {{- toYaml $pooler.serviceTemplate | nindent 4 }}
+  {{- end }}
+
+  {{- if $pooler.template }}
+  template:
+    {{- toYaml $pooler.template | nindent 4 }}
+  {{- end }}
+
+  {{- if $pooler.additionalPoolerSpec }}
+  {{- toYaml $pooler.additionalPoolerSpec | nindent 2 }}
+  {{- end }}
+
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

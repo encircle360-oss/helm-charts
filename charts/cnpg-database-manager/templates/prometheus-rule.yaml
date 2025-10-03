@@ -1,0 +1,94 @@
+{{- range $clusterName, $cluster := .Values.clusters }}
+{{- if $cluster.enabled }}
+{{- if and $cluster.monitoring $cluster.monitoring.enabled $cluster.monitoring.prometheusRule }}
+{{- if $cluster.monitoring.prometheusRule.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ $clusterName }}-alerts
+  labels:
+    {{- include "cnpg-databases.labels" $ | nindent 4 }}
+    cnpg.io/cluster: {{ $clusterName }}
+    {{- with $cluster.monitoring.prometheusRule.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with $cluster.monitoring.prometheusRule.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  groups:
+    - name: cloudnative-pg/{{ $clusterName }}
+      {{- if $cluster.monitoring.prometheusRule.interval }}
+      interval: {{ $cluster.monitoring.prometheusRule.interval }}
+      {{- end }}
+      rules:
+        {{- if $cluster.monitoring.prometheusRule.rules }}
+        {{- toYaml $cluster.monitoring.prometheusRule.rules | nindent 8 }}
+        {{- else }}
+        # Default alert rules
+        - alert: CNPGClusterOffline
+          annotations:
+            summary: "CNPG Cluster {{ $clusterName }} has no running instances"
+            description: "CloudNativePG Cluster {{ $clusterName }} has no ready instances. Applications cannot access the database."
+          expr: |
+            (count(cnpg_collector_up{namespace="{{ $.Release.Namespace }}",pod=~"{{ $clusterName }}-.*"}) OR on() vector(0)) == 0
+          for: 5m
+          labels:
+            severity: critical
+            namespace: {{ $.Release.Namespace }}
+            cnpg_cluster: {{ $clusterName }}
+
+        - alert: CNPGClusterHACritical
+          annotations:
+            summary: "CNPG Cluster {{ $clusterName }} has no standby replicas"
+            description: "CloudNativePG Cluster {{ $clusterName }} has no standby replicas available. High availability is compromised."
+          expr: |
+            cnpg_pg_replication_streaming_replicas{namespace="{{ $.Release.Namespace }}",pod=~"{{ $clusterName }}-.*"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            namespace: {{ $.Release.Namespace }}
+            cnpg_cluster: {{ $clusterName }}
+
+        - alert: CNPGClusterHighReplicationLag
+          annotations:
+            summary: "CNPG Cluster {{ $clusterName }} has high replication lag"
+            description: "CloudNativePG Cluster {{ $clusterName }} replication lag is >1000ms. Data replication may be delayed."
+          expr: |
+            cnpg_pg_replication_lag{namespace="{{ $.Release.Namespace }}",pod=~"{{ $clusterName }}-.*"} > 1
+          for: 5m
+          labels:
+            severity: warning
+            namespace: {{ $.Release.Namespace }}
+            cnpg_cluster: {{ $clusterName }}
+
+        - alert: CNPGClusterHighConnectionsCritical
+          annotations:
+            summary: "CNPG Cluster {{ $clusterName }} connection usage >95%"
+            description: "CloudNativePG Cluster {{ $clusterName }} is using more than 95% of max connections. May reject new connections soon."
+          expr: |
+            ((cnpg_backends_total{namespace="{{ $.Release.Namespace }}",pod=~"{{ $clusterName }}-.*"} / cnpg_pg_settings_setting{namespace="{{ $.Release.Namespace }}",pod=~"{{ $clusterName }}-.*",name="max_connections"}) * 100) > 95
+          for: 5m
+          labels:
+            severity: critical
+            namespace: {{ $.Release.Namespace }}
+            cnpg_cluster: {{ $clusterName }}
+
+        - alert: CNPGClusterHighConnectionsWarning
+          annotations:
+            summary: "CNPG Cluster {{ $clusterName }} connection usage >80%"
+            description: "CloudNativePG Cluster {{ $clusterName }} is using more than 80% of max connections."
+          expr: |
+            ((cnpg_backends_total{namespace="{{ $.Release.Namespace }}",pod=~"{{ $clusterName }}-.*"} / cnpg_pg_settings_setting{namespace="{{ $.Release.Namespace }}",pod=~"{{ $clusterName }}-.*",name="max_connections"}) * 100) > 80
+          for: 5m
+          labels:
+            severity: warning
+            namespace: {{ $.Release.Namespace }}
+            cnpg_cluster: {{ $clusterName }}
+        {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

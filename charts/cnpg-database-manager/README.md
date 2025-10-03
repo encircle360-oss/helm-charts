@@ -1,6 +1,6 @@
 # cnpg-database-manager
 
-![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
 
 Multi-database and multi-tenant management for CloudNativePG clusters with automatic secret generation and isolation
 
@@ -103,7 +103,36 @@ clusters:
         owner: web
 ```
 
-### Backup Configuration
+### Connection Pooling (PgBouncer)
+
+```yaml
+clusters:
+  main:
+    enabled: true
+    instances: 3
+    imageName: ghcr.io/cloudnative-pg/postgresql:17.2
+    storage:
+      size: 50Gi
+    databases:
+      - name: app-db
+        owner: app
+    poolers:
+      - name: rw
+        type: rw  # read-write pooler
+        instances: 3
+        poolMode: transaction
+        parameters:
+          max_client_conn: "1000"
+          default_pool_size: "25"
+        monitoring:
+          enablePodMonitor: true
+      - name: ro
+        type: ro  # read-only pooler
+        instances: 5
+        poolMode: transaction
+```
+
+### Backup Configuration (S3)
 
 ```yaml
 clusters:
@@ -121,14 +150,120 @@ clusters:
         bucket: my-postgres-backups
         region: eu-central-1
         path: /cluster-main
-        credentials:
-          existingSecret: s3-credentials
+        accessKeyId: ""
+        secretAccessKey: ""
     databases:
       - name: production-db
         owner: app
 ```
 
-### Monitoring with Prometheus
+### Backup Configuration (Azure Blob Storage)
+
+```yaml
+clusters:
+  main:
+    enabled: true
+    instances: 3
+    imageName: ghcr.io/cloudnative-pg/postgresql:17.2
+    storage:
+      size: 50Gi
+    backup:
+      enabled: true
+      schedule: "0 0 * * *"
+      retentionPolicy: "30d"
+      azure:
+        destinationPath: "https://mystorageaccount.blob.core.windows.net/backups/main"
+        inheritFromAzureAD: true  # Use Azure AD Workload Identity
+    databases:
+      - name: production-db
+        owner: app
+```
+
+### Backup Configuration (Google Cloud Storage)
+
+```yaml
+clusters:
+  main:
+    enabled: true
+    instances: 3
+    imageName: ghcr.io/cloudnative-pg/postgresql:17.2
+    storage:
+      size: 50Gi
+    backup:
+      enabled: true
+      schedule: "0 0 * * *"
+      retentionPolicy: "30d"
+      gcs:
+        bucket: my-postgres-backups
+        path: cluster-main
+        gkeEnvironment: true  # Use GKE Workload Identity
+    databases:
+      - name: production-db
+        owner: app
+```
+
+### Volume Snapshot Backups
+
+```yaml
+clusters:
+  main:
+    enabled: true
+    instances: 3
+    imageName: ghcr.io/cloudnative-pg/postgresql:17.2
+    storage:
+      size: 50Gi
+    backup:
+      enabled: true
+      schedule: "0 1 * * *"
+      retentionPolicy: "30d"
+      method: volumeSnapshot
+      volumeSnapshot:
+        className: csi-aws-vsc
+        online: true
+        onlineConfiguration:
+          immediateCheckpoint: true
+          waitForArchive: true
+    databases:
+      - name: production-db
+        owner: app
+```
+
+### Disaster Recovery and Point-in-Time Recovery (PITR)
+
+```yaml
+clusters:
+  recovered:
+    enabled: true
+    instances: 3
+    imageName: ghcr.io/cloudnative-pg/postgresql:17.2
+    storage:
+      size: 100Gi
+    databases:
+      - name: myapp
+        owner: appuser
+    recovery:
+      enabled: true
+      source: production-cluster
+      recoveryTarget:
+        targetTime: "2025-01-03T14:30:00Z"
+        exclusive: false
+    externalClusters:
+      - name: production-cluster
+        barmanObjectStore:
+          destinationPath: "s3://my-backups/prod-cluster"
+          endpointURL: "https://s3.amazonaws.com"
+          s3Credentials:
+            accessKeyId:
+              name: backup-creds
+              key: ACCESS_KEY_ID
+            secretAccessKey:
+              name: backup-creds
+              key: ACCESS_SECRET_KEY
+          wal:
+            maxParallel: 8
+```
+
+### Monitoring with Prometheus and PrometheusRule
 
 ```yaml
 clusters:
@@ -142,6 +277,52 @@ clusters:
       enabled: true
       podMonitor:
         enabled: true
+      prometheusRule:
+        enabled: true
+        labels:
+          team: platform
+        # Optional: Custom alert rules (otherwise defaults are used)
+        rules:
+          - alert: CustomDatabaseSize
+            annotations:
+              summary: "Database size exceeds threshold"
+            expr: |
+              cnpg_pg_database_size_bytes > 100000000000
+            for: 10m
+            labels:
+              severity: warning
+    databases:
+      - name: app-db
+        owner: app
+```
+
+### Image Catalog for Centralized Image Management
+
+```yaml
+imageCatalogs:
+  postgresql:
+    enabled: true
+    kind: ImageCatalog  # or ClusterImageCatalog for cluster-wide
+    images:
+      - major: 15
+        image: ghcr.io/cloudnative-pg/postgresql:15.6
+      - major: 16
+        image: ghcr.io/cloudnative-pg/postgresql:16.2
+      - major: 17
+        image: ghcr.io/cloudnative-pg/postgresql:17.2
+
+clusters:
+  main:
+    enabled: true
+    instances: 3
+    # Use imageCatalogRef instead of imageName for auto-updates
+    imageCatalogRef:
+      apiGroup: postgresql.cnpg.io
+      kind: ImageCatalog
+      name: postgresql
+      major: 17
+    storage:
+      size: 50Gi
     databases:
       - name: app-db
         owner: app
@@ -199,6 +380,123 @@ clusters:
     databases:
       - name: highload-app
         owner: app
+```
+
+### Connection Pooling (PgBouncer)
+
+CloudNativePG provides built-in connection pooling via PgBouncer through the Pooler CRD. Connection pooling improves database performance and resource utilization by reusing database connections.
+
+**Basic Pooler Configuration:**
+
+```yaml
+clusters:
+  main:
+    enabled: true
+    instances: 3
+    imageName: ghcr.io/cloudnative-pg/postgresql:17.2
+    storage:
+      size: 50Gi
+    databases:
+      - name: myapp
+        owner: appuser
+
+    # Connection pooling
+    poolers:
+      - name: rw
+        type: rw  # read-write pooler (connects to primary)
+        instances: 3
+        poolMode: transaction  # session or transaction
+        parameters:
+          max_client_conn: "1000"
+          default_pool_size: "25"
+          min_pool_size: "5"
+          reserve_pool_size: "5"
+        monitoring:
+          enablePodMonitor: true
+```
+
+**Multi-Pooler Setup (Read-Write + Read-Only):**
+
+```yaml
+poolers:
+  # Read-write pooler for primary
+  - name: rw
+    type: rw
+    instances: 3
+    poolMode: transaction
+    parameters:
+      max_client_conn: "1000"
+      default_pool_size: "25"
+    monitoring:
+      enablePodMonitor: true
+    template:
+      spec:
+        containers:
+        - name: pgbouncer
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+
+  # Read-only pooler for replicas
+  - name: ro
+    type: ro
+    instances: 5
+    poolMode: transaction
+    parameters:
+      max_client_conn: "2000"
+      default_pool_size: "50"
+    monitoring:
+      enablePodMonitor: true
+```
+
+**Pooler Types:**
+
+- **`rw` (read-write)**: Connects to the primary instance for write operations
+- **`ro` (read-only)**: Connects to replica instances for read operations (load balancing)
+- **`r` (read-any)**: Connects to any instance (primary or replicas)
+
+**Pool Modes:**
+
+- **`session`** (default): Connection held for entire client session. Use when applications need prepared statements, temporary tables, or session variables.
+- **`transaction`**: Connection released after each transaction. More efficient pooling, ideal for high-throughput OLTP workloads and stateless applications.
+
+**Connecting to Pooler:**
+
+Applications connect to pooler services instead of the database directly:
+
+```bash
+# Read-write pooler service
+<cluster-name>-pooler-rw.<namespace>.svc.cluster.local:5432
+
+# Read-only pooler service
+<cluster-name>-pooler-ro.<namespace>.svc.cluster.local:5432
+```
+
+**Advanced Pooler Configuration with additionalPoolerSpec:**
+
+For Pooler features not explicitly supported by the chart, use `additionalPoolerSpec`:
+
+```yaml
+poolers:
+  - name: rw
+    type: rw
+    instances: 3
+    poolMode: transaction
+    parameters:
+      max_client_conn: "1000"
+
+    # Custom service configuration (e.g., LoadBalancer for external access)
+    additionalPoolerSpec:
+      serviceTemplate:
+        metadata:
+          annotations:
+            service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+        spec:
+          type: LoadBalancer
 ```
 
 ### Advanced: Using additionalClusterSpec
@@ -315,6 +613,7 @@ To prevent conflicts, **do not** define these fields in `additionalClusterSpec` 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | clusters | object | `{}` (no clusters deployed by default) | PostgreSQL cluster configurations. Each key represents a cluster name. |
+| imageCatalogs | object | `{}` (no catalogs deployed by default) | Image catalog configurations. Defines reusable container image references. |
 
 ### Configuration Parameters
 
