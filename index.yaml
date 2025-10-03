@@ -4,6 +4,57 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: added
+          description: Connection pooling support via CloudNativePG Pooler CRD (PgBouncer)
+        - kind: added
+          description: Disaster recovery with Point-in-Time Recovery (PITR) and externalClusters support
+        - kind: added
+          description: PrometheusRule CRD integration with 5 default alert rules for monitoring
+        - kind: added
+          description: Azure Blob Storage and Google Cloud Storage backup providers
+        - kind: added
+          description: ImageCatalog and ClusterImageCatalog support for centralized image management
+        - kind: added
+          description: Volume snapshot backups for CSI-compatible storage providers
+        - kind: changed
+          description: Backup configuration now supports multiple providers (S3, Azure, GCS, VolumeSnapshot)
+        - kind: changed
+          description: imageName is now optional when using imageCatalogRef
+        - kind: fixed
+          description: S3 credentials structure in backup configuration
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/recommendations: '- url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg'
+    apiVersion: v2
+    appVersion: "1.0"
+    created: "2025-10-03T10:17:55.175552054Z"
+    description: Multi-database and multi-tenant management for CloudNativePG clusters
+      with automatic secret generation and isolation
+    digest: d22cd4007eac82aa519bff474a95fcb3ad2c587477f2ab38adc594c752ce31db
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager
+    icon: https://avatars.githubusercontent.com/u/100373852
+    keywords:
+    - postgresql
+    - database
+    - cloudnative-pg
+    - cnpg
+    - multi-tenant
+    - pgbouncer
+    - backup
+    - recovery
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: cnpg-database-manager
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://cloudnative-pg.io/
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/cnpg-database-manager-0.3.0/cnpg-database-manager-0.3.0.tgz
+    version: 0.3.0
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
           description: Add additionalClusterSpec field for flexible CloudNativePG Cluster configuration
         - kind: added
           description: Support any CloudNativePG feature without chart updates (affinity, certificates, walStorage, etc.)
@@ -977,4 +1028,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-10-03T08:54:26.075581047Z"
+generated: "2025-10-03T10:17:55.17561388Z"
