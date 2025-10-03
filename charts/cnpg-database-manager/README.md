@@ -15,9 +15,10 @@ Multi-database and multi-tenant management for CloudNativePG clusters with autom
 The official CloudNativePG `cluster` chart only supports single database per deployment. This chart fills the gap by providing:
 
 - **Multi-Database Management**: Deploy multiple databases in one PostgreSQL cluster
-- **Automatic Secret Generation**: Each database gets isolated credentials
-- **Secret Replication**: Optional secret distribution to application namespaces
+- **Declarative Role Management**: Automatic PostgreSQL user/role creation via CloudNativePG managed roles
+- **Database CRD Integration**: Uses CloudNativePG's Database CRD for proper lifecycle management
 - **Multi-Tenant Ready**: Perfect for consolidating multiple lightweight databases
+- **Flexible Configuration**: Support for any CloudNativePG feature via `additionalClusterSpec`
 
 Use this chart when you want to consolidate multiple applications into one PostgreSQL cluster while maintaining security isolation.
 
@@ -68,9 +69,10 @@ clusters:
 ```
 
 This creates:
-- One PostgreSQL cluster named `main` with 3 instances
-- Three separate databases with isolated credentials
-- Automatic secret generation for each database
+- One PostgreSQL cluster named `main` with 3 instances (HA setup)
+- Three Database CRDs (`main-keycloak`, `main-paperless`, `main-n8n`)
+- Three managed PostgreSQL roles (`keycloak`, `paperless`, `n8n`)
+- Three role password secrets (`main-keycloak-password`, `main-paperless-password`, `main-n8n-password`)
 
 ### Multi-Cluster Setup
 
@@ -360,37 +362,42 @@ The chart uses a dynamic configuration structure where each PostgreSQL cluster i
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `clusters.<name>.databases[].name` | string | Yes | - | Database name |
-| `clusters.<name>.databases[].owner` | string | Yes | - | Database owner/user name |
-| `clusters.<name>.databases[].targetNamespace` | string | No | - | Target namespace for secret replication |
-| `clusters.<name>.databases[].existingSecret` | string | No | - | Use existing secret for credentials |
+| `clusters.<name>.databases[].name` | string | Yes | - | Database name (PostgreSQL identifier format) |
+| `clusters.<name>.databases[].owner` | string | Yes | - | Database owner/user name (PostgreSQL identifier format) |
 | `clusters.<name>.databases[].encoding` | string | No | `"UTF8"` | Database encoding |
 | `clusters.<name>.databases[].locale` | string | No | `"C"` | Database locale |
+| `clusters.<name>.databases[].existingSecret` | string | No | - | Existing secret for role password (advanced use) |
+
+#### Additional Configuration
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `clusters.<name>.additionalClusterSpec` | object | No | `{}` | Additional CloudNativePG Cluster spec fields (see Advanced section) |
 
 ## How It Works
 
 ### Database and User Creation
 
-For each database defined in `clusters.<name>.databases[]`:
+For each database defined in `clusters.<name>.databases[]`, the chart creates:
 
-1. **Managed Roles**: PostgreSQL roles/users are created declaratively via `spec.managed.roles` in the Cluster CRD
-   - Each unique `owner` from all databases becomes a managed role
-   - Roles are deduplicated (multiple databases can share the same owner)
-   - Role passwords are stored in separate secrets (`<cluster>-<owner>-password`)
+1. **Managed Roles** (in Cluster CRD `spec.managed.roles`)
+   - Each unique `owner` from all databases becomes a managed PostgreSQL role
+   - Roles are automatically deduplicated (multiple databases can share the same owner)
+   - CloudNativePG manages the role lifecycle and password rotation
+   - Role passwords are stored in secrets: `<cluster>-<owner>-password`
 
-2. **Database Resource**: A CloudNativePG `Database` resource is created
+2. **Database CRDs** (CloudNativePG `Database` resources)
    - Database name from `name` field
-   - Owner references the managed role
-   - Database CRD automatically creates the PostgreSQL database
+   - Owner references the managed role created in step 1
+   - CloudNativePG operator automatically creates the PostgreSQL database
+   - Resource name: `<cluster>-<database-name>` (sanitized for RFC 1123)
 
-3. **Secret Generation**: A Kubernetes Secret is created with connection details:
-   - `username`: The database owner
-   - `password`: Auto-generated secure password (persisted across upgrades)
-   - `dbname`: Database name
-   - `host`: Cluster service endpoint
-   - `port`: PostgreSQL port (5432)
-   - `jdbc-url`: JDBC connection string
-   - `uri`: PostgreSQL URI connection string
+3. **Role Password Secrets** (Kubernetes Secrets)
+   - Type: `kubernetes.io/basic-auth`
+   - Name: `<cluster>-<owner>-password`
+   - Contains: `username` and `password` fields
+   - Created in the same namespace as the Helm chart
+   - Used by CloudNativePG's managed roles feature
 
 ### Secrets Management
 
@@ -582,9 +589,10 @@ kubectl logs -n cnpg-system deployment/cnpg-controller-manager
 |---------|-------------------------|------------|
 | Cluster Management | ✅ | ✅ |
 | Multiple Databases | ❌ (one per deployment) | ✅ (many per cluster) |
-| Automatic Secrets | ❌ | ✅ |
-| Secret Replication | ❌ | ✅ |
-| Multi-Cluster | ❌ | ✅ |
+| Managed Roles (declarative) | ❌ | ✅ |
+| Database CRD Integration | ❌ | ✅ |
+| Multi-Cluster Support | ❌ | ✅ (multiple clusters in one chart) |
+| Flexible Configuration | ❌ | ✅ (`additionalClusterSpec`) |
 | Backup Configuration | ✅ | ✅ |
 | Monitoring | ✅ | ✅ |
 
