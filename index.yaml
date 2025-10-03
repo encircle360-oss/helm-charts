@@ -3,6 +3,44 @@ entries:
   cnpg-database-manager:
   - annotations:
       artifacthub.io/changes: |
+        - kind: removed
+          description: Remove automatic application credential secrets generation
+        - kind: changed
+          description: Chart now only creates role password secrets for CloudNativePG managed roles
+        - kind: added
+          description: Comprehensive documentation for manual secret creation with SOPS
+        - kind: added
+          description: External Secrets Operator integration examples for future automation
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/recommendations: '- url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg'
+    apiVersion: v2
+    appVersion: "1.0"
+    created: "2025-10-03T00:08:00.21314566Z"
+    description: Multi-database and multi-tenant management for CloudNativePG clusters
+      with automatic secret generation and isolation
+    digest: 49c964c00a6877500905ba4d831cdb57b3a78ea66dc25db388df551cde93e00d
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager
+    icon: https://avatars.githubusercontent.com/u/100373852
+    keywords:
+    - postgresql
+    - database
+    - cloudnative-pg
+    - cnpg
+    - multi-tenant
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: cnpg-database-manager
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://cloudnative-pg.io/
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/cnpg-database-manager-0.2.0/cnpg-database-manager-0.2.0.tgz
+    version: 0.2.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: Add managed.roles to Cluster spec for declarative role management
         - kind: added
@@ -905,4 +943,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-10-02T23:21:15.181457682Z"
+generated: "2025-10-03T00:08:00.213220384Z"
