@@ -199,6 +199,14 @@ clusters: {}
   #       encoding: "UTF8"
   #       # -- Optional: Database locale (default: C)
   #       locale: "C"
+  #       # -- Optional: PostgreSQL extensions to install in this database
+  #       extensions: []
+  #         # - # -- Extension name (e.g., vector, postgis, timescaledb)
+  #         #   name: vector
+  #         #   # -- Extension version (optional, uses default if not specified)
+  #         #   version: "0.7.0"
+  #         #   # -- Schema where extension should be installed (optional, uses current default)
+  #         #   schema: public
   #     - name: paperless
   #       owner: paperless_user
   #       targetNamespace: paperless

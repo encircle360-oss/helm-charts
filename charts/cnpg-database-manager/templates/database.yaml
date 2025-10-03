@@ -22,6 +22,18 @@ spec:
   {{- if .locale }}
   locale: {{ .locale }}
   {{- end }}
+  {{- if .extensions }}
+  extensions:
+  {{- range .extensions }}
+  - name: {{ .name }}
+    {{- if .version }}
+    version: {{ .version | quote }}
+    {{- end }}
+    {{- if .schema }}
+    schema: {{ .schema }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

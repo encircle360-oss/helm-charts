@@ -1,6 +1,6 @@
 apiVersion: v2
 name: cnpg-database-manager
-description: Multi-database and multi-tenant management for CloudNativePG clusters with automatic secret generation and isolation
+description: Multi-database PostgreSQL management for CloudNativePG with declarative extensions, connection pooling, disaster recovery, and automated backups
 type: application
 version: 0.3.0
 appVersion: "1.0"
@@ -13,6 +13,9 @@ keywords:
   - pgbouncer
   - backup
   - recovery
+  - pgvector
+  - extensions
+  - pitr
 home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager
 sources:
   - https://github.com/encircle360-oss/helm-charts
@@ -26,7 +29,11 @@ annotations:
   artifacthub.io/prerelease: true
   artifacthub.io/changes: |
     - kind: added
-      description: Connection pooling support via CloudNativePG Pooler CRD (PgBouncer)
+      description: Declarative PostgreSQL extension management (pgvector, PostGIS, TimescaleDB) via Database CRD
+    - kind: added
+      description: Connection pooling support via CloudNativePG Pooler CRD (PgBouncer) with additionalPoolerSpec
+    - kind: added
+      description: Advanced role management documentation with superuser and group membership examples
     - kind: added
       description: Disaster recovery with Point-in-Time Recovery (PITR) and externalClusters support
     - kind: added

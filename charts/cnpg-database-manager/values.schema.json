@@ -452,6 +452,29 @@
                 "locale": {
                   "type": "string",
                   "description": "Database locale"
+                },
+                "extensions": {
+                  "type": "array",
+                  "description": "PostgreSQL extensions to install in this database (requires CloudNativePG 1.26+)",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Extension name (e.g., vector, postgis, timescaledb)",
+                        "minLength": 1
+                      },
+                      "version": {
+                        "type": "string",
+                        "description": "Extension version (optional, uses default if not specified)"
+                      },
+                      "schema": {
+                        "type": "string",
+                        "description": "Schema where extension should be installed (optional, uses current default)"
+                      }
+                    },
+                    "required": ["name"]
+                  }
                 }
               },
               "required": ["name", "owner"]
