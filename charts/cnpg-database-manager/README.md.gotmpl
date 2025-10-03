@@ -897,19 +897,6 @@ kubectl get secret <cluster-name>-<database-name>-app -o yaml
 kubectl logs -n cnpg-system deployment/cnpg-controller-manager
 ```
 
-## Comparison with Official Charts
-
-| Feature | Official `cluster` Chart | This Chart |
-|---------|-------------------------|------------|
-| Cluster Management | ✅ | ✅ |
-| Multiple Databases | ❌ (one per deployment) | ✅ (many per cluster) |
-| Managed Roles (declarative) | ❌ | ✅ |
-| Database CRD Integration | ❌ | ✅ |
-| Multi-Cluster Support | ❌ | ✅ (multiple clusters in one chart) |
-| Flexible Configuration | ❌ | ✅ (`additionalClusterSpec`) |
-| Backup Configuration | ✅ | ✅ |
-| Monitoring | ✅ | ✅ |
-
 ## Support & Professional Services
 
 ### Community Support
