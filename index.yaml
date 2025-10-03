@@ -3,6 +3,40 @@ entries:
   cnpg-database-manager:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: Add additionalClusterSpec field for flexible CloudNativePG Cluster configuration
+        - kind: added
+          description: Support any CloudNativePG feature without chart updates (affinity, certificates, walStorage, etc.)
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/recommendations: '- url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg'
+    apiVersion: v2
+    appVersion: "1.0"
+    created: "2025-10-03T08:54:26.075497541Z"
+    description: Multi-database and multi-tenant management for CloudNativePG clusters
+      with automatic secret generation and isolation
+    digest: f1d51a1ec399ab21f2963891841fe76174e9e4009454119d63cfad7e06d41cca
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager
+    icon: https://avatars.githubusercontent.com/u/100373852
+    keywords:
+    - postgresql
+    - database
+    - cloudnative-pg
+    - cnpg
+    - multi-tenant
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: cnpg-database-manager
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://cloudnative-pg.io/
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/cnpg-database-manager-0.2.1/cnpg-database-manager-0.2.1.tgz
+    version: 0.2.1
+  - annotations:
+      artifacthub.io/changes: |
         - kind: removed
           description: Remove automatic application credential secrets generation
         - kind: changed
@@ -943,4 +977,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-10-03T00:08:00.213220384Z"
+generated: "2025-10-03T08:54:26.075581047Z"
