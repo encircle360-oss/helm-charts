@@ -573,14 +573,15 @@ To prevent conflicts, **do not** define these fields in `additionalClusterSpec` 
 | Field | Use Instead |
 |-------|-------------|
 | `instances` | Chart parameter: `clusters.<name>.instances` |
-| `imageName` | Chart parameter: `clusters.<name>.imageName` |
+| `imageName` or `imageCatalogRef` | Chart parameters: `clusters.<name>.imageName` or `clusters.<name>.imageCatalogRef` |
 | `storage` | Chart parameter: `clusters.<name>.storage` |
 | `managed.roles` | Automatically generated from `clusters.<name>.databases` |
 | `postgresql.parameters` | Chart parameter: `clusters.<name>.maxConnections`, `sharedBuffers`, etc. |
 | `backup` | Chart parameter: `clusters.<name>.backup` |
-| `bootstrap.initdb` | Chart parameter: `clusters.<name>.initdb.postInitSQL` |
+| `bootstrap.initdb` or `bootstrap.recovery` | Chart parameters: `clusters.<name>.initdb.postInitSQL` or `clusters.<name>.recovery` |
 | `resources` | Chart parameter: `clusters.<name>.resources` |
 | `monitoring` | Chart parameter: `clusters.<name>.monitoring` |
+| `externalClusters` | Chart parameter: `clusters.<name>.externalClusters` |
 
 **Best Practices:**
 
@@ -625,7 +626,8 @@ The chart uses a dynamic configuration structure where each PostgreSQL cluster i
 |-----------|------|----------|---------|-------------|
 | `clusters.<name>.enabled` | bool | Yes | - | Enable or disable this cluster |
 | `clusters.<name>.instances` | int | Yes | - | Number of PostgreSQL instances (replicas) |
-| `clusters.<name>.imageName` | string | Yes | - | PostgreSQL container image with tag |
+| `clusters.<name>.imageName` | string | No* | - | PostgreSQL container image with tag (*required if imageCatalogRef not set) |
+| `clusters.<name>.imageCatalogRef` | object | No* | - | ImageCatalog reference for automatic image management (*alternative to imageName) |
 | `clusters.<name>.storage.size` | string | Yes | - | Size of persistent volume (e.g., `50Gi`) |
 | `clusters.<name>.storage.storageClass` | string | No | - | Storage class name |
 | `clusters.<name>.resources.requests.memory` | string | No | - | Memory request (e.g., `2Gi`) |
@@ -647,14 +649,26 @@ The chart uses a dynamic configuration structure where each PostgreSQL cluster i
 | `clusters.<name>.parameters` | object | No | `{}` | Additional custom PostgreSQL parameters |
 | `clusters.<name>.monitoring.enabled` | bool | No | `false` | Enable Prometheus monitoring |
 | `clusters.<name>.backup.enabled` | bool | No | `false` | Enable automated backups |
-| `clusters.<name>.backup.schedule` | string | No | `"0 0 0 * * *"` | Backup schedule (cron format) |
+| `clusters.<name>.backup.schedule` | string | No | - | Backup schedule (cron format, required for scheduledBackup) |
 | `clusters.<name>.backup.retentionPolicy` | string | No | `"30d"` | Backup retention policy |
+| `clusters.<name>.backup.method` | string | No | - | Backup method: `barmanObjectStore` or `volumeSnapshot` |
+| `clusters.<name>.backup.volumeSnapshot.className` | string | **Yes** (if volumeSnapshot) | - | VolumeSnapshot class name |
+| `clusters.<name>.backup.volumeSnapshot.online` | bool | No | `true` | Online (true) or offline (false) backup |
 | `clusters.<name>.backup.s3.bucket` | string | **Yes** (if S3) | - | S3 bucket name for backups |
-| `clusters.<name>.backup.s3.endpoint` | string | **Yes** (if S3) | - | S3 endpoint URL |
+| `clusters.<name>.backup.s3.endpoint` | string | No | - | S3 endpoint URL (optional, defaults to AWS) |
 | `clusters.<name>.backup.s3.region` | string | No | - | S3 region |
-| `clusters.<name>.backup.s3.accessKeyId` | string | **Yes** (if S3) | - | S3 access key ID |
-| `clusters.<name>.backup.s3.secretAccessKey` | string | **Yes** (if S3) | - | S3 secret access key |
-| `clusters.<name>.backup.s3.credentials.existingSecret` | string | No | - | Existing secret (alternative to accessKeyId/secretAccessKey) |
+| `clusters.<name>.backup.azure.destinationPath` | string | **Yes** (if Azure) | - | Azure Blob Storage destination path |
+| `clusters.<name>.backup.azure.inheritFromAzureAD` | bool | No | `false` | Use Azure AD Workload Identity |
+| `clusters.<name>.backup.gcs.bucket` | string | **Yes** (if GCS) | - | GCS bucket name |
+| `clusters.<name>.backup.gcs.gkeEnvironment` | bool | No | `false` | Use GKE Workload Identity |
+| `clusters.<name>.recovery.enabled` | bool | No | `false` | Enable recovery/PITR mode |
+| `clusters.<name>.recovery.source` | string | No | - | External cluster name for recovery |
+| `clusters.<name>.recovery.recoveryTarget.targetTime` | string | No | - | Point-in-Time Recovery target (RFC 3339) |
+| `clusters.<name>.poolers[]` | array | No | `[]` | Connection pooling configuration (PgBouncer) |
+| `clusters.<name>.poolers[].name` | string | **Yes** (if pooler) | - | Pooler name |
+| `clusters.<name>.poolers[].type` | string | No | `"rw"` | Pooler type: `rw`, `ro`, or `r` |
+| `clusters.<name>.poolers[].poolMode` | string | No | `"session"` | Pool mode: `session` or `transaction` |
+| `clusters.<name>.poolers[].additionalPoolerSpec` | object | No | `{}` | Additional Pooler spec fields |
 | `clusters.<name>.initdb.postInitSQL` | array | No | `[]` | Custom SQL statements after init |
 
 #### Database Configuration
@@ -666,6 +680,16 @@ The chart uses a dynamic configuration structure where each PostgreSQL cluster i
 | `clusters.<name>.databases[].encoding` | string | No | `"UTF8"` | Database encoding |
 | `clusters.<name>.databases[].locale` | string | No | `"C"` | Database locale |
 | `clusters.<name>.databases[].existingSecret` | string | No | - | Existing secret for role password (advanced use) |
+
+#### ImageCatalog Configuration
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `imageCatalogs.<name>.enabled` | bool | Yes | - | Enable or disable this catalog |
+| `imageCatalogs.<name>.kind` | string | No | `"ImageCatalog"` | Catalog kind: `ImageCatalog` or `ClusterImageCatalog` |
+| `imageCatalogs.<name>.images[]` | array | Yes | - | List of PostgreSQL images by major version |
+| `imageCatalogs.<name>.images[].major` | int | Yes | - | PostgreSQL major version |
+| `imageCatalogs.<name>.images[].image` | string | Yes | - | Container image URL |
 
 #### Additional Configuration
 
