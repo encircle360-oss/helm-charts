@@ -242,6 +242,11 @@
               },
               "required": ["name", "owner"]
             }
+          },
+          "additionalClusterSpec": {
+            "type": "object",
+            "description": "Additional CloudNativePG Cluster spec fields to merge into the Cluster CRD. Allows using any CloudNativePG feature without chart updates.",
+            "additionalProperties": true
           }
         },
         "required": ["enabled", "instances", "imageName", "storage", "databases"]

@@ -110,5 +110,9 @@ spec:
     {{- toYaml $cluster.resources | nindent 4 }}
   {{- end }}
 
+  {{- if $cluster.additionalClusterSpec }}
+  {{- toYaml $cluster.additionalClusterSpec | nindent 2 }}
+  {{- end }}
+
 {{- end }}
 {{- end }}

@@ -200,6 +200,104 @@ clusters:
         owner: app
 ```
 
+### Advanced: Using additionalClusterSpec
+
+For CloudNativePG features not explicitly supported by the chart, use `additionalClusterSpec` to pass any valid CloudNativePG Cluster spec fields.
+
+**Why Object-Based Configuration?**
+
+This chart uses an **object-based** approach (YAML dictionary) for `additionalClusterSpec` rather than a string-based approach (multiline string). This design choice provides:
+
+- ✅ **Type Safety**: Schema validation catches configuration errors before deployment
+- ✅ **IDE Support**: Autocomplete and validation in modern editors
+- ✅ **Structured API**: CloudNativePG has a well-defined API schema (unlike generic Kubernetes resources)
+- ✅ **GitOps Friendly**: Proper YAML parsing and diff tools work correctly
+- ✅ **Merge Safety**: Helm's YAML processing prevents malformed output
+
+Alternative approaches (like HashiCorp Consul's string-based `additionalSpec`) are designed for less structured APIs where raw YAML flexibility is needed. For CloudNativePG's typed API, the object-based approach is superior.
+
+**Usage:**
+
+```yaml
+clusters:
+  main:
+    enabled: true
+    instances: 3
+    imageName: ghcr.io/cloudnative-pg/postgresql:18
+    storage:
+      size: 100Gi
+    databases:
+      - name: myapp
+        owner: myuser
+
+    # Pass any CloudNativePG Cluster spec field
+    additionalClusterSpec:
+      # Enable superuser access for admin tools
+      enableSuperuserAccess: true
+
+      # Configure pod affinity for multi-zone HA
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: cnpg.io/cluster
+                    operator: In
+                    values: [main]
+              topologyKey: topology.kubernetes.io/zone
+
+      # Custom certificates
+      certificates:
+        serverCASecret: my-ca-secret
+        serverTLSSecret: my-tls-secret
+
+      # Replication tuning
+      minSyncReplicas: 1
+      maxSyncReplicas: 2
+
+      # Separate WAL storage
+      walStorage:
+        size: 50Gi
+        storageClass: fast-nvme
+```
+
+**Important Notes:**
+
+- Fields in `additionalClusterSpec` are merged into the Cluster CRD spec using Helm's `toYaml` function
+- This allows using any CloudNativePG feature without waiting for chart updates
+- The object-based approach provides validation and type safety through the values schema
+
+⚠️ **Avoid Overriding Chart-Managed Fields**
+
+To prevent conflicts, **do not** define these fields in `additionalClusterSpec` (use the chart's dedicated parameters instead):
+
+| Field | Use Instead |
+|-------|-------------|
+| `instances` | Chart parameter: `clusters.<name>.instances` |
+| `imageName` | Chart parameter: `clusters.<name>.imageName` |
+| `storage` | Chart parameter: `clusters.<name>.storage` |
+| `managed.roles` | Automatically generated from `clusters.<name>.databases` |
+| `postgresql.parameters` | Chart parameter: `clusters.<name>.maxConnections`, `sharedBuffers`, etc. |
+| `backup` | Chart parameter: `clusters.<name>.backup` |
+| `bootstrap.initdb` | Chart parameter: `clusters.<name>.initdb.postInitSQL` |
+| `resources` | Chart parameter: `clusters.<name>.resources` |
+| `monitoring` | Chart parameter: `clusters.<name>.monitoring` |
+
+**Best Practices:**
+
+1. Use `additionalClusterSpec` for fields **not** exposed by the chart
+2. Consult the [CloudNativePG API Reference](https://cloudnative-pg.io/documentation/current/cloudnative-pg.v1/#postgresql-cnpg-io-v1-ClusterSpec) for available fields
+3. Test configurations with `helm template` before applying
+4. Document why you're using `additionalClusterSpec` in your values file comments
+
+**Common Use Cases:**
+
+- **High Availability**: `affinity`, `topologySpreadConstraints`
+- **Security**: `enableSuperuserAccess`, `certificates`
+- **Replication**: `minSyncReplicas`, `maxSyncReplicas`
+- **Performance**: `walStorage` (separate WAL disk)
+- **Networking**: `primaryUpdateStrategy`, `primaryUpdateMethod`
+
 {{ template "chart.maintainersSection" . }}
 
 {{ template "chart.sourcesSection" . }}

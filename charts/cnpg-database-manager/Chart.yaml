@@ -2,7 +2,7 @@ apiVersion: v2
 name: cnpg-database-manager
 description: Multi-database and multi-tenant management for CloudNativePG clusters with automatic secret generation and isolation
 type: application
-version: 0.2.0
+version: 0.2.1
 appVersion: "1.0"
 keywords:
   - postgresql
@@ -22,13 +22,9 @@ annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/prerelease: true
   artifacthub.io/changes: |
-    - kind: removed
-      description: Remove automatic application credential secrets generation
-    - kind: changed
-      description: Chart now only creates role password secrets for CloudNativePG managed roles
     - kind: added
-      description: Comprehensive documentation for manual secret creation with SOPS
+      description: Add additionalClusterSpec field for flexible CloudNativePG Cluster configuration
     - kind: added
-      description: External Secrets Operator integration examples for future automation
+      description: Support any CloudNativePG feature without chart updates (affinity, certificates, walStorage, etc.)
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg
