@@ -145,7 +145,7 @@ clusters:
         owner: app
 ```
 
-### Secret Replication to Application Namespaces
+### Multiple Databases in One Cluster
 
 ```yaml
 clusters:
@@ -158,13 +158,9 @@ clusters:
     databases:
       - name: keycloak
         owner: keycloak
-        targetNamespace: keycloak-ns
       - name: paperless
         owner: paperless
-        targetNamespace: paperless-ns
 ```
-
-This automatically replicates database secrets to the application namespaces.
 
 ### Advanced PostgreSQL Configuration
 
@@ -298,21 +294,79 @@ For each database defined in `clusters.<name>.databases[]`:
    - `jdbc-url`: JDBC connection string
    - `uri`: PostgreSQL URI connection string
 
-### Secret Naming
+### Secrets Management
 
-**Database Credentials Secrets**: `<cluster-name>-<database-name>-creds`
-- Example: For cluster `main` and database `keycloak`, the secret is `main-keycloak-creds`
-- Contains full connection details (username, password, host, port, URIs)
+The chart generates **only** the secrets required by CloudNativePG for managed roles:
 
 **Role Password Secrets**: `<cluster-name>-<owner-name>-password`
 - Example: For cluster `main` and owner `keycloak`, the secret is `main-keycloak-password`
 - Type: `kubernetes.io/basic-auth`
-- Used by CloudNativePG's managed roles feature
+- Created in the same namespace as the Helm chart
+- Used by CloudNativePG's `spec.managed.roles.passwordSecret`
 - Shared across multiple databases with the same owner
 
-### Secret Replication
+### Application Credentials
 
-If `targetNamespace` is specified for a database, the secret is automatically replicated to that namespace.
+**Applications need to create their own secrets** in their respective namespaces with database connection details.
+
+You can retrieve the password from the role secret and create application secrets manually:
+
+```bash
+# Get the password from CNPG namespace
+PASSWORD=$(kubectl -n cnpg-databases get secret main-keycloak-password \
+  -o jsonpath='{.data.password}' | base64 -d)
+
+# Create application secret in app namespace
+kubectl -n keycloak create secret generic keycloak-db \
+  --from-literal=username=keycloak \
+  --from-literal=password="$PASSWORD" \
+  --from-literal=host=main-rw.cnpg-databases.svc.cluster.local \
+  --from-literal=port=5432 \
+  --from-literal=database=keycloak
+```
+
+**For GitOps with SOPS encryption:**
+
+```yaml
+# keycloak/secrets.enc.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: keycloak-db
+  namespace: keycloak
+type: Opaque
+stringData:
+  username: keycloak
+  password: ENC[AES256_GCM,data:xxx,iv:yyy,tag:zzz,type:str]  # encrypted with sops
+  host: main-rw.cnpg-databases.svc.cluster.local
+  port: "5432"
+  database: keycloak
+  # Optional convenience fields
+  jdbc-url: jdbc:postgresql://main-rw.cnpg-databases.svc.cluster.local:5432/keycloak
+  uri: postgresql://keycloak:${password}@main-rw.cnpg-databases.svc.cluster.local:5432/keycloak
+```
+
+**Future: External Secrets Operator Integration**
+
+For automated secret distribution, consider using [External Secrets Operator](https://external-secrets.io/):
+
+```yaml
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: keycloak-db
+  namespace: keycloak
+spec:
+  secretStoreRef:
+    name: kubernetes-backend
+  target:
+    name: keycloak-db
+  data:
+  - secretKey: password
+    remoteRef:
+      key: main-keycloak-password
+      property: password
+```
 
 ## Use Cases
 
@@ -331,16 +385,12 @@ clusters:
     databases:
       - name: auth-service
         owner: auth
-        targetNamespace: auth
       - name: user-service
         owner: users
-        targetNamespace: users
       - name: order-service
         owner: orders
-        targetNamespace: orders
       - name: payment-service
         owner: payments
-        targetNamespace: payments
 ```
 
 ### Multi-Tenant SaaS
