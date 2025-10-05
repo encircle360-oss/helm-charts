@@ -3,6 +3,48 @@ entries:
   cnpg-database-manager:
   - annotations:
       artifacthub.io/changes: |
+        - kind: fixed
+          description: Removed invalid scheduledBackup field from Cluster spec (not part of CloudNativePG API)
+        - kind: fixed
+          description: Improved 6-term cron pattern validation in values schema
+        - kind: added
+          description: Comprehensive documentation for 6-term cron schedule format (with seconds field)
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/recommendations: '- url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg'
+    apiVersion: v2
+    appVersion: "1.0"
+    created: "2025-10-05T13:15:12.960644357Z"
+    description: Multi-database PostgreSQL management for CloudNativePG with declarative
+      extensions, connection pooling, disaster recovery, and automated backups
+    digest: 79d910ec95c55ff4e44d24fafdb551b80f2a8e1d53ef76c14ba0dc0ba62dfff6
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager
+    icon: https://avatars.githubusercontent.com/u/100373852
+    keywords:
+    - postgresql
+    - database
+    - cloudnative-pg
+    - cnpg
+    - multi-tenant
+    - pgbouncer
+    - backup
+    - recovery
+    - pgvector
+    - extensions
+    - pitr
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: cnpg-database-manager
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://cloudnative-pg.io/
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/cnpg-database-manager-0.4.3/cnpg-database-manager-0.4.3.tgz
+    version: 0.4.3
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: ScheduledBackup CRD creation for volumeSnapshot backups with schedule
         - kind: added
@@ -1214,4 +1256,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-10-05T10:23:25.670472862Z"
+generated: "2025-10-05T13:15:12.960788888Z"
