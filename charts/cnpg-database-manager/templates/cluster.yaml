@@ -182,23 +182,6 @@ spec:
         {{- end }}
       {{- end }}
     {{- end }}
-
-  {{- if $cluster.backup.schedule }}
-  scheduledBackup:
-    - name: daily-backup
-      schedule: {{ $cluster.backup.schedule | quote }}
-      backupOwnerReference: self
-      {{- if $cluster.backup.method }}
-      method: {{ $cluster.backup.method }}
-      {{- end }}
-      {{- if $cluster.backup.online }}
-      online: {{ $cluster.backup.online }}
-      {{- end }}
-      {{- if $cluster.backup.onlineConfiguration }}
-      onlineConfiguration:
-        {{- toYaml $cluster.backup.onlineConfiguration | nindent 8 }}
-      {{- end }}
-  {{- end }}
   {{- end }}
   {{- end }}
 

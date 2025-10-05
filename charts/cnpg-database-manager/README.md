@@ -1,6 +1,6 @@
 # cnpg-database-manager
 
-![Version: 0.4.2](https://img.shields.io/badge/Version-0.4.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 0.4.3](https://img.shields.io/badge/Version-0.4.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
 
 Multi-database PostgreSQL management for CloudNativePG with declarative extensions, connection pooling, disaster recovery, and automated backups
 
@@ -144,7 +144,7 @@ clusters:
       size: 50Gi
     backup:
       enabled: true
-      schedule: "0 0 * * *"
+      schedule: "0 0 0 * * *"  # Daily at midnight (6-term cron)
       retentionPolicy: "30d"
       s3:
         bucket: my-postgres-backups
@@ -169,7 +169,7 @@ clusters:
       size: 50Gi
     backup:
       enabled: true
-      schedule: "0 0 * * *"
+      schedule: "0 0 0 * * *"  # Daily at midnight (6-term cron)
       retentionPolicy: "30d"
       azure:
         destinationPath: "https://mystorageaccount.blob.core.windows.net/backups/main"
@@ -191,7 +191,7 @@ clusters:
       size: 50Gi
     backup:
       enabled: true
-      schedule: "0 0 * * *"
+      schedule: "0 0 0 * * *"  # Daily at midnight (6-term cron)
       retentionPolicy: "30d"
       gcs:
         bucket: my-postgres-backups
@@ -206,6 +206,32 @@ clusters:
 
 When using `method: volumeSnapshot` with a `schedule`, the chart automatically creates a `ScheduledBackup` CRD that triggers backups according to the cron schedule.
 
+#### ⚠️ Important: Cron Schedule Format
+
+CloudNativePG uses **6-term cron expressions** (not standard 5-term cron):
+
+| Field    | Allowed Values | Description |
+|----------|---------------|-------------|
+| Seconds  | 0-59          | When to trigger (usually 0) |
+| Minutes  | 0-59          | Minute of the hour |
+| Hours    | 0-23          | Hour of the day |
+| Day      | 1-31          | Day of the month |
+| Month    | 1-12          | Month of the year |
+| Weekday  | 0-6           | Day of the week (0 = Sunday) |
+
+**Common Examples:**
+- `"0 0 * * * *"` - Every hour at minute 0
+- `"0 0 0 * * *"` - Daily at midnight
+- `"0 30 2 * * *"` - Daily at 2:30 AM
+- `"0 0 */6 * * *"` - Every 6 hours
+- `"0 0 2 * * 0"` - Every Sunday at 2:00 AM
+
+**⚠️ Common Mistake:**
+
+Do NOT use standard 5-term cron like `"0 * * * *"` - this will be interpreted as running **every minute** (when seconds=0), not every hour!
+
+For more details, see [CloudNativePG Backup Documentation](https://cloudnative-pg.io/documentation/current/backup/).
+
 **Basic Volume Snapshot Backup:**
 
 ```yaml
@@ -218,7 +244,7 @@ clusters:
       size: 50Gi
     backup:
       enabled: true
-      schedule: "0 */3 * * *"  # Every 3 hours
+      schedule: "0 0 */3 * * *"  # Every 3 hours (6-term cron)
       retentionPolicy: "30d"
       method: volumeSnapshot
       volumeSnapshot:
@@ -244,7 +270,7 @@ clusters:
       size: 50Gi
     backup:
       enabled: true
-      schedule: "0 */3 * * *"
+      schedule: "0 0 */3 * * *"  # Every 3 hours (6-term cron)
       method: volumeSnapshot
       target: prefer-standby  # Use standby for backups (reduces primary load)
       immediate: true         # Create immediate backup on deployment

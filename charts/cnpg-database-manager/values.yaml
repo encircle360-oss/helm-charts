@@ -135,7 +135,15 @@ clusters: {}
   #   backup:
   #     # -- Enable automated backups
   #     enabled: false
-  #     # -- Backup schedule (cron format, creates ScheduledBackup for volumeSnapshot)
+  #     # -- Backup schedule in 6-term cron format: "second minute hour day month weekday"
+  #     # IMPORTANT: CloudNativePG uses 6-term cron (with seconds), NOT standard 5-term cron!
+  #     # Common examples:
+  #     #   "0 0 * * * *"    - Every hour at minute 0
+  #     #   "0 0 0 * * *"    - Daily at midnight
+  #     #   "0 30 2 * * *"   - Daily at 2:30 AM
+  #     #   "0 0 */6 * * *"  - Every 6 hours
+  #     # WARNING: Do NOT use "0 * * * *" (5-term) - this will run every minute, not every hour!
+  #     # Creates ScheduledBackup CRD when using volumeSnapshot method
   #     schedule: "0 0 0 * * *"
   #     # -- Backup retention policy
   #     retentionPolicy: "30d"

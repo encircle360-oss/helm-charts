@@ -277,7 +277,8 @@
               },
               "schedule": {
                 "type": "string",
-                "description": "Backup schedule in cron format"
+                "description": "Backup schedule in 6-term cron format: 'second minute hour day month weekday' (e.g., '0 0 * * * *' for hourly, '0 0 0 * * *' for daily)",
+                "pattern": "^(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every (\\d+(ns|us|µs|ms|s|m|h))+)|(((\\d+(-\\d+)?(,\\d+(-\\d+)?)*|\\*/\\d+|\\*) ){5}(\\d+(-\\d+)?(,\\d+(-\\d+)?)*|\\*/\\d+|\\*))$"
               },
               "retentionPolicy": {
                 "type": "string",
