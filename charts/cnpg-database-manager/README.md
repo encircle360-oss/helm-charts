@@ -1,8 +1,8 @@
 # cnpg-database-manager
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 0.4.1](https://img.shields.io/badge/Version-0.4.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
 
-Multi-database and multi-tenant management for CloudNativePG clusters with automatic secret generation and isolation
+Multi-database PostgreSQL management for CloudNativePG with declarative extensions, connection pooling, disaster recovery, and automated backups
 
 **Homepage:** <https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager>
 
@@ -411,6 +411,92 @@ clusters:
 - For extensions requiring superuser privileges, CloudNativePG handles this automatically
 - Requires CloudNativePG operator version 1.26.0 or higher
 
+### Separate WAL Storage (Performance Optimization)
+
+For performance-critical workloads, you can separate WAL (Write-Ahead Log) storage onto a different volume. This enables parallel I/O and better storage tier optimization.
+
+**Basic WAL Storage:**
+
+```yaml
+clusters:
+  main:
+    enabled: true
+    instances: 3
+    imageName: ghcr.io/cloudnative-pg/postgresql:17.2
+
+    # Main PGDATA storage
+    storage:
+      size: 50Gi
+      storageClass: longhorn-postgres
+
+    # Separate WAL storage
+    walStorage:
+      enabled: true
+      size: 10Gi
+      storageClass: longhorn-postgres-wal  # Can be faster storage tier
+```
+
+**Different Storage Classes:**
+
+```yaml
+clusters:
+  main:
+    enabled: true
+    instances: 3
+    imageName: ghcr.io/cloudnative-pg/postgresql:17.2
+
+    # PGDATA on standard storage
+    storage:
+      size: 50Gi
+      storageClass: standard-ssd
+
+    # WAL on faster storage tier
+    walStorage:
+      enabled: true
+      size: 10Gi
+      storageClass: fast-nvme
+```
+
+**Advanced PVC Template Configuration:**
+
+```yaml
+clusters:
+  main:
+    enabled: true
+    instances: 3
+    imageName: ghcr.io/cloudnative-pg/postgresql:17.2
+
+    # Advanced PGDATA storage with PVC template
+    storage:
+      pvcTemplate:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Gi
+        storageClassName: premium-ssd
+        volumeMode: Filesystem
+
+    # Advanced WAL storage with PVC template
+    walStorage:
+      enabled: true
+      pvcTemplate:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 20Gi
+        storageClassName: ultra-fast-nvme
+        volumeMode: Filesystem
+```
+
+**Important Notes:**
+
+- WAL storage cannot be removed once added to a cluster
+- Size the WAL volume according to PostgreSQL settings (`min_wal_size`, `max_wal_size`)
+- Running out of WAL disk space will halt PostgreSQL
+- Recommended WAL size: 10-20% of PGDATA size
+
 ### Advanced PostgreSQL Configuration
 
 ```yaml
@@ -791,6 +877,11 @@ The chart uses a dynamic configuration structure where each PostgreSQL cluster i
 | `clusters.<name>.imageCatalogRef` | object | No* | - | ImageCatalog reference for automatic image management (*alternative to imageName) |
 | `clusters.<name>.storage.size` | string | Yes | - | Size of persistent volume (e.g., `50Gi`) |
 | `clusters.<name>.storage.storageClass` | string | No | - | Storage class name |
+| `clusters.<name>.storage.pvcTemplate` | object | No | `{}` | Advanced PVC template for custom storage configuration |
+| `clusters.<name>.walStorage.enabled` | bool | No | `false` | Enable separate WAL storage volume |
+| `clusters.<name>.walStorage.size` | string | No | `"10Gi"` | Size of WAL persistent volume |
+| `clusters.<name>.walStorage.storageClass` | string | No | - | Storage class name for WAL volume |
+| `clusters.<name>.walStorage.pvcTemplate` | object | No | `{}` | Advanced PVC template for WAL storage |
 | `clusters.<name>.resources.requests.memory` | string | No | - | Memory request (e.g., `2Gi`) |
 | `clusters.<name>.resources.requests.cpu` | string | No | - | CPU request (e.g., `1000m`) |
 | `clusters.<name>.resources.limits.memory` | string | No | - | Memory limit (e.g., `4Gi`) |

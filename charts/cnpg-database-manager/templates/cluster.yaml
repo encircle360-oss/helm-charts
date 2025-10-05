@@ -55,10 +55,30 @@ spec:
       {{- end }}
 
   storage:
+    {{- if $cluster.storage.pvcTemplate }}
+    pvcTemplate:
+      {{- toYaml $cluster.storage.pvcTemplate | nindent 6 }}
+    {{- else }}
     size: {{ $cluster.storage.size | default "50Gi" }}
     {{- if $cluster.storage.storageClass }}
     storageClass: {{ $cluster.storage.storageClass }}
     {{- end }}
+    {{- end }}
+
+  {{- if $cluster.walStorage }}
+  {{- if $cluster.walStorage.enabled }}
+  walStorage:
+    {{- if $cluster.walStorage.pvcTemplate }}
+    pvcTemplate:
+      {{- toYaml $cluster.walStorage.pvcTemplate | nindent 6 }}
+    {{- else }}
+    size: {{ $cluster.walStorage.size | default "10Gi" }}
+    {{- if $cluster.walStorage.storageClass }}
+    storageClass: {{ $cluster.walStorage.storageClass }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
 
   {{- if $cluster.monitoring }}
   {{- if $cluster.monitoring.enabled }}

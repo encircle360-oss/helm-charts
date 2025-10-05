@@ -50,7 +50,34 @@ clusters: {}
   #     size: 50Gi
   #     # -- Storage class name (optional)
   #     storageClass: ""
-  #   
+  #     # -- PVC template for advanced customization (optional)
+  #     pvcTemplate: {}
+  #       # accessModes:
+  #       #   - ReadWriteOnce
+  #       # resources:
+  #       #   requests:
+  #       #     storage: 50Gi
+  #       # storageClassName: premium-ssd
+  #       # volumeMode: Filesystem
+  #
+  #   # -- WAL storage configuration (optional, for performance optimization)
+  #   walStorage:
+  #     # -- Enable separate WAL storage
+  #     enabled: false
+  #     # -- Size of the WAL persistent volume
+  #     size: 10Gi
+  #     # -- Storage class name for WAL volume (optional)
+  #     storageClass: ""
+  #     # -- PVC template for WAL volume advanced customization (optional)
+  #     pvcTemplate: {}
+  #       # accessModes:
+  #       #   - ReadWriteOnce
+  #       # resources:
+  #       #   requests:
+  #       #     storage: 10Gi
+  #       # storageClassName: fast-nvme
+  #       # volumeMode: Filesystem
+  #
   #   # -- Resource limits and requests
   #   resources:
   #     requests:

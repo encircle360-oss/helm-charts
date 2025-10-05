@@ -104,9 +104,37 @@
               "storageClass": {
                 "type": "string",
                 "description": "Storage class name"
+              },
+              "pvcTemplate": {
+                "type": "object",
+                "description": "PVC template for advanced customization",
+                "additionalProperties": true
               }
-            },
-            "required": ["size"]
+            }
+          },
+          "walStorage": {
+            "type": "object",
+            "description": "Separate WAL storage configuration (optional, for performance)",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "description": "Enable separate WAL storage"
+              },
+              "size": {
+                "type": "string",
+                "description": "Size of the WAL persistent volume",
+                "pattern": "^[0-9]+(Mi|Gi|Ti)$"
+              },
+              "storageClass": {
+                "type": "string",
+                "description": "Storage class name for WAL volume"
+              },
+              "pvcTemplate": {
+                "type": "object",
+                "description": "PVC template for WAL volume advanced customization",
+                "additionalProperties": true
+              }
+            }
           },
           "resources": {
             "type": "object",
