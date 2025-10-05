@@ -1,0 +1,65 @@
+{{- range $clusterName, $cluster := .Values.clusters }}
+{{- if $cluster.enabled }}
+{{- if $cluster.backup }}
+{{- if $cluster.backup.enabled }}
+{{- if $cluster.backup.schedule }}
+{{- if eq ($cluster.backup.method | default "barmanObjectStore") "volumeSnapshot" }}
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: {{ $clusterName }}-scheduled-backup
+  labels:
+    {{- include "cnpg-databases.labels" $ | nindent 4 }}
+    cnpg.io/cluster: {{ $clusterName }}
+spec:
+  # Required: cron schedule
+  schedule: {{ $cluster.backup.schedule | quote }}
+
+  # Required: target cluster
+  cluster:
+    name: {{ $clusterName }}
+
+  # Method: volumeSnapshot
+  method: volumeSnapshot
+
+  # Backup target (primary, prefer-standby, etc.)
+  {{- if $cluster.backup.target }}
+  target: {{ $cluster.backup.target }}
+  {{- end }}
+
+  # Suspend scheduling
+  {{- if hasKey $cluster.backup "suspend" }}
+  suspend: {{ $cluster.backup.suspend }}
+  {{- end }}
+
+  # Backup ownership reference
+  {{- if $cluster.backup.backupOwnerReference }}
+  backupOwnerReference: {{ $cluster.backup.backupOwnerReference }}
+  {{- end }}
+
+  # Immediate backup on creation
+  {{- if $cluster.backup.immediate }}
+  immediate: {{ $cluster.backup.immediate }}
+  {{- end }}
+
+  # Online/hot backup configuration
+  {{- if hasKey $cluster.backup.volumeSnapshot "online" }}
+  online: {{ $cluster.backup.volumeSnapshot.online }}
+  {{- end }}
+
+  {{- if $cluster.backup.volumeSnapshot.onlineConfiguration }}
+  onlineConfiguration:
+    {{- if hasKey $cluster.backup.volumeSnapshot.onlineConfiguration "immediateCheckpoint" }}
+    immediateCheckpoint: {{ $cluster.backup.volumeSnapshot.onlineConfiguration.immediateCheckpoint }}
+    {{- end }}
+    {{- if hasKey $cluster.backup.volumeSnapshot.onlineConfiguration "waitForArchive" }}
+    waitForArchive: {{ $cluster.backup.volumeSnapshot.onlineConfiguration.waitForArchive }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

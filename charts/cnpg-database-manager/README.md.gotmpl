@@ -205,6 +205,10 @@ clusters:
 
 ### Volume Snapshot Backups
 
+When using `method: volumeSnapshot` with a `schedule`, the chart automatically creates a `ScheduledBackup` CRD that triggers backups according to the cron schedule.
+
+**Basic Volume Snapshot Backup:**
+
 ```yaml
 clusters:
   main:
@@ -215,18 +219,58 @@ clusters:
       size: 50Gi
     backup:
       enabled: true
-      schedule: "0 1 * * *"
+      schedule: "0 */3 * * *"  # Every 3 hours
       retentionPolicy: "30d"
       method: volumeSnapshot
       volumeSnapshot:
-        className: csi-aws-vsc
+        className: longhorn-backup  # Your VolumeSnapshotClass
         online: true
         onlineConfiguration:
-          immediateCheckpoint: true
+          immediateCheckpoint: false
           waitForArchive: true
     databases:
       - name: production-db
         owner: app
+```
+
+**Advanced Configuration with Backup Target:**
+
+```yaml
+clusters:
+  main:
+    enabled: true
+    instances: 3
+    imageName: ghcr.io/cloudnative-pg/postgresql:17.2
+    storage:
+      size: 50Gi
+    backup:
+      enabled: true
+      schedule: "0 */3 * * *"
+      method: volumeSnapshot
+      target: prefer-standby  # Use standby for backups (reduces primary load)
+      immediate: true         # Create immediate backup on deployment
+      volumeSnapshot:
+        className: longhorn-backup
+        online: true
+    databases:
+      - name: production-db
+        owner: app
+```
+
+**How it works:**
+
+1. Chart creates the Cluster with `backup.volumeSnapshot` configuration
+2. Chart creates a `ScheduledBackup` CRD that triggers backups on schedule
+3. CloudNativePG operator creates `Backup` resources automatically
+4. Kubernetes CSI creates `VolumeSnapshot` resources
+5. Storage driver (Longhorn, etc.) backs up to configured target (S3/NFS)
+
+**Verify backups:**
+
+```bash
+kubectl get scheduledbackup
+kubectl get backup
+kubectl get volumesnapshot
 ```
 
 ### Disaster Recovery and Point-in-Time Recovery (PITR)
@@ -892,9 +936,13 @@ The chart uses a dynamic configuration structure where each PostgreSQL cluster i
 | `clusters.<name>.parameters` | object | No | `{}` | Additional custom PostgreSQL parameters |
 | `clusters.<name>.monitoring.enabled` | bool | No | `false` | Enable Prometheus monitoring |
 | `clusters.<name>.backup.enabled` | bool | No | `false` | Enable automated backups |
-| `clusters.<name>.backup.schedule` | string | No | - | Backup schedule (cron format, required for scheduledBackup) |
+| `clusters.<name>.backup.schedule` | string | No | - | Backup schedule (cron format, creates ScheduledBackup for volumeSnapshot) |
 | `clusters.<name>.backup.retentionPolicy` | string | No | `"30d"` | Backup retention policy |
 | `clusters.<name>.backup.method` | string | No | - | Backup method: `barmanObjectStore` or `volumeSnapshot` |
+| `clusters.<name>.backup.target` | string | No | - | Backup target: `primary` or `prefer-standby` |
+| `clusters.<name>.backup.suspend` | bool | No | `false` | Suspend scheduled backups |
+| `clusters.<name>.backup.immediate` | bool | No | `false` | Trigger immediate backup on ScheduledBackup creation |
+| `clusters.<name>.backup.backupOwnerReference` | string | No | - | Backup ownership: `self`, `cluster`, or `none` |
 | `clusters.<name>.backup.volumeSnapshot.className` | string | **Yes** (if volumeSnapshot) | - | VolumeSnapshot class name |
 | `clusters.<name>.backup.volumeSnapshot.online` | bool | No | `true` | Online (true) or offline (false) backup |
 | `clusters.<name>.backup.s3.bucket` | string | **Yes** (if S3) | - | S3 bucket name for backups |

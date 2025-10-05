@@ -135,7 +135,7 @@ clusters: {}
   #   backup:
   #     # -- Enable automated backups
   #     enabled: false
-  #     # -- Backup schedule (cron format)
+  #     # -- Backup schedule (cron format, creates ScheduledBackup for volumeSnapshot)
   #     schedule: "0 0 0 * * *"
   #     # -- Backup retention policy
   #     retentionPolicy: "30d"
@@ -145,6 +145,15 @@ clusters: {}
   #
   #     # -- Backup method: barmanObjectStore (default) or volumeSnapshot
   #     method: ""
+  #
+  #     # -- Backup target: primary (default) or prefer-standby
+  #     target: ""
+  #     # -- Suspend scheduled backups
+  #     suspend: false
+  #     # -- Trigger immediate backup on ScheduledBackup creation
+  #     immediate: false
+  #     # -- Backup ownership reference: self (default), cluster, or none
+  #     backupOwnerReference: ""
   #
   #     # -- Volume snapshot configuration (for CSI-compatible storage)
   #     volumeSnapshot:

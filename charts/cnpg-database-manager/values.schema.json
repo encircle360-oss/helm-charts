@@ -292,6 +292,24 @@
                 "description": "Backup method",
                 "enum": ["barmanObjectStore", "volumeSnapshot"]
               },
+              "target": {
+                "type": "string",
+                "description": "Backup target instance",
+                "enum": ["primary", "prefer-standby"]
+              },
+              "suspend": {
+                "type": "boolean",
+                "description": "Suspend scheduled backups"
+              },
+              "immediate": {
+                "type": "boolean",
+                "description": "Trigger immediate backup on ScheduledBackup creation"
+              },
+              "backupOwnerReference": {
+                "type": "string",
+                "description": "Backup ownership reference",
+                "enum": ["self", "cluster", "none"]
+              },
               "online": {
                 "type": "boolean",
                 "description": "Online backup mode for scheduled backups"
