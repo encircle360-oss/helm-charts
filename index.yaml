@@ -4,6 +4,68 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: added
+          description: Separate WAL storage support for performance optimization with pvcTemplate
+        - kind: added
+          description: Advanced PVC template support for storage and walStorage configuration
+        - kind: added
+          description: Declarative PostgreSQL extension management (pgvector, PostGIS, TimescaleDB) via Database CRD
+        - kind: added
+          description: Connection pooling support via CloudNativePG Pooler CRD (PgBouncer) with additionalPoolerSpec
+        - kind: added
+          description: Advanced role management documentation with superuser and group membership examples
+        - kind: added
+          description: Disaster recovery with Point-in-Time Recovery (PITR) and externalClusters support
+        - kind: added
+          description: PrometheusRule CRD integration with 5 default alert rules for monitoring
+        - kind: added
+          description: Azure Blob Storage and Google Cloud Storage backup providers
+        - kind: added
+          description: ImageCatalog and ClusterImageCatalog support for centralized image management
+        - kind: added
+          description: Volume snapshot backups for CSI-compatible storage providers
+        - kind: changed
+          description: Backup configuration now supports multiple providers (S3, Azure, GCS, VolumeSnapshot)
+        - kind: changed
+          description: imageName is now optional when using imageCatalogRef
+        - kind: fixed
+          description: S3 credentials structure in backup configuration
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/recommendations: '- url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg'
+    apiVersion: v2
+    appVersion: "1.0"
+    created: "2025-10-05T08:25:12.255178711Z"
+    description: Multi-database PostgreSQL management for CloudNativePG with declarative
+      extensions, connection pooling, disaster recovery, and automated backups
+    digest: 4e46e8ea28781ff9ba1a2bc5bb32bc09c2567bccec53da563ea4c763ba5fa638
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager
+    icon: https://avatars.githubusercontent.com/u/100373852
+    keywords:
+    - postgresql
+    - database
+    - cloudnative-pg
+    - cnpg
+    - multi-tenant
+    - pgbouncer
+    - backup
+    - recovery
+    - pgvector
+    - extensions
+    - pitr
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: cnpg-database-manager
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://cloudnative-pg.io/
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/cnpg-database-manager-0.4.1/cnpg-database-manager-0.4.1.tgz
+    version: 0.4.1
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
           description: Declarative PostgreSQL extension management (pgvector, PostGIS, TimescaleDB) via Database CRD
         - kind: added
           description: Connection pooling support via CloudNativePG Pooler CRD (PgBouncer) with additionalPoolerSpec
@@ -1086,4 +1148,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-10-03T11:25:47.613725336Z"
+generated: "2025-10-05T08:25:12.255266364Z"
