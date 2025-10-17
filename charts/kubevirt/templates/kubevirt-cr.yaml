@@ -1,4 +1,4 @@
-{{- if .Values.global.enabled }}
+{{- if and .Values.global.enabled .Values.kubevirt.deploy }}
 apiVersion: kubevirt.io/v1
 kind: KubeVirt
 metadata:

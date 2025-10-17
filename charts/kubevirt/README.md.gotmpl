@@ -1,10 +1,11 @@
-# kubevirt
+{{ template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
 
-![Version: 1.6.2](https://img.shields.io/badge/Version-1.6.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.6.2](https://img.shields.io/badge/AppVersion-v1.6.2-informational?style=flat-square)
+{{ template "chart.badgesSection" . }}
 
-KubeVirt - Virtual Machine Management on Kubernetes - Deploy and manage VMs as native Kubernetes resources
+{{ template "chart.description" . }}
 
-**Homepage:** <https://github.com/encircle360-oss/helm-charts/tree/main/charts/kubevirt>
+{{ template "chart.homepageLine" . }}
 
 > **⚠️ UNDER CONSTRUCTION**
 > This chart is currently under active development and has not been battle-tested in production environments.
@@ -656,123 +657,10 @@ This Helm chart is provided "AS IS" without warranty of any kind. encircle360 Gm
 
 Use this chart at your own risk. For production-ready virtualization solutions with SLA requirements, contact our professional support services at **hello@encircle360.com**
 
-## Maintainers
+{{ template "chart.maintainersSection" . }}
 
-| Name | Email | Url |
-| ---- | ------ | --- |
-| encircle360-oss | <oss@encircle360.com> |  |
+{{ template "chart.sourcesSection" . }}
 
-## Source Code
+{{ template "chart.requirementsSection" . }}
 
-* <https://github.com/encircle360-oss/helm-charts>
-* <https://github.com/kubevirt/kubevirt>
-* <https://kubevirt.io>
-
-## Requirements
-
-Kubernetes: `>=1.30.0-0`
-
-## Values
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| crds | object | `{"install":true,"keep":true}` | Custom resource definitions |
-| crds.install | bool | `true` | Install CRDs |
-| crds.keep | bool | `true` | Keep CRDs on chart uninstall |
-| global | object | `{"enabled":true}` | Global configuration |
-| global.enabled | bool | `true` | Enable deployment of KubeVirt |
-| kubevirt | object | `{"annotations":{},"certificateRotateStrategy":{"selfSigned":{"caOverlapInterval":"168h","caRotateInterval":"168h","certRotateInterval":"168h"}},"configuration":{"cpuModel":"","cpuRequest":"","developerConfiguration":{"featureGates":null,"useEmulation":false},"instancetype":{"referencePolicy":"reference"},"migration":{"allowAutoConverge":false,"allowPostCopy":false,"bandwidthPerGiB":"64Mi","completionTimeoutPerGiB":800,"disableTLS":false,"network":"","nodeDrainTaintKey":"kubevirt.io/drain","parallelMigrationsPerCluster":5,"parallelOutboundMigrationsPerNode":2,"progressTimeout":150,"unsafeMigrationOverride":false},"network":{"binding":{},"defaultNetworkInterface":"masquerade","permitBridgeInterfaceOnPodNetwork":false,"permitSlirpInterface":false},"obsoleteCPUModels":{},"permittedHostDevices":{"mediatedDevices":[],"pciHostDevices":[]},"selinuxLauncherType":"virt_launcher.process","smbios":{},"vmStateStorageClass":""},"deploy":true,"image":{"pullPolicy":"IfNotPresent","registry":"","tag":""},"infra":{"nodePlacement":{"affinity":{},"nodeSelector":{},"tolerations":[]}},"labels":{},"name":"kubevirt","workloadUpdateStrategy":{"batchEvictionInterval":"1m","batchEvictionSize":10,"workloadUpdateMethods":[]},"workloads":{"nodePlacement":{"affinity":{},"nodeSelector":{},"tolerations":[]}}}` | KubeVirt CR configuration |
-| kubevirt.annotations | object | `{}` | Custom annotations for KubeVirt CR |
-| kubevirt.certificateRotateStrategy | object | `{"selfSigned":{"caOverlapInterval":"168h","caRotateInterval":"168h","certRotateInterval":"168h"}}` | Certificate rotation strategy |
-| kubevirt.certificateRotateStrategy.selfSigned.caOverlapInterval | string | `"168h"` | CA overlap interval (duration the old CA is kept) |
-| kubevirt.certificateRotateStrategy.selfSigned.caRotateInterval | string | `"168h"` | CA rotation interval |
-| kubevirt.certificateRotateStrategy.selfSigned.certRotateInterval | string | `"168h"` | Certificate rotation interval |
-| kubevirt.configuration | object | `{"cpuModel":"","cpuRequest":"","developerConfiguration":{"featureGates":null,"useEmulation":false},"instancetype":{"referencePolicy":"reference"},"migration":{"allowAutoConverge":false,"allowPostCopy":false,"bandwidthPerGiB":"64Mi","completionTimeoutPerGiB":800,"disableTLS":false,"network":"","nodeDrainTaintKey":"kubevirt.io/drain","parallelMigrationsPerCluster":5,"parallelOutboundMigrationsPerNode":2,"progressTimeout":150,"unsafeMigrationOverride":false},"network":{"binding":{},"defaultNetworkInterface":"masquerade","permitBridgeInterfaceOnPodNetwork":false,"permitSlirpInterface":false},"obsoleteCPUModels":{},"permittedHostDevices":{"mediatedDevices":[],"pciHostDevices":[]},"selinuxLauncherType":"virt_launcher.process","smbios":{},"vmStateStorageClass":""}` | Main configuration section |
-| kubevirt.configuration.cpuModel | string | `""` | Default CPU model for VMs when not specified Example: "host-passthrough", "host-model", "Penryn", "IvyBridge", etc. |
-| kubevirt.configuration.cpuRequest | string | `""` | Default CPU request for VMs when not specified Example: "100m" or "1" (1 core) |
-| kubevirt.configuration.developerConfiguration | object | `{"featureGates":null,"useEmulation":false}` | Developer configuration |
-| kubevirt.configuration.developerConfiguration.featureGates | string | `nil` | Feature gates configuration Feature gates control optional KubeVirt features See: https://kubevirt.io/user-guide/operations/activating_feature_gates/ |
-| kubevirt.configuration.developerConfiguration.useEmulation | bool | `false` | Use QEMU software emulation instead of KVM hardware virtualization Useful for testing on non-virtualization-capable nodes |
-| kubevirt.configuration.instancetype | object | `{"referencePolicy":"reference"}` | Instancetype configuration |
-| kubevirt.configuration.instancetype.referencePolicy | string | `"reference"` | Reference policy for instance types Options: "reference" (default), "expand", "expandAll" - reference: Store only reference to instancetype - expand: Expand instancetype into VM spec once - expandAll: Always expand instancetype |
-| kubevirt.configuration.migration | object | `{"allowAutoConverge":false,"allowPostCopy":false,"bandwidthPerGiB":"64Mi","completionTimeoutPerGiB":800,"disableTLS":false,"network":"","nodeDrainTaintKey":"kubevirt.io/drain","parallelMigrationsPerCluster":5,"parallelOutboundMigrationsPerNode":2,"progressTimeout":150,"unsafeMigrationOverride":false}` | Live migration configuration |
-| kubevirt.configuration.migration.allowAutoConverge | bool | `false` | Allow auto-converge for slow migrations |
-| kubevirt.configuration.migration.allowPostCopy | bool | `false` | Allow post-copy migration (use with caution) |
-| kubevirt.configuration.migration.bandwidthPerGiB | string | `"64Mi"` | Network bandwidth limit per migration |
-| kubevirt.configuration.migration.completionTimeoutPerGiB | int | `800` | Migration completion timeout per GiB of memory |
-| kubevirt.configuration.migration.disableTLS | bool | `false` | Disable TLS for migrations (not recommended for production) |
-| kubevirt.configuration.migration.network | string | `""` | Dedicated migration network (optional) Example: "migration-network" |
-| kubevirt.configuration.migration.nodeDrainTaintKey | string | `"kubevirt.io/drain"` | Node drain taint key |
-| kubevirt.configuration.migration.parallelMigrationsPerCluster | int | `5` | Maximum number of parallel migrations in the cluster |
-| kubevirt.configuration.migration.parallelOutboundMigrationsPerNode | int | `2` | Maximum number of parallel outbound migrations per node |
-| kubevirt.configuration.migration.progressTimeout | int | `150` | Progress timeout in seconds |
-| kubevirt.configuration.migration.unsafeMigrationOverride | bool | `false` | Unsafe migration override (allows migrations in unsafe conditions) |
-| kubevirt.configuration.network | object | `{"binding":{},"defaultNetworkInterface":"masquerade","permitBridgeInterfaceOnPodNetwork":false,"permitSlirpInterface":false}` | Network configuration |
-| kubevirt.configuration.network.binding | object | `{}` | Network binding plugins configuration |
-| kubevirt.configuration.network.defaultNetworkInterface | string | `"masquerade"` | Default network interface type Options: "masquerade", "bridge", "slirp" |
-| kubevirt.configuration.network.permitBridgeInterfaceOnPodNetwork | bool | `false` | Permit bridge interface on pod network |
-| kubevirt.configuration.network.permitSlirpInterface | bool | `false` | Permit SLIRP interface |
-| kubevirt.configuration.obsoleteCPUModels | object | `{}` | Obsolete CPU models that should not be used These CPUs are considered too old and potentially insecure |
-| kubevirt.configuration.permittedHostDevices | object | `{"mediatedDevices":[],"pciHostDevices":[]}` | Permitted host devices for passthrough |
-| kubevirt.configuration.permittedHostDevices.mediatedDevices | list | `[]` | Mediated devices (vGPU, etc.) |
-| kubevirt.configuration.permittedHostDevices.pciHostDevices | list | `[]` | PCI host devices |
-| kubevirt.configuration.selinuxLauncherType | string | `"virt_launcher.process"` | SELinux configuration |
-| kubevirt.configuration.smbios | object | `{}` | SMBIOS configuration (system information exposed to VMs) |
-| kubevirt.configuration.vmStateStorageClass | string | `""` | Storage class for VM state (snapshots, etc.) |
-| kubevirt.deploy | bool | `true` | Deploy KubeVirt Custom Resource (disable for CI tests or when CRDs don't exist yet) |
-| kubevirt.image | object | `{"pullPolicy":"IfNotPresent","registry":"","tag":""}` | Image configuration for KubeVirt components |
-| kubevirt.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
-| kubevirt.image.registry | string | `""` | Custom image registry (leave empty to use default quay.io/kubevirt) |
-| kubevirt.image.tag | string | `""` | Custom image tag (leave empty to use operator's default) |
-| kubevirt.infra | object | `{"nodePlacement":{"affinity":{},"nodeSelector":{},"tolerations":[]}}` | Infrastructure components placement (virt-api, virt-controller) |
-| kubevirt.infra.nodePlacement | object | `{"affinity":{},"nodeSelector":{},"tolerations":[]}` | Node placement configuration for infrastructure components |
-| kubevirt.infra.nodePlacement.affinity | object | `{}` | Affinity rules |
-| kubevirt.infra.nodePlacement.nodeSelector | object | `{}` | Node selector |
-| kubevirt.infra.nodePlacement.tolerations | list | `[]` | Tolerations |
-| kubevirt.labels | object | `{}` | Custom labels for KubeVirt CR |
-| kubevirt.name | string | `"kubevirt"` | Name of the KubeVirt CR |
-| kubevirt.workloadUpdateStrategy | object | `{"batchEvictionInterval":"1m","batchEvictionSize":10,"workloadUpdateMethods":[]}` | Workload update strategy |
-| kubevirt.workloadUpdateStrategy.batchEvictionInterval | string | `"1m"` | Interval between batch evictions |
-| kubevirt.workloadUpdateStrategy.batchEvictionSize | int | `10` | Number of VMs to evict in parallel during updates |
-| kubevirt.workloadUpdateStrategy.workloadUpdateMethods | list | `[]` | Workload update methods Options: "LiveMigrate", "Evict" |
-| kubevirt.workloads | object | `{"nodePlacement":{"affinity":{},"nodeSelector":{},"tolerations":[]}}` | Workload components placement (virt-handler, virt-launcher) |
-| kubevirt.workloads.nodePlacement | object | `{"affinity":{},"nodeSelector":{},"tolerations":[]}` | Node placement configuration for workload components |
-| kubevirt.workloads.nodePlacement.affinity | object | `{}` | Affinity rules |
-| kubevirt.workloads.nodePlacement.nodeSelector | object | `{}` | Node selector |
-| kubevirt.workloads.nodePlacement.tolerations | list | `[]` | Tolerations |
-| monitoring | object | `{"enabled":false,"namespace":"monitoring","prometheusRule":{"additionalRules":[],"enabled":false,"labels":{}},"scrapeInterval":"30s","serviceAccount":"prometheus-k8s","serviceMonitorLabels":{},"serviceMonitorNamespace":""}` | Monitoring configuration |
-| monitoring.enabled | bool | `false` | Enable monitoring (ServiceMonitor and PrometheusRule) |
-| monitoring.namespace | string | `"monitoring"` | Namespace where Prometheus is installed |
-| monitoring.prometheusRule | object | `{"additionalRules":[],"enabled":false,"labels":{}}` | PrometheusRule configuration |
-| monitoring.prometheusRule.additionalRules | list | `[]` | Custom alerting rules Add your custom Prometheus alerting rules here |
-| monitoring.prometheusRule.enabled | bool | `false` | Enable PrometheusRule |
-| monitoring.prometheusRule.labels | object | `{}` | Additional labels for PrometheusRule |
-| monitoring.scrapeInterval | string | `"30s"` | Scrape interval for metrics |
-| monitoring.serviceAccount | string | `"prometheus-k8s"` | ServiceAccount used by Prometheus |
-| monitoring.serviceMonitorLabels | object | `{}` | Additional labels for ServiceMonitor |
-| monitoring.serviceMonitorNamespace | string | `""` | Namespace for ServiceMonitor resource Leave empty to deploy in the same namespace as KubeVirt |
-| namespace | object | `{"create":true,"name":"kubevirt"}` | Namespace configuration |
-| namespace.create | bool | `true` | Create the namespace if it doesn't exist |
-| namespace.name | string | `"kubevirt"` | Name of the namespace for KubeVirt installation |
-| operator | object | `{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchExpressions":[{"key":"kubevirt.io","operator":"In","values":["virt-operator"]}]},"topologyKey":"kubernetes.io/hostname"},"weight":1}]}},"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/virt-operator","tag":"v1.6.2"},"imagePullSecrets":[],"nodeSelector":{},"priorityClassName":"kubevirt-cluster-critical","replicas":2,"resources":{"limits":{"cpu":"1000m","memory":"450Mi"},"requests":{"cpu":"10m","memory":"450Mi"}},"tolerations":[]}` | KubeVirt Operator configuration |
-| operator.affinity | object | `{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchExpressions":[{"key":"kubevirt.io","operator":"In","values":["virt-operator"]}]},"topologyKey":"kubernetes.io/hostname"},"weight":1}]}}` | Affinity rules for operator pods |
-| operator.enabled | bool | `true` | Enable operator deployment |
-| operator.image | object | `{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/virt-operator","tag":"v1.6.2"}` | Operator container image configuration |
-| operator.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
-| operator.image.registry | string | `"quay.io"` | Image registry |
-| operator.image.repository | string | `"kubevirt/virt-operator"` | Image repository |
-| operator.image.tag | string | `"v1.6.2"` | Image tag (defaults to chart appVersion) |
-| operator.imagePullSecrets | list | `[]` | Image pull secrets for private registries |
-| operator.nodeSelector | object | `{}` | Node selector for operator pods |
-| operator.priorityClassName | string | `"kubevirt-cluster-critical"` | Priority class for operator pods |
-| operator.replicas | int | `2` | Number of operator replicas |
-| operator.resources | object | `{"limits":{"cpu":"1000m","memory":"450Mi"},"requests":{"cpu":"10m","memory":"450Mi"}}` | Resource limits and requests for operator |
-| operator.tolerations | list | `[]` | Tolerations for operator pods |
-| priorityClass | object | `{"create":true,"description":"Priority class for KubeVirt cluster-critical components","globalDefault":false,"name":"kubevirt-cluster-critical","value":1000000000}` | Priority class configuration |
-| priorityClass.create | bool | `true` | Create priority class |
-| priorityClass.description | string | `"Priority class for KubeVirt cluster-critical components"` | Description |
-| priorityClass.globalDefault | bool | `false` | Global default (not recommended for KubeVirt) |
-| priorityClass.name | string | `"kubevirt-cluster-critical"` | Priority class name |
-| priorityClass.value | int | `1000000000` | Priority value (higher = more important) |
-| rbac | object | `{"create":true}` | RBAC configuration |
-| rbac.create | bool | `true` | Create RBAC resources |
+{{ template "chart.valuesSection" . }}

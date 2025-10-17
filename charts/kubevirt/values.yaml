@@ -69,6 +69,9 @@ operator:
 
 # -- KubeVirt CR configuration
 kubevirt:
+  # -- Deploy KubeVirt Custom Resource (disable for CI tests or when CRDs don't exist yet)
+  deploy: true
+
   # -- Name of the KubeVirt CR
   name: kubevirt
 
