@@ -25,7 +25,7 @@ icon: https://raw.githubusercontent.com/kubevirt/kubevirt/main/docs/images/logo.
 kubeVersion: ">=1.30.0-0"
 annotations:
   artifacthub.io/license: Apache-2.0
-  artifacthub.io/prerelease: true
+  artifacthub.io/prerelease: "true"
   artifacthub.io/changes: |
     - kind: added
       description: Initial release of KubeVirt Helm chart v1.6.2
@@ -39,9 +39,3 @@ annotations:
       description: Monitoring integration with ServiceMonitor and PrometheusRule
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/kubevirt/kubevirt-operator
-  artifacthub.io/signKey: |
-    fingerprint:
-    url:
-  artifacthub.io/containsSecurityUpdates: "false"
-  artifacthub.io/operator: "true"
-  artifacthub.io/operatorCapabilities: Seamless Upgrades
