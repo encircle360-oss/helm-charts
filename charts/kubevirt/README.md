@@ -676,9 +676,6 @@ Kubernetes: `>=1.30.0-0`
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| crds | object | `{"install":true,"keep":true}` | Custom resource definitions |
-| crds.install | bool | `true` | Install CRDs |
-| crds.keep | bool | `true` | Keep CRDs on chart uninstall |
 | global | object | `{"enabled":true}` | Global configuration |
 | global.enabled | bool | `true` | Enable deployment of KubeVirt |
 | kubevirt | object | `{"annotations":{},"certificateRotateStrategy":{"selfSigned":{"caOverlapInterval":"168h","caRotateInterval":"168h","certRotateInterval":"168h"}},"configuration":{"cpuModel":"","cpuRequest":"","developerConfiguration":{"featureGates":null,"useEmulation":false},"instancetype":{"referencePolicy":"reference"},"migration":{"allowAutoConverge":false,"allowPostCopy":false,"bandwidthPerGiB":"64Mi","completionTimeoutPerGiB":800,"disableTLS":false,"network":"","nodeDrainTaintKey":"kubevirt.io/drain","parallelMigrationsPerCluster":5,"parallelOutboundMigrationsPerNode":2,"progressTimeout":150,"unsafeMigrationOverride":false},"network":{"binding":{},"defaultNetworkInterface":"masquerade","permitBridgeInterfaceOnPodNetwork":false,"permitSlirpInterface":false},"obsoleteCPUModels":{},"permittedHostDevices":{"mediatedDevices":[],"pciHostDevices":[]},"selinuxLauncherType":"virt_launcher.process","smbios":{},"vmStateStorageClass":""},"deploy":true,"image":{"pullPolicy":"IfNotPresent","registry":"","tag":""},"infra":{"nodePlacement":{"affinity":{},"nodeSelector":{},"tolerations":[]}},"labels":{},"name":"kubevirt","workloadUpdateStrategy":{"batchEvictionInterval":"1m","batchEvictionSize":10,"workloadUpdateMethods":[]},"workloads":{"nodePlacement":{"affinity":{},"nodeSelector":{},"tolerations":[]}}}` | KubeVirt CR configuration |

@@ -375,10 +375,7 @@ priorityClass:
   # -- Description
   description: "Priority class for KubeVirt cluster-critical components"
 
-# -- Custom resource definitions
-crds:
-  # -- Install CRDs
-  install: true
-
-  # -- Keep CRDs on chart uninstall
-  keep: true
+# Note: CRDs are automatically created by the virt-operator at runtime, not by Helm.
+# This follows the official KubeVirt operator pattern.
+# CRDs will remain in the cluster after 'helm uninstall' for data safety.
+# To remove CRDs: kubectl delete crds -l operator.kubevirt.io
