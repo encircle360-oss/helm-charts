@@ -22,17 +22,18 @@ spec:
           set -e
           echo "Testing KubeVirt installation..."
 
-          # Check if KubeVirt CR exists
+          # Check if operator is running
+          echo "Checking virt-operator deployment..."
+          kubectl get deployment virt-operator -n {{ include "kubevirt.namespace" . }}
+          kubectl wait --for=condition=available --timeout=60s deployment/virt-operator -n {{ include "kubevirt.namespace" . }}
+          echo "✓ Operator deployment is available"
+
+          {{- if .Values.kubevirt.deploy }}
+          # Full deployment test: Check KubeVirt CR
           echo "Checking KubeVirt CR..."
           kubectl get kubevirt {{ .Values.kubevirt.name }} -n {{ include "kubevirt.namespace" . }}
 
-          # Check if operator is running
-          echo "Checking virt-operator..."
-          kubectl get deployment virt-operator -n {{ include "kubevirt.namespace" . }}
-          kubectl wait --for=condition=available --timeout=60s deployment/virt-operator -n {{ include "kubevirt.namespace" . }}
-
-          # Check if KubeVirt is available
-          echo "Checking KubeVirt status..."
+          echo "Waiting for KubeVirt to be available..."
           kubectl wait kubevirt {{ .Values.kubevirt.name }} -n {{ include "kubevirt.namespace" . }} \
             --for=condition=Available --timeout=300s || true
 
@@ -48,4 +49,11 @@ spec:
             echo "This may be normal if the installation is still in progress."
             exit 0
           fi
+          {{- else }}
+          # CI test mode: Only operator is deployed
+          echo "✓ Operator-only test mode: KubeVirt CR deployment is disabled"
+          echo "✓ This is expected in CI environments where CRDs don't exist yet"
+          echo "✓ Test passed successfully"
+          exit 0
+          {{- end }}
 {{- end }}
