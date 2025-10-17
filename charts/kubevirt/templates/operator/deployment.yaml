@@ -1,0 +1,114 @@
+{{- if and .Values.global.enabled .Values.operator.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: virt-operator
+  namespace: {{ include "kubevirt.namespace" . }}
+  labels:
+    {{- include "kubevirt.operator.labels" . | nindent 4 }}
+    prometheus.kubevirt.io: ""
+spec:
+  replicas: {{ .Values.operator.replicas }}
+  selector:
+    matchLabels:
+      {{- include "kubevirt.operator.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        {{- include "kubevirt.operator.selectorLabels" . | nindent 8 }}
+        prometheus.kubevirt.io: ""
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+    spec:
+      {{- with .Values.operator.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.operator.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.operator.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.priorityClass.create }}
+      priorityClassName: {{ include "kubevirt.priorityClassName" . }}
+      {{- end }}
+      serviceAccountName: {{ include "kubevirt.operator.serviceAccountName" . }}
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: virt-operator
+          image: {{ include "kubevirt.operator.image" . }}
+          imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
+          command:
+            - virt-operator
+            - --port
+            - "8443"
+            - -v
+            - "2"
+          ports:
+            - name: metrics
+              protocol: TCP
+              containerPort: 8443
+            - name: webhooks
+              protocol: TCP
+              containerPort: 8444
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 8443
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 8443
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          {{- with .Values.operator.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: OPERATOR_IMAGE
+              value: {{ include "kubevirt.operator.image" . }}
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.annotations['olm.targetNamespaces']
+            - name: KUBEVIRT_VERSION
+              value: {{ .Chart.AppVersion | quote }}
+            {{- if .Values.kubevirt.image.registry }}
+            - name: KUBEVIRT_REGISTRY
+              value: {{ .Values.kubevirt.image.registry }}
+            {{- end }}
+            {{- if .Values.kubevirt.image.tag }}
+            - name: KUBEVIRT_TAG
+              value: {{ .Values.kubevirt.image.tag }}
+            {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+      {{- with .Values.operator.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

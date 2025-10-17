@@ -1,0 +1,208 @@
+{{- if .Values.global.enabled }}
+apiVersion: kubevirt.io/v1
+kind: KubeVirt
+metadata:
+  name: {{ .Values.kubevirt.name }}
+  namespace: {{ include "kubevirt.namespace" . }}
+  labels:
+    {{- include "kubevirt.labels" . | nindent 4 }}
+    {{- with .Values.kubevirt.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.kubevirt.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if or .Values.kubevirt.image.registry .Values.kubevirt.image.tag }}
+  {{- if .Values.kubevirt.image.registry }}
+  imageRegistry: {{ .Values.kubevirt.image.registry }}
+  {{- end }}
+  {{- if .Values.kubevirt.image.tag }}
+  imageTag: {{ .Values.kubevirt.image.tag }}
+  {{- end }}
+  {{- end }}
+  imagePullPolicy: {{ .Values.kubevirt.image.pullPolicy }}
+
+  {{- with .Values.kubevirt.certificateRotateStrategy }}
+  certificateRotateStrategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+
+  configuration:
+    {{- with .Values.kubevirt.configuration.developerConfiguration }}
+    developerConfiguration:
+      {{- if .useEmulation }}
+      useEmulation: true
+      {{- end }}
+      {{- with .featureGates }}
+      featureGates:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- end }}
+
+    {{- with .Values.kubevirt.configuration.cpuModel }}
+    cpuModel: {{ . }}
+    {{- end }}
+
+    {{- with .Values.kubevirt.configuration.cpuRequest }}
+    cpuRequest: {{ . }}
+    {{- end }}
+
+    {{- with .Values.kubevirt.configuration.obsoleteCPUModels }}
+    obsoleteCPUModels:
+      {{- range $key, $value := . }}
+      {{ $key }}: {{ $value }}
+      {{- end }}
+    {{- end }}
+
+    {{- with .Values.kubevirt.configuration.network }}
+    network:
+      {{- with .defaultNetworkInterface }}
+      defaultNetworkInterface: {{ . }}
+      {{- end }}
+      {{- if hasKey . "permitBridgeInterfaceOnPodNetwork" }}
+      permitBridgeInterfaceOnPodNetwork: {{ .permitBridgeInterfaceOnPodNetwork }}
+      {{- end }}
+      {{- if hasKey . "permitSlirpInterface" }}
+      permitSlirpInterface: {{ .permitSlirpInterface }}
+      {{- end }}
+      {{- with .binding }}
+      binding:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- end }}
+
+    {{- with .Values.kubevirt.configuration.migration }}
+    migrationConfiguration:
+      {{- if hasKey . "disableTLS" }}
+      disableTLS: {{ .disableTLS }}
+      {{- end }}
+      {{- if hasKey . "allowAutoConverge" }}
+      allowAutoConverge: {{ .allowAutoConverge }}
+      {{- end }}
+      {{- with .bandwidthPerGiB }}
+      bandwidthPerMigration: {{ . }}
+      {{- end }}
+      {{- with .completionTimeoutPerGiB }}
+      completionTimeoutPerGiB: {{ . }}
+      {{- end }}
+      {{- with .progressTimeout }}
+      progressTimeout: {{ . }}
+      {{- end }}
+      {{- with .parallelMigrationsPerCluster }}
+      parallelMigrationsPerCluster: {{ . }}
+      {{- end }}
+      {{- with .parallelOutboundMigrationsPerNode }}
+      parallelOutboundMigrationsPerNode: {{ . }}
+      {{- end }}
+      {{- if hasKey . "allowPostCopy" }}
+      allowPostCopy: {{ .allowPostCopy }}
+      {{- end }}
+      {{- if hasKey . "unsafeMigrationOverride" }}
+      unsafeMigrationOverride: {{ .unsafeMigrationOverride }}
+      {{- end }}
+      {{- with .nodeDrainTaintKey }}
+      nodeDrainTaintKey: {{ . }}
+      {{- end }}
+      {{- with .network }}
+      network: {{ . }}
+      {{- end }}
+    {{- end }}
+
+    {{- with .Values.kubevirt.configuration.vmStateStorageClass }}
+    vmStateStorageClass: {{ . }}
+    {{- end }}
+
+    {{- with .Values.kubevirt.configuration.permittedHostDevices }}
+    permittedHostDevices:
+      {{- with .pciHostDevices }}
+      pciHostDevices:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .mediatedDevices }}
+      mediatedDevices:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- end }}
+
+    {{- with .Values.kubevirt.configuration.instancetype }}
+    {{- if .referencePolicy }}
+    instancetype:
+      referencePolicy: {{ .referencePolicy }}
+    {{- end }}
+    {{- end }}
+
+    {{- with .Values.kubevirt.configuration.selinuxLauncherType }}
+    selinuxLauncherType: {{ . }}
+    {{- end }}
+
+    {{- with .Values.kubevirt.configuration.smbios }}
+    smbios:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+
+  {{- with .Values.kubevirt.workloadUpdateStrategy }}
+  workloadUpdateStrategy:
+    {{- with .workloadUpdateMethods }}
+    workloadUpdateMethods:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .batchEvictionSize }}
+    batchEvictionSize: {{ . }}
+    {{- end }}
+    {{- with .batchEvictionInterval }}
+    batchEvictionInterval: {{ . }}
+    {{- end }}
+  {{- end }}
+
+  {{- with .Values.kubevirt.infra }}
+  infra:
+    {{- with .nodePlacement }}
+    {{- if or .nodeSelector .affinity .tolerations }}
+    nodePlacement:
+      {{- with .nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+
+  {{- with .Values.kubevirt.workloads }}
+  workloads:
+    {{- with .nodePlacement }}
+    {{- if or .nodeSelector .affinity .tolerations }}
+    nodePlacement:
+      {{- with .nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+
+  {{- if .Values.monitoring.enabled }}
+  monitorNamespace: {{ include "kubevirt.monitoring.namespace" . }}
+  monitorAccount: {{ .Values.monitoring.serviceAccount }}
+  {{- with .Values.monitoring.serviceMonitorNamespace }}
+  serviceMonitorNamespace: {{ . }}
+  {{- end }}
+  {{- end }}
+{{- end }}

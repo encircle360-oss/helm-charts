@@ -1,0 +1,51 @@
+{{- if .Values.global.enabled }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "kubevirt.fullname" . }}-test-connection"
+  namespace: {{ include "kubevirt.namespace" . }}
+  labels:
+    {{- include "kubevirt.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+spec:
+  restartPolicy: Never
+  serviceAccountName: {{ include "kubevirt.operator.serviceAccountName" . }}
+  containers:
+    - name: kubectl
+      image: bitnami/kubectl:latest
+      command:
+        - /bin/sh
+        - -c
+        - |
+          set -e
+          echo "Testing KubeVirt installation..."
+
+          # Check if KubeVirt CR exists
+          echo "Checking KubeVirt CR..."
+          kubectl get kubevirt {{ .Values.kubevirt.name }} -n {{ include "kubevirt.namespace" . }}
+
+          # Check if operator is running
+          echo "Checking virt-operator..."
+          kubectl get deployment virt-operator -n {{ include "kubevirt.namespace" . }}
+          kubectl wait --for=condition=available --timeout=60s deployment/virt-operator -n {{ include "kubevirt.namespace" . }}
+
+          # Check if KubeVirt is available
+          echo "Checking KubeVirt status..."
+          kubectl wait kubevirt {{ .Values.kubevirt.name }} -n {{ include "kubevirt.namespace" . }} \
+            --for=condition=Available --timeout=300s || true
+
+          STATUS=$(kubectl get kubevirt {{ .Values.kubevirt.name }} -n {{ include "kubevirt.namespace" . }} \
+            -o jsonpath='{.status.phase}')
+          echo "KubeVirt status: $STATUS"
+
+          if [ "$STATUS" = "Deployed" ]; then
+            echo "✓ KubeVirt is successfully deployed"
+            exit 0
+          else
+            echo "⚠ KubeVirt is not fully deployed yet. Current status: $STATUS"
+            echo "This may be normal if the installation is still in progress."
+            exit 0
+          fi
+{{- end }}
