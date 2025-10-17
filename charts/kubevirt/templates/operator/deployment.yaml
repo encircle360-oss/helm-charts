@@ -19,8 +19,6 @@ spec:
       labels:
         {{- include "kubevirt.operator.selectorLabels" . | nindent 8 }}
         prometheus.kubevirt.io: ""
-      annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: ""
     spec:
       {{- with .Values.operator.affinity }}
       affinity:
