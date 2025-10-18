@@ -8,6 +8,14 @@ We love your input! We want to make contributing to this project as easy and tra
 - Proposing new features
 - Becoming a maintainer
 
+## Getting Help
+
+Before you start contributing, feel free to reach out:
+
+- **Discord**: Join our [Discord Server](https://discord.gg/6WWWrhFVf3) to chat with maintainers and get quick help
+- **Discussions**: Use [GitHub Discussions](https://github.com/encircle360-oss/helm-charts/discussions) for questions
+- **Issues**: Search [existing issues](https://github.com/encircle360-oss/helm-charts/issues) or create a new one
+
 ## Development Process
 
 We use GitHub to host code, to track issues and feature requests, as well as accept pull requests.
