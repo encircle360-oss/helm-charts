@@ -50,10 +50,10 @@ jobs:
           # Check if update needed
           if [[ "$CURRENT" != "$LATEST" ]]; then
             echo "needs_update=true" >> $GITHUB_OUTPUT
-            echo "✨ New version available: $CURRENT → $LATEST"
+            echo "New version available: $CURRENT -> $LATEST"
           else
             echo "needs_update=false" >> $GITHUB_OUTPUT
-            echo "✓ Already up to date: $CURRENT"
+            echo "Already up to date: $CURRENT"
           fi
 
       - name: Update Chart files
@@ -98,11 +98,11 @@ jobs:
           RELEASE_URL="${{ steps.release_notes.outputs.release_url }}"
 
           cat > /tmp/pr-body.md << 'EOF'
-## 🚀 KubeVirt Update: $OLD_VERSION → $NEW_VERSION
+## KubeVirt Update: $OLD_VERSION -> $NEW_VERSION
 
 This PR was automatically created by the KubeVirt update workflow.
 
-### ✅ Automated Changes
+### Automated Changes
 
 - [x] Updated Chart.yaml version to `$NEW_VERSION`
 - [x] Updated Chart.yaml appVersion to `$NEW_VERSION`
@@ -110,19 +110,19 @@ This PR was automatically created by the KubeVirt update workflow.
 - [x] Updated version references in README
 - [x] Regenerated documentation
 
-### ⚠️ Manual Review Required
+### Manual Review Required
 
 **BEFORE MERGING, you MUST complete these steps:**
 
-#### 1️⃣ Review Release Notes
+#### 1. Review Release Notes
 - [ ] Read [$NEW_VERSION Release Notes]($RELEASE_URL)
 - [ ] Identify breaking changes
 - [ ] Note new features
 - [ ] Check deprecations
 
-#### 2️⃣ Update Feature Gates
-- [ ] Check if any Beta features became **GA** → Remove from `featureGates` list
-- [ ] Check for **new Alpha/Beta features** → Add to comments in values.yaml
+#### 2. Update Feature Gates
+- [ ] Check if any Beta features became **GA** -> Remove from `featureGates` list
+- [ ] Check for **new Alpha/Beta features** -> Add to comments in values.yaml
 - [ ] Remove **deprecated features** from values.yaml
 
 **How to check:**
@@ -131,12 +131,12 @@ This PR was automatically created by the KubeVirt update workflow.
 # Look for: "X is now GA", "new feature Y", "deprecated Z"
 ```
 
-#### 3️⃣ Update Configuration
-- [ ] Check for **renamed config options** (e.g. `bandwidthPerGiB` → `bandwidthPerMigration`)
+#### 3. Update Configuration
+- [ ] Check for **renamed config options** (e.g. `bandwidthPerGiB` -> `bandwidthPerMigration`)
 - [ ] Update default values if recommended in release notes
 - [ ] Verify GPU passthrough settings still compatible
 
-#### 4️⃣ Test Locally
+#### 4. Test Locally
 ```bash
 # Lint
 helm lint charts/kubevirt
@@ -158,12 +158,12 @@ helm install kubevirt charts/kubevirt \\
 helm test kubevirt -n kubevirt
 ```
 
-#### 5️⃣ Update Documentation
+#### 5. Update Documentation
 - [ ] Update README.md.gotmpl with new features/changes
 - [ ] Run `helm-docs --chart-search-root=charts`
 - [ ] Commit documentation changes
 
-#### 6️⃣ Verify Templates
+#### 6. Verify Templates
 - [ ] Check if new KubeVirt components were added (DaemonSets, Services, etc.)
 - [ ] Download and compare official manifests if unsure:
   ```bash
@@ -171,7 +171,7 @@ helm test kubevirt -n kubevirt
   # Compare with templates/operator/
   ```
 
-### 📋 Release Information
+### Release Information
 
 <details>
 <summary>Click to expand KubeVirt $NEW_VERSION release notes</summary>
@@ -191,7 +191,7 @@ EOF
 
 </details>
 
-### 🔗 Useful Links
+### Useful Links
 
 - **Release:** $RELEASE_URL
 - **Operator Manifest:** https://github.com/kubevirt/kubevirt/releases/download/$NEW_VERSION/kubevirt-operator.yaml
@@ -200,7 +200,7 @@ EOF
 
 ---
 
-⚠️ **DO NOT merge without completing the manual checklist above!**
+**WARNING: DO NOT merge without completing the manual checklist above!**
 
 The most critical step is updating Feature Gates - GA features MUST be removed from the featureGates list.
 EOF
@@ -235,9 +235,9 @@ EOF
         if: steps.versions.outputs.needs_update == 'true'
         run: |
           cat >> $GITHUB_STEP_SUMMARY << EOF
-          ### ✨ KubeVirt Update PR Created
+          ### KubeVirt Update PR Created
 
-          **Version:** ${{ steps.versions.outputs.current }} → ${{ steps.versions.outputs.latest }}
+          **Version:** ${{ steps.versions.outputs.current }} -> ${{ steps.versions.outputs.latest }}
 
           **Next Steps:**
           1. Review the created PR
@@ -245,14 +245,14 @@ EOF
           3. Test locally
           4. Merge when ready
 
-          ⚠️ **Important:** Don't forget to update Feature Gates in values.yaml!
+          **Important:** Don't forget to update Feature Gates in values.yaml!
           EOF
 
       - name: No update needed
         if: steps.versions.outputs.needs_update == 'false'
         run: |
           cat >> $GITHUB_STEP_SUMMARY << EOF
-          ### ✓ KubeVirt Chart is up to date
+          ### KubeVirt Chart is up to date
 
           **Current Version:** ${{ steps.versions.outputs.current }}
 
