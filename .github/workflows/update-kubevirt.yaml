@@ -64,8 +64,8 @@ jobs:
 
           echo "Updating to $NEW_VERSION..."
 
-          # 1. Chart.yaml
-          yq -i '.version = "'$NEW_VERSION_NO_V'"' charts/kubevirt/Chart.yaml
+          # 1. Chart.yaml - Only update appVersion, NOT chart version
+          # Chart version is independent and follows 0.x.y semantic versioning
           yq -i '.appVersion = "'$NEW_VERSION'"' charts/kubevirt/Chart.yaml
 
           # 2. values.yaml - Image Tag
@@ -103,12 +103,13 @@ jobs:
           This PR was automatically created by the KubeVirt update workflow.
           
           ### Automated Changes
-          
-          - [x] Updated Chart.yaml version to `$NEW_VERSION`
+
           - [x] Updated Chart.yaml appVersion to `$NEW_VERSION`
           - [x] Updated operator image tag to `$NEW_VERSION`
           - [x] Updated version references in README
           - [x] Regenerated documentation
+
+          **Note:** Chart version (0.x.y) is NOT automatically updated - it follows independent semantic versioning.
           
           ### Manual Review Required
           
@@ -158,12 +159,17 @@ jobs:
           helm test kubevirt -n kubevirt
           ```
           
-          #### 5. Update Documentation
+          #### 5. Bump Chart Version
+          - [ ] Decide if this is a patch (0.x.y+1), minor (0.x+1.0), or major change
+          - [ ] Update Chart.yaml `version` field manually
+          - [ ] Update `artifacthub.io/changes` annotation with changelog
+
+          #### 6. Update Documentation
           - [ ] Update README.md.gotmpl with new features/changes
           - [ ] Run `helm-docs --chart-search-root=charts`
           - [ ] Commit documentation changes
-          
-          #### 6. Verify Templates
+
+          #### 7. Verify Templates
           - [ ] Check if new KubeVirt components were added (DaemonSets, Services, etc.)
           - [ ] Download and compare official manifests if unsure:
             ```bash

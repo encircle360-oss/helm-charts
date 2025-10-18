@@ -2,7 +2,7 @@ apiVersion: v2
 name: kubevirt
 description: KubeVirt - Virtual Machine Management on Kubernetes - Deploy and manage VMs as native Kubernetes resources
 type: application
-version: 1.6.2
+version: 0.1.1
 appVersion: "v1.6.2"
 keywords:
   - kubevirt
@@ -27,8 +27,12 @@ annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/prerelease: "true"
   artifacthub.io/changes: |
+    - kind: fixed
+      description: Correct migration configuration field name (migrations instead of migrationConfiguration)
+    - kind: changed
+      description: Chart versioning now independent from KubeVirt appVersion (0.x.y for chart, v1.6.2 for app)
     - kind: added
-      description: Initial release of KubeVirt Helm chart v1.6.2
+      description: Initial release supporting KubeVirt v1.6.2
     - kind: added
       description: Support for all KubeVirt v1.6.2 feature gates (Alpha/Beta/GA)
     - kind: added
