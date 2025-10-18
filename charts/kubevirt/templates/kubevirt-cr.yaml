@@ -74,7 +74,7 @@ spec:
     {{- end }}
 
     {{- with .Values.kubevirt.configuration.migration }}
-    migrationConfiguration:
+    migrations:
       {{- if hasKey . "disableTLS" }}
       disableTLS: {{ .disableTLS }}
       {{- end }}
