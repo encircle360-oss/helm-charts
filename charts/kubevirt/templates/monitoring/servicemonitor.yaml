@@ -1,0 +1,26 @@
+{{- if and .Values.global.enabled .Values.monitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kubevirt-metrics
+  namespace: {{ include "kubevirt.monitoring.serviceMonitorNamespace" . }}
+  labels:
+    {{- include "kubevirt.labels" . | nindent 4 }}
+    {{- with .Values.monitoring.serviceMonitorLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      prometheus.kubevirt.io: "true"
+  namespaceSelector:
+    matchNames:
+      - {{ include "kubevirt.namespace" . }}
+  endpoints:
+    - port: metrics
+      scheme: https
+      tlsConfig:
+        insecureSkipVerify: true
+      interval: {{ .Values.monitoring.scrapeInterval }}
+      path: /metrics
+{{- end }}

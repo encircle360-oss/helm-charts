@@ -1,0 +1,10 @@
+{{- if and .Values.global.enabled .Values.namespace.create }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ include "kubevirt.namespace" . }}
+  labels:
+    {{- include "kubevirt.labels" . | nindent 4 }}
+    kubevirt.io: ""
+    pod-security.kubernetes.io/enforce: "privileged"
+{{- end }}

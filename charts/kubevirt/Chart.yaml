@@ -1,0 +1,41 @@
+apiVersion: v2
+name: kubevirt
+description: KubeVirt - Virtual Machine Management on Kubernetes - Deploy and manage VMs as native Kubernetes resources
+type: application
+version: 1.6.2
+appVersion: "v1.6.2"
+keywords:
+  - kubevirt
+  - virtualization
+  - vm
+  - virtual-machine
+  - kvm
+  - qemu
+  - vmi
+  - kubernetes-vms
+home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/kubevirt
+sources:
+  - https://github.com/encircle360-oss/helm-charts
+  - https://github.com/kubevirt/kubevirt
+  - https://kubevirt.io
+maintainers:
+  - name: encircle360-oss
+    email: oss@encircle360.com
+icon: https://raw.githubusercontent.com/kubevirt/kubevirt/main/docs/images/logo.svg
+kubeVersion: ">=1.30.0-0"
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/prerelease: "true"
+  artifacthub.io/changes: |
+    - kind: added
+      description: Initial release of KubeVirt Helm chart v1.6.2
+    - kind: added
+      description: Support for all KubeVirt v1.6.2 feature gates (Alpha/Beta/GA)
+    - kind: added
+      description: Comprehensive operator deployment and RBAC configuration
+    - kind: added
+      description: Full KubeVirt CR configuration support
+    - kind: added
+      description: Monitoring integration with ServiceMonitor and PrometheusRule
+  artifacthub.io/recommendations: |
+    - url: https://artifacthub.io/packages/helm/kubevirt/kubevirt-operator

@@ -1,0 +1,62 @@
+{{- if and .Values.global.enabled .Values.monitoring.enabled .Values.monitoring.prometheusRule.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kubevirt-alerts
+  namespace: {{ include "kubevirt.monitoring.serviceMonitorNamespace" . }}
+  labels:
+    {{- include "kubevirt.labels" . | nindent 4 }}
+    {{- with .Values.monitoring.prometheusRule.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+    - name: kubevirt.rules
+      interval: 30s
+      rules:
+        # Default KubeVirt alert rules
+        - alert: KubeVirtComponentDown
+          annotations:
+            summary: "KubeVirt component is down"
+            description: "KubeVirt component {{`{{ $labels.pod }}`}} in namespace {{`{{ $labels.namespace }}`}} is not available."
+          expr: |
+            up{namespace="{{ include "kubevirt.namespace" . }}",pod=~"virt-.*"} == 0
+          for: 5m
+          labels:
+            severity: critical
+
+        - alert: KubeVirtVMIExcessiveMigrations
+          annotations:
+            summary: "VMI {{`{{ $labels.name }}`}} is migrating too frequently"
+            description: "VirtualMachineInstance {{`{{ $labels.name }}`}} in namespace {{`{{ $labels.namespace }}`}} has migrated {{`{{ $value }}`}} times in the last hour."
+          expr: |
+            sum(increase(kubevirt_vmi_migration_succeeded[1h])) by (name, namespace) > 3
+          for: 5m
+          labels:
+            severity: warning
+
+        - alert: KubeVirtVMIHighMemoryUsage
+          annotations:
+            summary: "VMI {{`{{ $labels.name }}`}} has high memory usage"
+            description: "VirtualMachineInstance {{`{{ $labels.name }}`}} in namespace {{`{{ $labels.namespace }}`}} is using {{`{{ $value }}`}}% of available memory."
+          expr: |
+            (kubevirt_vmi_memory_used_bytes / kubevirt_vmi_memory_available_bytes) * 100 > 90
+          for: 10m
+          labels:
+            severity: warning
+
+        - alert: KubeVirtNoAvailableNodesToRunVMs
+          annotations:
+            summary: "No available nodes to run VMs"
+            description: "No nodes are available to schedule new VirtualMachineInstances."
+          expr: |
+            kubevirt_nodes_with_kvm == 0
+          for: 5m
+          labels:
+            severity: critical
+
+        {{- with .Values.monitoring.prometheusRule.additionalRules }}
+        # Additional custom rules
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+{{- end }}

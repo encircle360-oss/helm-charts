@@ -1,0 +1,23 @@
+# CI Test Values for KubeVirt Chart
+# This file is automatically used by chart-testing during CI runs
+# It ensures the chart can be installed in a test environment
+
+# Skip KubeVirt CR deployment in CI
+# The CRD doesn't exist in the test cluster, but we still test the operator deployment
+kubevirt:
+  deploy: false
+
+# Reduce resource requests for CI
+operator:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+# Disable monitoring in CI
+monitoring:
+  enabled: false

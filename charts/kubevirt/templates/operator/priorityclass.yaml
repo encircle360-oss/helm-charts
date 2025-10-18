@@ -1,0 +1,11 @@
+{{- if and .Values.global.enabled .Values.priorityClass.create }}
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: {{ include "kubevirt.priorityClassName" . }}
+  labels:
+    {{- include "kubevirt.labels" . | nindent 4 }}
+value: {{ .Values.priorityClass.value }}
+globalDefault: {{ .Values.priorityClass.globalDefault }}
+description: {{ .Values.priorityClass.description | quote }}
+{{- end }}

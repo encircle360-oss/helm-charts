@@ -1,0 +1,177 @@
+Thank you for installing {{ .Chart.Name }} version {{ .Chart.Version }}!
+
+KubeVirt {{ .Chart.AppVersion }} has been deployed to namespace: {{ include "kubevirt.namespace" . }}
+
+========================================
+⚠️  IMPORTANT WARNING
+========================================
+
+This chart is UNDER ACTIVE DEVELOPMENT and NOT PRODUCTION-READY!
+
+- This chart has NOT been battle-tested in production environments
+- KubeVirt requires deep Kubernetes and virtualization expertise
+- Thoroughly test in non-production environments ONLY
+- Use at your own risk
+
+For production support, contact: hello@encircle360.com
+
+========================================
+INSTALLATION STATUS
+========================================
+
+To check the status of the KubeVirt installation, run:
+
+  kubectl get kubevirt {{ .Values.kubevirt.name }} -n {{ include "kubevirt.namespace" . }}
+
+Wait for the KubeVirt CR to reach the "Deployed" phase:
+
+  kubectl wait kubevirt {{ .Values.kubevirt.name }} -n {{ include "kubevirt.namespace" . }} \
+    --for=condition=Available --timeout=10m
+
+Check all KubeVirt components are running:
+
+  kubectl get pods -n {{ include "kubevirt.namespace" . }}
+
+Expected components:
+  - virt-operator ({{ .Values.operator.replicas }} replicas)
+  - virt-api
+  - virt-controller
+  - virt-handler (daemonset on all nodes)
+
+========================================
+GETTING STARTED
+========================================
+
+1. Create your first VirtualMachine:
+
+cat <<EOF | kubectl apply -f -
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: testvm
+spec:
+  running: false
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: testvm
+    spec:
+      domain:
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+        resources:
+          requests:
+            memory: 1024M
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/kubevirt/cirros-container-disk-demo
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userDataBase64: SGkuXG4=
+EOF
+
+2. Start the VM:
+
+  kubectl virt start testvm
+
+3. Access the VM console:
+
+  kubectl virt console testvm
+
+4. Check VM status:
+
+  kubectl get vms
+  kubectl get vmis
+
+========================================
+FEATURE GATES
+========================================
+{{- if .Values.kubevirt.configuration.developerConfiguration.featureGates }}
+
+Currently enabled feature gates:
+{{- range .Values.kubevirt.configuration.developerConfiguration.featureGates }}
+  - {{ . }}
+{{- end }}
+{{- else }}
+
+No optional feature gates are currently enabled.
+To enable feature gates, update your values.yaml:
+
+  kubevirt:
+    configuration:
+      developerConfiguration:
+        featureGates:
+          - Snapshot
+          - HotplugVolumes
+{{- end }}
+
+========================================
+MONITORING
+========================================
+{{- if .Values.monitoring.enabled }}
+
+Monitoring is ENABLED.
+- ServiceMonitor: {{ include "kubevirt.monitoring.serviceMonitorNamespace" . }}/kubevirt-metrics
+{{- if .Values.monitoring.prometheusRule.enabled }}
+- PrometheusRule: {{ include "kubevirt.monitoring.serviceMonitorNamespace" . }}/kubevirt-alerts
+{{- end }}
+
+View metrics:
+  kubectl port-forward -n {{ include "kubevirt.namespace" . }} deploy/virt-operator 8443:8443
+  curl -k https://localhost:8443/metrics
+{{- else }}
+
+Monitoring is DISABLED.
+To enable monitoring, set in your values.yaml:
+
+  monitoring:
+    enabled: true
+    namespace: monitoring
+    serviceAccount: prometheus-k8s
+{{- end }}
+
+========================================
+DOCUMENTATION
+========================================
+
+- KubeVirt Documentation: https://kubevirt.io/user-guide/
+- Chart Documentation: https://github.com/encircle360-oss/helm-charts/tree/main/charts/kubevirt
+- KubeVirt API Reference: https://kubevirt.io/api-reference/
+
+========================================
+TROUBLESHOOTING
+========================================
+
+If you encounter issues:
+
+1. Check operator logs:
+   kubectl logs -n {{ include "kubevirt.namespace" . }} deployment/virt-operator
+
+2. Check KubeVirt status:
+   kubectl describe kubevirt {{ .Values.kubevirt.name }} -n {{ include "kubevirt.namespace" . }}
+
+3. Check component health:
+   kubectl get pods -n {{ include "kubevirt.namespace" . }} -o wide
+
+4. Verify node virtualization capabilities:
+   kubectl get nodes -o jsonpath='{.items[*].status.allocatable}' | grep devices.kubevirt.io/kvm
+
+========================================
+SUPPORT
+========================================
+
+Community Support:
+  - GitHub Issues: https://github.com/encircle360-oss/helm-charts/issues
+  - GitHub Discussions: https://github.com/encircle360-oss/helm-charts/discussions
+
+Professional Support:
+  - Contact: hello@encircle360.com
+
+⚠️  REMINDER: This chart is NOT production-ready. Use at your own risk!
