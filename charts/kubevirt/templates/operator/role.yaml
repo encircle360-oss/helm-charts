@@ -6,57 +6,152 @@ metadata:
   namespace: {{ include "kubevirt.namespace" . }}
   labels:
     {{- include "kubevirt.operator.labels" . | nindent 4 }}
-    operator.kubevirt.io: ""
+    kubevirt.io: ""
 rules:
-  - apiGroups:
-      - ""
-    resources:
-      - secrets
-    verbs:
-      - create
-      - get
-      - list
-      - watch
-      - patch
-      - delete
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-    verbs:
-      - create
-      - get
-      - list
-      - watch
-      - patch
-      - delete
-  - apiGroups:
-      - route.openshift.io
-    resources:
-      - routes
-    verbs:
-      - create
-      - get
-      - list
-      - watch
-      - patch
-      - delete
-  - apiGroups:
-      - route.openshift.io
-    resources:
-      - routes/custom-host
-    verbs:
-      - create
-  - apiGroups:
-      - coordination.k8s.io
-    resources:
-      - leases
-    verbs:
-      - get
-      - list
-      - watch
-      - delete
-      - update
-      - create
-      - patch
+- apiGroups:
+  - ""
+  resourceNames:
+  - kubevirt-ca
+  - kubevirt-export-ca
+  - kubevirt-virt-handler-certs
+  - kubevirt-virt-handler-server-certs
+  - kubevirt-operator-certs
+  - kubevirt-virt-api-certs
+  - kubevirt-controller-certs
+  - kubevirt-exportproxy-certs
+  - kubevirt-synchronization-controller-certs
+  - kubevirt-synchronization-controller-server-certs
+  resources:
+  - secrets
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - patch
+  - delete
+- apiGroups:
+  - route.openshift.io
+  resources:
+  - routes
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - patch
+  - delete
+- apiGroups:
+  - route.openshift.io
+  resources:
+  - routes/custom-host
+  verbs:
+  - create
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - delete
+  - update
+  - create
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - route.openshift.io
+  resources:
+  - routes
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - list
+  - get
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - delete
+  - update
+  - create
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resourceNames:
+  - kubevirt-export-ca
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resourceNames:
+  - kubevirt-ca
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - delete
+  - update
+  - create
+  - patch
 {{- end }}

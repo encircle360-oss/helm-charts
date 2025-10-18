@@ -5,7 +5,7 @@ metadata:
   name: kubevirt-operator
   labels:
     {{- include "kubevirt.operator.labels" . | nindent 4 }}
-    operator.kubevirt.io: ""
+    kubevirt.io: ""
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
