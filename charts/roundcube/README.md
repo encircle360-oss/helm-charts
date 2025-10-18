@@ -525,6 +525,36 @@ If users are getting logged out frequently:
 2. Ensure all replicas can access the same session store
 3. Check session timeout settings
 
+## Contributing & Maintainership
+
+### We Welcome Contributors! 🎉
+
+We're looking for contributors and co-maintainers for this Roundcube chart! Whether you want to:
+- **Become a co-maintainer** for this chart
+- **Submit pull requests** for bug fixes, features, or documentation improvements
+- **Help with testing** Roundcube deployments in different environments
+- **Improve documentation** with real-world examples and best practices
+- **Share your Roundcube expertise** with the community
+
+**Every contribution is valuable!** You don't need to be a Helm expert - if you know Roundcube well and want to help others deploy it on Kubernetes, we'd love your input.
+
+### Become a Chart Co-Maintainer
+
+Interested in becoming a co-maintainer for this Roundcube chart? We'd be thrilled!
+
+**What we're looking for:**
+- Experience with Roundcube (configuration, plugins, administration)
+- Interest in Kubernetes and Helm
+- Willingness to help review PRs and answer issues
+- Passion for helping others deploy Roundcube successfully
+
+**How to get involved:**
+- Start by contributing PRs or helping in issues/discussions
+- Reach out to us at **oss@encircle360.com** expressing your interest
+- We'll work together to onboard you as a co-maintainer
+
+You don't need to commit full-time - even occasional help is valuable and appreciated!
+
 ## Support & Professional Services
 
 ### Community Support

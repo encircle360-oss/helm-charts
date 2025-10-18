@@ -1236,6 +1236,37 @@ kubectl get secret <cluster-name>-<database-name>-app -o yaml
 kubectl logs -n cnpg-system deployment/cnpg-controller-manager
 ```
 
+## Contributing & Maintainership
+
+### We Welcome Contributors! 🎉
+
+We're actively looking for contributors and co-maintainers for this CloudNativePG Database Manager chart! Whether you want to:
+- **Become a co-maintainer** for this chart
+- **Submit pull requests** for bug fixes, features, or documentation improvements
+- **Help with testing** complex PostgreSQL setups (HA, replication, backup/restore)
+- **Improve documentation** with production use cases and best practices
+- **Share your PostgreSQL and CloudNativePG expertise** with the community
+
+**Every contribution makes a difference!** Whether you're a PostgreSQL DBA, a CloudNativePG user, or a Kubernetes enthusiast - your perspective is valuable.
+
+### Become a Chart Co-Maintainer
+
+Interested in becoming a co-maintainer for this CloudNativePG chart? We'd love to have you!
+
+**What we're looking for:**
+- Experience with PostgreSQL (administration, replication, backup strategies)
+- Familiarity with CloudNativePG or interest in learning it
+- Kubernetes and Helm knowledge
+- Willingness to review PRs and help with issues
+- Commitment to helping users achieve reliable PostgreSQL deployments
+
+**How to get involved:**
+- Start by contributing PRs or helping answer issues/discussions
+- Reach out to us at **oss@encircle360.com** expressing your interest
+- We'll collaborate to onboard you as a co-maintainer
+
+We especially welcome PostgreSQL experts who want to share their database knowledge with the Kubernetes community!
+
 ## Support & Professional Services
 
 ### Community Support

@@ -626,6 +626,37 @@ If you're currently using raw KubeVirt manifests:
 - [Chart Repository](https://github.com/encircle360-oss/helm-charts)
 - [Issue Tracker](https://github.com/encircle360-oss/helm-charts/issues)
 
+## Contributing & Maintainership
+
+### We Welcome Contributors! 🎉
+
+We're actively seeking contributors and co-maintainers for this KubeVirt chart! Whether you want to:
+- **Become a co-maintainer** for this chart
+- **Submit pull requests** for bug fixes, features, or documentation improvements
+- **Help with testing** virtualization features and VM workloads
+- **Improve documentation** with real-world VM deployment examples
+- **Share your virtualization and KubeVirt expertise** with the community
+
+**Your expertise is valuable!** Whether you're a virtualization expert, a KubeVirt user, or someone passionate about running VMs on Kubernetes - we'd love your contribution.
+
+### Become a Chart Co-Maintainer
+
+Interested in becoming a co-maintainer for this KubeVirt chart? We'd be excited to collaborate!
+
+**What we're looking for:**
+- Experience with virtualization (KVM, QEMU, libvirt) or KubeVirt
+- Strong Kubernetes and Helm knowledge
+- Understanding of VM networking, storage, and live migration
+- Willingness to review PRs and help with issues
+- Passion for bringing virtualization to Kubernetes
+
+**How to get involved:**
+- Start by contributing PRs or helping in issues/discussions
+- Reach out to us at **oss@encircle360.com** expressing your interest
+- We'll work together to onboard you as a co-maintainer
+
+We especially welcome virtualization experts who can help users successfully run VMs on Kubernetes!
+
 ## Support & Professional Services
 
 ### Community Support
