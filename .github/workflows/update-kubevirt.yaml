@@ -98,114 +98,115 @@ jobs:
           RELEASE_URL="${{ steps.release_notes.outputs.release_url }}"
 
           cat > /tmp/pr-body.md << 'EOF'
-## KubeVirt Update: $OLD_VERSION -> $NEW_VERSION
+          ## KubeVirt Update: $OLD_VERSION -> $NEW_VERSION
+          
+          This PR was automatically created by the KubeVirt update workflow.
+          
+          ### Automated Changes
+          
+          - [x] Updated Chart.yaml version to `$NEW_VERSION`
+          - [x] Updated Chart.yaml appVersion to `$NEW_VERSION`
+          - [x] Updated operator image tag to `$NEW_VERSION`
+          - [x] Updated version references in README
+          - [x] Regenerated documentation
+          
+          ### Manual Review Required
+          
+          **BEFORE MERGING, you MUST complete these steps:**
+          
+          #### 1. Review Release Notes
+          - [ ] Read [$NEW_VERSION Release Notes]($RELEASE_URL)
+          - [ ] Identify breaking changes
+          - [ ] Note new features
+          - [ ] Check deprecations
+          
+          #### 2. Update Feature Gates
+          - [ ] Check if any Beta features became **GA** -> Remove from `featureGates` list
+          - [ ] Check for **new Alpha/Beta features** -> Add to comments in values.yaml
+          - [ ] Remove **deprecated features** from values.yaml
+          
+          **How to check:**
+          ```bash
+          # Search release notes for "feature gate" mentions
+          # Look for: "X is now GA", "new feature Y", "deprecated Z"
+          ```
+          
+          #### 3. Update Configuration
+          - [ ] Check for **renamed config options** (e.g. `bandwidthPerGiB` -> `bandwidthPerMigration`)
+          - [ ] Update default values if recommended in release notes
+          - [ ] Verify GPU passthrough settings still compatible
+          
+          #### 4. Test Locally
+          ```bash
+          # Lint
+          helm lint charts/kubevirt
+          
+          # Template validation
+          helm template kubevirt charts/kubevirt --validate
+          
+          # Dry-run
+          helm install kubevirt charts/kubevirt \\
+            -f charts/kubevirt/ci/ci-values.yaml \\
+            --dry-run --debug
+          
+          # Install in test cluster (recommended)
+          helm install kubevirt charts/kubevirt \\
+            -f charts/kubevirt/ci/ci-values.yaml \\
+            --namespace kubevirt --create-namespace
+          
+          # Run tests
+          helm test kubevirt -n kubevirt
+          ```
+          
+          #### 5. Update Documentation
+          - [ ] Update README.md.gotmpl with new features/changes
+          - [ ] Run `helm-docs --chart-search-root=charts`
+          - [ ] Commit documentation changes
+          
+          #### 6. Verify Templates
+          - [ ] Check if new KubeVirt components were added (DaemonSets, Services, etc.)
+          - [ ] Download and compare official manifests if unsure:
+            ```bash
+            curl -sL https://github.com/kubevirt/kubevirt/releases/download/$NEW_VERSION/kubevirt-operator.yaml > /tmp/operator.yaml
+            # Compare with templates/operator/
+            ```
+          
+          ### Release Information
+          
+          <details>
+          <summary>Click to expand KubeVirt $NEW_VERSION release notes</summary>
+          
+          EOF
 
-This PR was automatically created by the KubeVirt update workflow.
-
-### Automated Changes
-
-- [x] Updated Chart.yaml version to `$NEW_VERSION`
-- [x] Updated Chart.yaml appVersion to `$NEW_VERSION`
-- [x] Updated operator image tag to `$NEW_VERSION`
-- [x] Updated version references in README
-- [x] Regenerated documentation
-
-### Manual Review Required
-
-**BEFORE MERGING, you MUST complete these steps:**
-
-#### 1. Review Release Notes
-- [ ] Read [$NEW_VERSION Release Notes]($RELEASE_URL)
-- [ ] Identify breaking changes
-- [ ] Note new features
-- [ ] Check deprecations
-
-#### 2. Update Feature Gates
-- [ ] Check if any Beta features became **GA** -> Remove from `featureGates` list
-- [ ] Check for **new Alpha/Beta features** -> Add to comments in values.yaml
-- [ ] Remove **deprecated features** from values.yaml
-
-**How to check:**
-```bash
-# Search release notes for "feature gate" mentions
-# Look for: "X is now GA", "new feature Y", "deprecated Z"
-```
-
-#### 3. Update Configuration
-- [ ] Check for **renamed config options** (e.g. `bandwidthPerGiB` -> `bandwidthPerMigration`)
-- [ ] Update default values if recommended in release notes
-- [ ] Verify GPU passthrough settings still compatible
-
-#### 4. Test Locally
-```bash
-# Lint
-helm lint charts/kubevirt
-
-# Template validation
-helm template kubevirt charts/kubevirt --validate
-
-# Dry-run
-helm install kubevirt charts/kubevirt \\
-  -f charts/kubevirt/ci/ci-values.yaml \\
-  --dry-run --debug
-
-# Install in test cluster (recommended)
-helm install kubevirt charts/kubevirt \\
-  -f charts/kubevirt/ci/ci-values.yaml \\
-  --namespace kubevirt --create-namespace
-
-# Run tests
-helm test kubevirt -n kubevirt
-```
-
-#### 5. Update Documentation
-- [ ] Update README.md.gotmpl with new features/changes
-- [ ] Run `helm-docs --chart-search-root=charts`
-- [ ] Commit documentation changes
-
-#### 6. Verify Templates
-- [ ] Check if new KubeVirt components were added (DaemonSets, Services, etc.)
-- [ ] Download and compare official manifests if unsure:
-  ```bash
-  curl -sL https://github.com/kubevirt/kubevirt/releases/download/$NEW_VERSION/kubevirt-operator.yaml > /tmp/operator.yaml
-  # Compare with templates/operator/
-  ```
-
-### Release Information
-
-<details>
-<summary>Click to expand KubeVirt $NEW_VERSION release notes</summary>
-
-EOF
-
-          # Insert variables
+          # Insert variables and remove leading whitespace
           sed -i "s/\$NEW_VERSION/$NEW_VERSION/g" /tmp/pr-body.md
           sed -i "s/\$OLD_VERSION/$OLD_VERSION/g" /tmp/pr-body.md
           sed -i "s|\$RELEASE_URL|$RELEASE_URL|g" /tmp/pr-body.md
+          sed -i 's/^          //g' /tmp/pr-body.md
 
           # Append release notes
           cat /tmp/release-notes.md >> /tmp/pr-body.md
 
           # Close details
           cat >> /tmp/pr-body.md << 'EOF'
+          
+          </details>
+          
+          ### Useful Links
+          
+          - **Release:** $RELEASE_URL
+          - **Operator Manifest:** https://github.com/kubevirt/kubevirt/releases/download/$NEW_VERSION/kubevirt-operator.yaml
+          - **CR Example:** https://github.com/kubevirt/kubevirt/releases/download/$NEW_VERSION/kubevirt-cr.yaml
+          - **Changelog:** https://github.com/kubevirt/kubevirt/blob/main/CHANGELOG.md
+          
+          ---
+          
+          **WARNING: DO NOT merge without completing the manual checklist above!**
+          
+          The most critical step is updating Feature Gates - GA features MUST be removed from the featureGates list.
+          EOF
 
-</details>
-
-### Useful Links
-
-- **Release:** $RELEASE_URL
-- **Operator Manifest:** https://github.com/kubevirt/kubevirt/releases/download/$NEW_VERSION/kubevirt-operator.yaml
-- **CR Example:** https://github.com/kubevirt/kubevirt/releases/download/$NEW_VERSION/kubevirt-cr.yaml
-- **Changelog:** https://github.com/kubevirt/kubevirt/blob/main/CHANGELOG.md
-
----
-
-**WARNING: DO NOT merge without completing the manual checklist above!**
-
-The most critical step is updating Feature Gates - GA features MUST be removed from the featureGates list.
-EOF
-
-          # Final variable replacement
+          # Final variable replacement (whitespace already removed in first sed block)
           sed -i "s/\$NEW_VERSION/$NEW_VERSION/g" /tmp/pr-body.md
           sed -i "s|\$RELEASE_URL|$RELEASE_URL|g" /tmp/pr-body.md
 
