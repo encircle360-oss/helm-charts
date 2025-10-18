@@ -605,6 +605,53 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/cnpg-database-manager-0.1.0/cnpg-database-manager-0.1.0.tgz
     version: 0.1.0
+  kubevirt:
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: Initial release of KubeVirt Helm chart v1.6.2
+        - kind: added
+          description: Support for all KubeVirt v1.6.2 feature gates (Alpha/Beta/GA)
+        - kind: added
+          description: Comprehensive operator deployment and RBAC configuration
+        - kind: added
+          description: Full KubeVirt CR configuration support
+        - kind: added
+          description: Monitoring integration with ServiceMonitor and PrometheusRule
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/kubevirt/kubevirt-operator
+    apiVersion: v2
+    appVersion: v1.6.2
+    created: "2025-10-18T09:34:19.747448247Z"
+    description: KubeVirt - Virtual Machine Management on Kubernetes - Deploy and
+      manage VMs as native Kubernetes resources
+    digest: b4495de1d3e46608ade3903899a0973c98c83532ac4d124150e2db8ea48dbd6b
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/kubevirt
+    icon: https://raw.githubusercontent.com/kubevirt/kubevirt/main/docs/images/logo.svg
+    keywords:
+    - kubevirt
+    - virtualization
+    - vm
+    - virtual-machine
+    - kvm
+    - qemu
+    - vmi
+    - kubernetes-vms
+    kubeVersion: '>=1.30.0-0'
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: kubevirt
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://github.com/kubevirt/kubevirt
+    - https://kubevirt.io
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/kubevirt-1.6.2/kubevirt-1.6.2.tgz
+    version: 1.6.2
   roundcube:
   - annotations:
       artifacthub.io/changes: |
@@ -1256,4 +1303,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-10-05T13:15:12.960788888Z"
+generated: "2025-10-18T09:34:19.889242927Z"
