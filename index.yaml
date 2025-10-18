@@ -655,6 +655,54 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: fixed
+          description: Complete RBAC permissions - ClusterRole now matches official KubeVirt v1.6.2 manifest (1090 lines)
+        - kind: fixed
+          description: Complete Role permissions with all resourceNames and controller-specific rules (157 lines)
+        - kind: fixed
+          description: Correct RoleBinding name (kubevirt-operator-rolebinding)
+        - kind: fixed
+          description: Remove namespace.yaml to prevent race condition (use createNamespace in helmfile)
+        - kind: fixed
+          description: Correct labels for ServiceAccount and ClusterRoleBinding (kubevirt.io only)
+        - kind: fixed
+          description: Update PriorityClass description to match official manifest
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/kubevirt/kubevirt-operator
+    apiVersion: v2
+    appVersion: v1.6.2
+    created: "2025-10-18T11:26:55.579932497Z"
+    description: KubeVirt - Virtual Machine Management on Kubernetes - Deploy and
+      manage VMs as native Kubernetes resources
+    digest: 6bee75e0502cc8febecce47e65b94cd31447ff338d15c722c372eb146cba612e
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/kubevirt
+    icon: https://raw.githubusercontent.com/kubevirt/kubevirt/main/docs/images/logo.svg
+    keywords:
+    - kubevirt
+    - virtualization
+    - vm
+    - virtual-machine
+    - kvm
+    - qemu
+    - vmi
+    - kubernetes-vms
+    kubeVersion: '>=1.30.0-0'
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: kubevirt
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://github.com/kubevirt/kubevirt
+    - https://kubevirt.io
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/kubevirt-0.1.2/kubevirt-0.1.2.tgz
+    version: 0.1.2
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: fixed
           description: Correct migration configuration field name (migrations instead of migrationConfiguration)
         - kind: changed
           description: Chart versioning now independent from KubeVirt appVersion (0.x.y for chart, v1.6.2 for app)
@@ -1353,4 +1401,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-10-18T10:56:57.722324621Z"
+generated: "2025-10-18T11:26:55.580013779Z"
