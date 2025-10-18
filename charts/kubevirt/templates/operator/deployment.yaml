@@ -16,22 +16,44 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      {{- with .Values.operator.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
         {{- include "kubevirt.operator.selectorLabels" . | nindent 8 }}
-        prometheus.kubevirt.io: ""
+        prometheus.kubevirt.io: "true"
+        name: virt-operator
     spec:
-      {{- with .Values.operator.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.operator.nodeSelector }}
+        {{- if .Values.operator.affinity }}
+        {{- toYaml .Values.operator.affinity | nindent 8 }}
+        {{- else }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: kubevirt.io
+                      operator: In
+                      values:
+                        - virt-operator
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        {{- end }}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.operator.tolerations }}
+        {{- if .Values.operator.nodeSelector }}
+        {{- toYaml .Values.operator.nodeSelector | nindent 8 }}
+        {{- else }}
+        kubernetes.io/os: linux
+        {{- end }}
       tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- if .Values.operator.tolerations }}
+        {{- toYaml .Values.operator.tolerations | nindent 8 }}
+        {{- else }}
+        - key: CriticalAddonsOnly
+          operator: Exists
+        {{- end }}
       {{- if .Values.priorityClass.create }}
       priorityClassName: {{ include "kubevirt.priorityClassName" . }}
       {{- end }}
@@ -77,12 +99,17 @@ spec:
             timeoutSeconds: 10
             successThreshold: 1
             failureThreshold: 3
-          {{- with .Values.operator.resources }}
           resources:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- if .Values.operator.resources }}
+            {{- toYaml .Values.operator.resources | nindent 12 }}
+            {{- else }}
+            requests:
+              cpu: 10m
+              memory: 450Mi
+            {{- end }}
+          terminationMessagePolicy: FallbackToLogsOnError
           env:
-            - name: OPERATOR_IMAGE
+            - name: VIRT_OPERATOR_IMAGE
               value: {{ include "kubevirt.operator.image" . }}
             - name: WATCH_NAMESPACE
               valueFrom:
@@ -105,6 +132,19 @@ spec:
                 - ALL
             seccompProfile:
               type: RuntimeDefault
+          volumeMounts:
+            - mountPath: /etc/virt-operator/certificates
+              name: kubevirt-operator-certs
+              readOnly: true
+            - mountPath: /profile-data
+              name: profile-data
+      volumes:
+        - name: kubevirt-operator-certs
+          secret:
+            optional: true
+            secretName: kubevirt-operator-certs
+        - name: profile-data
+          emptyDir: {}
       {{- with .Values.operator.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

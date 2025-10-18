@@ -751,8 +751,8 @@ Kubernetes: `>=1.30.0-0`
 | namespace | object | `{"create":true,"name":"kubevirt"}` | Namespace configuration |
 | namespace.create | bool | `true` | Create the namespace if it doesn't exist |
 | namespace.name | string | `"kubevirt"` | Name of the namespace for KubeVirt installation |
-| operator | object | `{"affinity":{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchExpressions":[{"key":"kubevirt.io","operator":"In","values":["virt-operator"]}]},"topologyKey":"kubernetes.io/hostname"},"weight":1}]}},"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/virt-operator","tag":"v1.6.2"},"imagePullSecrets":[],"nodeSelector":{},"priorityClassName":"kubevirt-cluster-critical","replicas":2,"resources":{"limits":{"cpu":"1000m","memory":"450Mi"},"requests":{"cpu":"10m","memory":"450Mi"}},"tolerations":[]}` | KubeVirt Operator configuration |
-| operator.affinity | object | `{"podAntiAffinity":{"preferredDuringSchedulingIgnoredDuringExecution":[{"podAffinityTerm":{"labelSelector":{"matchExpressions":[{"key":"kubevirt.io","operator":"In","values":["virt-operator"]}]},"topologyKey":"kubernetes.io/hostname"},"weight":1}]}}` | Affinity rules for operator pods |
+| operator | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/virt-operator","tag":"v1.6.2"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"priorityClassName":"kubevirt-cluster-critical","replicas":2,"resources":{"limits":{"cpu":"1000m","memory":"450Mi"},"requests":{"cpu":"10m","memory":"450Mi"}},"tolerations":[]}` | KubeVirt Operator configuration |
+| operator.affinity | object | `{}` | Affinity rules for operator pods Default: pod anti-affinity for better distribution across nodes Set to {} to use template defaults or override with custom affinity |
 | operator.enabled | bool | `true` | Enable operator deployment |
 | operator.image | object | `{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/virt-operator","tag":"v1.6.2"}` | Operator container image configuration |
 | operator.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
@@ -760,11 +760,12 @@ Kubernetes: `>=1.30.0-0`
 | operator.image.repository | string | `"kubevirt/virt-operator"` | Image repository |
 | operator.image.tag | string | `"v1.6.2"` | Image tag (defaults to chart appVersion) |
 | operator.imagePullSecrets | list | `[]` | Image pull secrets for private registries |
-| operator.nodeSelector | object | `{}` | Node selector for operator pods |
+| operator.nodeSelector | object | `{}` | Node selector for operator pods (default: kubernetes.io/os: linux) Set to {} to use template defaults or override with custom selectors |
+| operator.podAnnotations | object | `{}` | Pod annotations (e.g., for OpenShift: openshift.io/required-scc: restricted-v2) |
 | operator.priorityClassName | string | `"kubevirt-cluster-critical"` | Priority class for operator pods |
 | operator.replicas | int | `2` | Number of operator replicas |
 | operator.resources | object | `{"limits":{"cpu":"1000m","memory":"450Mi"},"requests":{"cpu":"10m","memory":"450Mi"}}` | Resource limits and requests for operator |
-| operator.tolerations | list | `[]` | Tolerations for operator pods |
+| operator.tolerations | list | `[]` | Tolerations for operator pods (default: CriticalAddonsOnly) Set to [] to use template defaults or override with custom tolerations |
 | priorityClass | object | `{"create":true,"description":"Priority class for KubeVirt cluster-critical components","globalDefault":false,"name":"kubevirt-cluster-critical","value":1000000000}` | Priority class configuration |
 | priorityClass.create | bool | `true` | Create priority class |
 | priorityClass.description | string | `"Priority class for KubeVirt cluster-critical components"` | Description |

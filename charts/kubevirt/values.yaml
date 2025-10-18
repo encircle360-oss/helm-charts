@@ -35,6 +35,9 @@ operator:
   # -- Image pull secrets for private registries
   imagePullSecrets: []
 
+  # -- Pod annotations (e.g., for OpenShift: openshift.io/required-scc: restricted-v2)
+  podAnnotations: {}
+
   # -- Resource limits and requests for operator
   resources:
     requests:
@@ -47,25 +50,18 @@ operator:
   # -- Priority class for operator pods
   priorityClassName: kubevirt-cluster-critical
 
-  # -- Node selector for operator pods
+  # -- Node selector for operator pods (default: kubernetes.io/os: linux)
+  # Set to {} to use template defaults or override with custom selectors
   nodeSelector: {}
 
-  # -- Tolerations for operator pods
+  # -- Tolerations for operator pods (default: CriticalAddonsOnly)
+  # Set to [] to use template defaults or override with custom tolerations
   tolerations: []
 
   # -- Affinity rules for operator pods
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 1
-          podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-                - key: kubevirt.io
-                  operator: In
-                  values:
-                    - virt-operator
-            topologyKey: kubernetes.io/hostname
+  # Default: pod anti-affinity for better distribution across nodes
+  # Set to {} to use template defaults or override with custom affinity
+  affinity: {}
 
 # -- KubeVirt CR configuration
 kubevirt:
@@ -375,7 +371,7 @@ priorityClass:
   # -- Description
   description: "Priority class for KubeVirt cluster-critical components"
 
-# Note: CRDs are automatically created by the virt-operator at runtime, not by Helm.
-# This follows the official KubeVirt operator pattern.
-# CRDs will remain in the cluster after 'helm uninstall' for data safety.
-# To remove CRDs: kubectl delete crds -l operator.kubevirt.io
+# Note: KubeVirt CRDs are installed via the crds/ directory (Helm best practice).
+# CRDs are installed before any other resources and remain in the cluster after 'helm uninstall'.
+# This is intentional for data safety - VMs and related resources depend on these CRDs.
+# To manually remove CRDs after uninstall: kubectl delete crd kubevirts.kubevirt.io
