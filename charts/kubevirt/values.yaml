@@ -10,8 +10,6 @@ global:
 namespace:
   # -- Name of the namespace for KubeVirt installation
   name: kubevirt
-  # -- Create the namespace if it doesn't exist
-  create: true
 
 # -- KubeVirt Operator configuration
 operator:
@@ -369,7 +367,7 @@ priorityClass:
   globalDefault: false
 
   # -- Description
-  description: "Priority class for KubeVirt cluster-critical components"
+  description: "This priority class should be used for core kubevirt components only."
 
 # Note: KubeVirt CRDs are installed via the crds/ directory (Helm best practice).
 # CRDs are installed before any other resources and remain in the cluster after 'helm uninstall'.

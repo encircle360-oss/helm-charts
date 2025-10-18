@@ -1,6 +1,6 @@
 # kubevirt
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.6.2](https://img.shields.io/badge/AppVersion-v1.6.2-informational?style=flat-square)
+![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.6.2](https://img.shields.io/badge/AppVersion-v1.6.2-informational?style=flat-square)
 
 KubeVirt - Virtual Machine Management on Kubernetes - Deploy and manage VMs as native Kubernetes resources
 
@@ -779,8 +779,7 @@ Kubernetes: `>=1.30.0-0`
 | monitoring.serviceAccount | string | `"prometheus-k8s"` | ServiceAccount used by Prometheus |
 | monitoring.serviceMonitorLabels | object | `{}` | Additional labels for ServiceMonitor |
 | monitoring.serviceMonitorNamespace | string | `""` | Namespace for ServiceMonitor resource Leave empty to deploy in the same namespace as KubeVirt |
-| namespace | object | `{"create":true,"name":"kubevirt"}` | Namespace configuration |
-| namespace.create | bool | `true` | Create the namespace if it doesn't exist |
+| namespace | object | `{"name":"kubevirt"}` | Namespace configuration |
 | namespace.name | string | `"kubevirt"` | Name of the namespace for KubeVirt installation |
 | operator | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/virt-operator","tag":"v1.6.2"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"priorityClassName":"kubevirt-cluster-critical","replicas":2,"resources":{"limits":{"cpu":"1000m","memory":"450Mi"},"requests":{"cpu":"10m","memory":"450Mi"}},"tolerations":[]}` | KubeVirt Operator configuration |
 | operator.affinity | object | `{}` | Affinity rules for operator pods Default: pod anti-affinity for better distribution across nodes Set to {} to use template defaults or override with custom affinity |
@@ -797,9 +796,9 @@ Kubernetes: `>=1.30.0-0`
 | operator.replicas | int | `2` | Number of operator replicas |
 | operator.resources | object | `{"limits":{"cpu":"1000m","memory":"450Mi"},"requests":{"cpu":"10m","memory":"450Mi"}}` | Resource limits and requests for operator |
 | operator.tolerations | list | `[]` | Tolerations for operator pods (default: CriticalAddonsOnly) Set to [] to use template defaults or override with custom tolerations |
-| priorityClass | object | `{"create":true,"description":"Priority class for KubeVirt cluster-critical components","globalDefault":false,"name":"kubevirt-cluster-critical","value":1000000000}` | Priority class configuration |
+| priorityClass | object | `{"create":true,"description":"This priority class should be used for core kubevirt components only.","globalDefault":false,"name":"kubevirt-cluster-critical","value":1000000000}` | Priority class configuration |
 | priorityClass.create | bool | `true` | Create priority class |
-| priorityClass.description | string | `"Priority class for KubeVirt cluster-critical components"` | Description |
+| priorityClass.description | string | `"This priority class should be used for core kubevirt components only."` | Description |
 | priorityClass.globalDefault | bool | `false` | Global default (not recommended for KubeVirt) |
 | priorityClass.name | string | `"kubevirt-cluster-critical"` | Priority class name |
 | priorityClass.value | int | `1000000000` | Priority value (higher = more important) |

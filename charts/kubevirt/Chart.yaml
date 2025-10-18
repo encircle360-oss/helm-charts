@@ -2,7 +2,7 @@ apiVersion: v2
 name: kubevirt
 description: KubeVirt - Virtual Machine Management on Kubernetes - Deploy and manage VMs as native Kubernetes resources
 type: application
-version: 0.1.1
+version: 0.1.2
 appVersion: "v1.6.2"
 keywords:
   - kubevirt
@@ -28,18 +28,16 @@ annotations:
   artifacthub.io/prerelease: "true"
   artifacthub.io/changes: |
     - kind: fixed
-      description: Correct migration configuration field name (migrations instead of migrationConfiguration)
-    - kind: changed
-      description: Chart versioning now independent from KubeVirt appVersion (0.x.y for chart, v1.6.2 for app)
-    - kind: added
-      description: Initial release supporting KubeVirt v1.6.2
-    - kind: added
-      description: Support for all KubeVirt v1.6.2 feature gates (Alpha/Beta/GA)
-    - kind: added
-      description: Comprehensive operator deployment and RBAC configuration
-    - kind: added
-      description: Full KubeVirt CR configuration support
-    - kind: added
-      description: Monitoring integration with ServiceMonitor and PrometheusRule
+      description: Complete RBAC permissions - ClusterRole now matches official KubeVirt v1.6.2 manifest (1090 lines)
+    - kind: fixed
+      description: Complete Role permissions with all resourceNames and controller-specific rules (157 lines)
+    - kind: fixed
+      description: Correct RoleBinding name (kubevirt-operator-rolebinding)
+    - kind: fixed
+      description: Remove namespace.yaml to prevent race condition (use createNamespace in helmfile)
+    - kind: fixed
+      description: Correct labels for ServiceAccount and ClusterRoleBinding (kubevirt.io only)
+    - kind: fixed
+      description: Update PriorityClass description to match official manifest
   artifacthub.io/recommendations: |
     - url: https://artifacthub.io/packages/helm/kubevirt/kubevirt-operator
