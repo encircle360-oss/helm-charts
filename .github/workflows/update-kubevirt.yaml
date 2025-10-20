@@ -223,7 +223,7 @@ jobs:
 
       - name: Create Pull Request
         if: steps.versions.outputs.needs_update == 'true'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "feat(kubevirt): update to ${{ steps.versions.outputs.latest }}"
