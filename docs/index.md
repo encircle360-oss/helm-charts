@@ -16,6 +16,7 @@ Welcome to the encircle360 OSS Helm Charts repository! This collection provides 
 | [CNPG Database Manager](charts/cnpg-database-manager.md) | Multi-database and multi-tenant management for CloudNativePG clusters | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/cnpg-database-manager/Chart.yaml&query=$.version&label=version) |
 | [KubeVirt](charts/kubevirt.md) | Virtual Machine Management on Kubernetes | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/kubevirt/Chart.yaml&query=$.version&label=version) |
 | [Roundcube](charts/roundcube.md) | A free and open source webmail solution with a desktop-like user interface | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/roundcube/Chart.yaml&query=$.version&label=version) |
+| [Yaade](charts/yaade.md) | Open-source, self-hosted, collaborative [API development environment](https://github.com/EsperoTech/yaade) | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/yaade/Chart.yaml&query=$.version&label=version) |
 
 ## Installation
 
@@ -37,6 +38,9 @@ helm install my-databases encircle360/cnpg-database-manager
 
 # Install KubeVirt
 helm install kubevirt encircle360/kubevirt --namespace kubevirt --create-namespace
+
+# Install Yaade
+helm install my-yaade encircle360/yaade
 ```
 
 ## Configuration

@@ -98,3 +98,4 @@ nav:
     - CNPG Database Manager: charts/cnpg-database-manager.md
     - KubeVirt: charts/kubevirt.md
     - Roundcube: charts/roundcube.md
+    - Yaade: charts/yaade.md

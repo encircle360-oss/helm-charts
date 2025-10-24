@@ -1,0 +1,22 @@
+{{- if and .Values.fileStorage.enabled (not .Values.fileStorage.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "yaade.fullname" . }}-files
+  labels:
+    {{- include "yaade.labels" . | nindent 4 }}
+    app.kubernetes.io/component: file-storage
+  {{- with .Values.fileStorage.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    - {{ .Values.fileStorage.accessMode }}
+  {{- if .Values.fileStorage.storageClass }}
+  storageClassName: {{ .Values.fileStorage.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.fileStorage.size }}
+{{- end }}

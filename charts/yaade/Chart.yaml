@@ -1,0 +1,36 @@
+apiVersion: v2
+name: yaade
+description: Yaade is an open-source, self-hosted, collaborative API development environment
+type: application
+version: 0.1.0
+appVersion: "latest"
+keywords:
+  - yaade
+  - api
+  - rest
+  - testing
+  - development
+  - postman
+  - collaboration
+home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/yaade
+sources:
+  - https://github.com/encircle360-oss/helm-charts
+  - https://github.com/EsperoTech/yaade
+  - https://docs.yaade.io
+maintainers:
+  - name: encircle360-oss
+    email: oss@encircle360.com
+icon: https://raw.githubusercontent.com/EsperoTech/yaade/main/client/public/favicon.png
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/changes: |
+    - kind: added
+      description: Initial release of Yaade Helm chart
+    - kind: added
+      description: Self-hosted, collaborative API development environment
+    - kind: added
+      description: Support for separate file storage volumes
+    - kind: added
+      description: OAuth2/OIDC authentication documentation
+    - kind: added
+      description: Comprehensive configuration examples
