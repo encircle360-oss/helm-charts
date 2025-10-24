@@ -1,0 +1,23 @@
+# CI test values for Yaade chart
+# These values are used for automated testing with chart-testing (ct)
+
+# Use minimal resources for CI
+resources:
+  limits:
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi
+
+# Enable persistence but use small size
+persistence:
+  enabled: true
+  size: 1Gi
+
+# Disable autoscaling for CI
+autoscaling:
+  enabled: false
+
+# Configure admin username
+yaade:
+  adminUsername: "testadmin"

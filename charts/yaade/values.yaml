@@ -1,0 +1,208 @@
+# Default values for yaade.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- Number of replicas (note: multiple replicas require shared storage)
+replicaCount: 1
+
+image:
+  # -- Image repository
+  repository: esperotech/yaade
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion
+  tag: ""
+
+# -- Image pull secrets
+imagePullSecrets: []
+
+# -- Override name
+nameOverride: ""
+
+# -- Override full name
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use
+  name: ""
+
+# -- Pod annotations
+podAnnotations: {}
+
+# -- Pod security context
+podSecurityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsNonRoot: true
+
+# -- Security context
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+
+service:
+  # -- Service type
+  type: ClusterIP
+  # -- Service port
+  port: 9339
+  # -- Target port
+  targetPort: 9339
+  # -- Annotations
+  annotations: {}
+
+ingress:
+  # -- Enable ingress
+  enabled: false
+  # -- Ingress class name
+  className: ""
+  # -- Annotations
+  annotations: {}
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    # nginx.ingress.kubernetes.io/proxy-body-size: 50m
+  # -- Hosts configuration
+  hosts:
+    - host: yaade.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  # -- TLS configuration
+  tls: []
+  #  - secretName: yaade-tls
+  #    hosts:
+  #      - yaade.example.com
+
+# -- Resource limits and requests
+resources:
+  limits:
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+# -- Autoscaling configuration (note: requires shared storage for multiple replicas)
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# -- Node selector
+nodeSelector: {}
+
+# -- Tolerations
+tolerations: []
+
+# -- Affinity
+affinity: {}
+
+# -- Persistence configuration for Yaade data
+persistence:
+  # -- Enable persistence for /app/data (H2 database)
+  enabled: true
+  # -- Storage class
+  storageClass: ""
+  # -- Access mode
+  accessMode: ReadWriteOnce
+  # -- Size
+  size: 10Gi
+  # -- Existing claim
+  existingClaim: ""
+  # -- Annotations for PVC
+  annotations: {}
+
+# -- File storage configuration
+# Files uploaded in Yaade are stored separately from the database
+# IMPORTANT: Files are NOT included in database backups!
+fileStorage:
+  # -- Enable separate persistent volume for file storage
+  # If disabled, files are stored in the main data volume at /app/data/files
+  enabled: false
+  # -- Custom file storage path (sets YAADE_FILE_STORAGE_PATH)
+  # Leave empty to use default location
+  path: ""
+  # -- Storage class for file storage volume
+  storageClass: ""
+  # -- Access mode for file storage
+  accessMode: ReadWriteOnce
+  # -- Size of file storage volume
+  size: 20Gi
+  # -- Existing claim for file storage
+  existingClaim: ""
+  # -- Annotations for file storage PVC
+  annotations: {}
+
+# -- Yaade specific configuration
+yaade:
+  # -- Admin username for initial setup
+  # This is required on first startup. Default password is "password" and must be changed after first login.
+  adminUsername: "admin"
+  # -- Base path for reverse proxy deployments
+  # Set this when running Yaade behind a reverse proxy that serves it at a subpath (e.g., /yaade)
+  # Example: "/yaade" for https://example.com/yaade
+  basePath: ""
+  # -- File storage path (YAADE_FILE_STORAGE_PATH)
+  # Set this to customize where uploaded files are stored
+  # Leave empty to use default location (/app/data/files)
+  # Can be used with network storage (NFS, s3fs, etc.)
+  fileStoragePath: ""
+  # -- Additional environment variables
+  # Use this for any additional environment variables needed by Yaade
+  extraEnv: []
+    # - name: CUSTOM_VAR
+    #   value: "custom-value"
+
+# -- Extra volumes
+extraVolumes: []
+
+# -- Extra volume mounts
+extraVolumeMounts: []
+
+# -- Init containers
+initContainers: []
+
+# -- Sidecar containers
+sidecarContainers: []
+
+# -- Liveness probe configuration
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+# -- Readiness probe configuration
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+# -- Startup probe configuration
+startupProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 30
+  successThreshold: 1
