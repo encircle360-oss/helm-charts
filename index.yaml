@@ -1355,4 +1355,46 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.2.2/roundcube-0.2.2.tgz
     version: 0.2.2
-generated: "2025-10-18T11:26:55.580013779Z"
+  yaade:
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: Initial release of Yaade Helm chart
+        - kind: added
+          description: Self-hosted, collaborative API development environment
+        - kind: added
+          description: Support for separate file storage volumes
+        - kind: added
+          description: OAuth2/OIDC authentication documentation
+        - kind: added
+          description: Comprehensive configuration examples
+      artifacthub.io/license: Apache-2.0
+    apiVersion: v2
+    appVersion: latest
+    created: "2025-10-24T22:01:45.72794942Z"
+    description: Yaade is an open-source, self-hosted, collaborative API development
+      environment
+    digest: 29bae5f2a244182580090baed27cf3280a6d981bebe2077511cbfe3ddd7c29d8
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/yaade
+    icon: https://raw.githubusercontent.com/EsperoTech/yaade/main/client/public/favicon.png
+    keywords:
+    - yaade
+    - api
+    - rest
+    - testing
+    - development
+    - postman
+    - collaboration
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: yaade
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://github.com/EsperoTech/yaade
+    - https://docs.yaade.io
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/yaade-0.1.0/yaade-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-10-24T22:01:45.728051592Z"
