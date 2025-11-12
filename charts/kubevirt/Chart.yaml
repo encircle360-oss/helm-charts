@@ -3,7 +3,7 @@ name: kubevirt
 description: KubeVirt - Virtual Machine Management on Kubernetes - Deploy and manage VMs as native Kubernetes resources
 type: application
 version: 0.1.2
-appVersion: "v1.6.2"
+appVersion: "v1.6.3"
 keywords:
   - kubevirt
   - virtualization

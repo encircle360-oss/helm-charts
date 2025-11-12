@@ -1,140 +1,577 @@
-# encircle360 OSS Helm Charts
+helm-docs
+=========
+[![Go Report Card](https://goreportcard.com/badge/github.com/norwoodj/helm-docs)](https://goreportcard.com/report/github.com/norwoodj/helm-docs)
 
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/encircle360-oss)](https://artifacthub.io/packages/search?repo=encircle360-oss)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Release Charts](https://github.com/encircle360-oss/helm-charts/actions/workflows/release.yaml/badge.svg)](https://github.com/encircle360-oss/helm-charts/actions/workflows/release.yaml)
-[![Deploy Documentation](https://github.com/encircle360-oss/helm-charts/actions/workflows/pages.yaml/badge.svg)](https://github.com/encircle360-oss/helm-charts/actions/workflows/pages.yaml)
-[![Discord](https://img.shields.io/badge/Discord-Join%20Chat-7289da?logo=discord&logoColor=white)](https://discord.gg/6WWWrhFVf3)
+The helm-docs tool auto-generates documentation from helm charts into markdown files. The resulting
+files contain metadata about their respective chart and a table with each of the chart's values, their defaults, and an
+optional description parsed from comments.
 
-A collection of Helm charts for various open-source applications, maintained and sponsored by [encircle360 GmbH](https://encircle360.com) together with the open source community, partners and friends.
+The markdown generation is entirely [gotemplate](https://golang.org/pkg/text/template) driven. The tool parses metadata
+from charts and generates a number of sub-templates that can be referenced in a template file (by default `README.md.gotmpl`).
+If no template file is provided, the tool has a default internal template that will generate a reasonably formatted README.
 
-**Documentation**: [https://encircle360-oss.github.io/helm-charts/docs/](https://encircle360-oss.github.io/helm-charts/docs/)
+The most useful aspect of this tool is the auto-detection of field descriptions from comments:
+```yaml
+config:
+  databasesToCreate:
+    # -- default database for storage of database metadata
+    - postgres
+
+    # -- database for the [hashbash](https://github.com/norwoodj/hashbash-backend-go) project
+    - hashbash
+
+  usersToCreate:
+    # -- admin user
+    - {name: root, admin: true}
+
+    # -- user with access to the database with the same name
+    - {name: hashbash, readwriteDatabases: [hashbash]}
+
+statefulset:
+  image:
+    # -- Image to use for deploying, must support an entrypoint which creates users/databases from appropriate config files
+    repository: jnorwood/postgresql
+    tag: "11"
+
+  # -- Additional volumes to be mounted into the database container
+  extraVolumes:
+    - name: data
+      emptyDir: {}
+```
+
+Resulting in a resulting README section like so:
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| config.databasesToCreate[0] | string | `"postgresql"` | default database for storage of database metadata |
+| config.databasesToCreate[1] | string | `"hashbash"` | database for the [hashbash](https://github.com/norwoodj/hashbash-backend-go) project |
+| config.usersToCreate[0] | object | `{"admin":true,"name":"root"}` | admin user |
+| config.usersToCreate[1] | object | `{"name":"hashbash","readwriteDatabases":["hashbash"]}` | user with access to the database with the same name |
+| statefulset.extraVolumes | list | `[{"emptyDir":{},"name":"data"}]` | Additional volumes to be mounted into the database container |
+| statefulset.image.repository | string | `"jnorwood/postgresql:11"` | Image to use for deploying, must support an entrypoint which creates users/databases from appropriate config files |
+| statefulset.image.tag | string | `"18.0831"` |  |
+
+You'll notice that some complex fields (lists and objects) are documented while others aren't, and that some simple fields
+like `statefulset.image.tag` are documented even without a description comment. The rules for what is and isn't documented in
+the final table will be described in detail later in this document.
+
+## Installation
+helm-docs can be installed using [homebrew](https://brew.sh/):
+
+```bash
+brew install norwoodj/tap/helm-docs
+```
+
+or [scoop](https://scoop.sh):
+
+```bash
+scoop install helm-docs
+```
+
+This will download and install the [latest release](https://github.com/norwoodj/helm-docs/releases/latest)
+of the tool.
+
+To build from source in this repository:
+
+```bash
+cd cmd/helm-docs
+go build
+```
+
+Or install from source:
+
+```bash
+go install github.com/norwoodj/helm-docs/cmd/helm-docs@latest
+```
 
 ## Usage
 
-### Add Helm Repository
+### Pre-commit hook
+
+If you want to automatically generate `README.md` files with a pre-commit hook, make sure you
+[install the pre-commit binary](https://pre-commit.com/#install), and add a [.pre-commit-config.yaml file](./.pre-commit-config.yaml)
+to your project. Then run:
 
 ```bash
-helm repo add encircle360-oss https://encircle360-oss.github.io/helm-charts/
-helm repo update
+pre-commit install
+pre-commit install-hooks
 ```
 
-### Search for Charts
+Future changes to your chart's `requirements.yaml`, `values.yaml`, `Chart.yaml`, or `README.md.gotmpl` files will cause an update to documentation when you commit.
+
+There are several variants of `pre-commit` hooks to choose from depending on your use case.
+
+#### `helm-docs`  Uses `helm-docs` binary located in your `PATH`
+
+```yaml
+---
+repos:
+  - repo: https://github.com/norwoodj/helm-docs
+    rev:  ""
+    hooks:
+      - id: helm-docs
+        args:
+          # Make the tool search for charts only under the `charts` directory
+          - --chart-search-root=charts
+
+```
+
+
+#### `helm-docs-built` Uses `helm-docs` built from code in git
+
+```yaml
+---
+repos:
+  - repo: https://github.com/norwoodj/helm-docs
+    rev:  ""
+    hooks:
+      - id: helm-docs-built
+        args:
+          # Make the tool search for charts only under the `charts` directory
+          - --chart-search-root=charts
+
+```
+
+
+#### `helm-docs-container` Uses the container image of `helm-docs:latest`
+
+```yaml
+---
+repos:
+  - repo: https://github.com/norwoodj/helm-docs
+    rev:  ""
+    hooks:
+      - id: helm-docs-container
+        args:
+          # Make the tool search for charts only under the `charts` directory
+          - --chart-search-root=charts
+
+```
+
+#### To pin the `helm-docs` container to a specific tag, follow the example below:
+
+
+```yaml
+---
+repos:
+  - repo: https://github.com/norwoodj/helm-docs
+    rev:  ""
+    hooks:
+      - id: helm-docs-container
+        entry: jnorwood/helm-docs:x.y.z
+        args:
+          # Make the tool search for charts only under the `charts` directory
+          - --chart-search-root=charts
+
+```
+
+
+### Running the binary directly
+
+To run and generate documentation into READMEs for all helm charts within or recursively contained by a directory:
 
 ```bash
-helm search repo encircle360-oss
+helm-docs
+# OR
+helm-docs --dry-run # prints generated documentation to stdout rather than modifying READMEs
 ```
 
-### Install a Chart
+The tool searches recursively through subdirectories of the current directory for `Chart.yaml` files and generates documentation
+for every chart that it finds.
+
+### Using docker
+
+You can mount a directory with charts under `/helm-docs` within the container.
+
+Then run:
 
 ```bash
-helm install my-release encircle360-oss/<chart-name>
+docker run --rm --volume "$(pwd):/helm-docs" -u $(id -u) jnorwood/helm-docs:latest
 ```
 
-## Available Charts
+## Ignoring Chart Directories
+helm-docs supports a `.helmdocsignore` file, exactly like a `.gitignore` file in which one can specify directories to ignore
+when searching for charts. Directories specified need not be charts themselves, so parent directories containing potentially
+many charts can be ignored and none of the charts underneath them will be processed. You may also directly reference the
+Chart.yaml file for a chart to skip processing for it.
 
-| Chart | Description | Chart Version | App Version |
-|-------|-------------|---------------|--------------|
-| [cnpg-database-manager](./charts/cnpg-database-manager) | Multi-database and multi-tenant management for CloudNativePG | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/cnpg-database-manager/Chart.yaml&query=$.version&label=chart&color=blue) | ![AppVersion](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/cnpg-database-manager/Chart.yaml&query=$.appVersion&label=app&color=informational) |
-| [kubevirt](./charts/kubevirt) | Virtual Machine Management on Kubernetes | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/kubevirt/Chart.yaml&query=$.version&label=chart&color=blue) | ![AppVersion](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/kubevirt/Chart.yaml&query=$.appVersion&label=app&color=informational) |
-| [roundcube](./charts/roundcube) | A free and open source webmail solution | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/roundcube/Chart.yaml&query=$.version&label=chart&color=blue) | ![AppVersion](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/roundcube/Chart.yaml&query=$.appVersion&label=app&color=informational) |
-| [yaade](./charts/yaade) | Open-source, self-hosted, collaborative [API development environment](https://github.com/EsperoTech/yaade) | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/yaade/Chart.yaml&query=$.version&label=chart&color=blue) | ![AppVersion](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/yaade/Chart.yaml&query=$.appVersion&label=app&color=informational) |
+## Generating Doc with Dependency values
+Umbrella Helm chart documentation can include dependency values with `document-dependency-values` flag.
+All dependency values will be merged into values of umbrella chart documentation.
 
-## Development
+If you want to include dependency values, but don't want to generate doc for each dependency:
+* set `chart-search-root` parameter to directory that contains umbrella chart and all dependency charts.
+* list all charts you want to generate doc using `chart-to-generate` flag
+* set `document-dependency-values` flag to true
 
-### Prerequisites
+## Markdown Rendering
+There are two important parameters to be aware of when running helm-docs. `--chart-search-root` specifies the directory
+under which the tool will recursively search for charts to render documentation for. `--template-files` specifies the list
+of gotemplate files that should be used in rendering the resulting markdown file for each chart found. By default
+`--chart-search-root=.` and `--template-files=README.md.gotmpl`.
 
-- [Helm](https://helm.sh/docs/intro/install/) >= 3.14.0
-- [Kubernetes](https://kubernetes.io/) >= 1.27
-- [ct (Chart Testing)](https://github.com/helm/chart-testing) for linting and testing
-- [helm-docs](https://github.com/norwoodj/helm-docs) for generating chart documentation
+If a template file is specified as a filename only as with the default above, the file is interpreted as being _relative to each chart directory found_.
+If however a template file is specified as a relative path, e.g. the first of `--template-files=./_templates.gotmpl --template-files=README.md.gotmpl`
+then the file is interpreted as being relative to the `chart-search-root`.
 
-### Testing Charts Locally
+This repo is a good example of this in action. If you take a look at the [.pre-commit-config.yaml file](./.pre-commit-config.yaml)
+here, you'll see our search root is set to [example-charts](./example-charts) and the list of templates used for each chart
+is the [_templates.gotmpl file in that directory](./example-charts/_templates.gotmpl) and the README.md.gotmpl file in
+each chart directory.
 
-```bash
-# Lint chart
-helm lint charts/<chart-name>
+If any of the specified template files is not found for a chart (you'll notice most of the example charts do not have a README.md.gotmpl)
+file, then the internal default template is used instead.
 
-# Test chart installation
-helm install test-release charts/<chart-name> --debug --dry-run
+In addition to extra defined templates you specify in these template files, there are quite a few built-in templates that
+can be used as well:
+
+| Name | Description |
+|------|-------------|
+| chart.header              | The main heading of the generated markdown file |
+| chart.name                | The _name_ field from the chart's `Chart.yaml` file |
+| chart.deprecationWarning  | A deprecation warning which is displayed when the _deprecated_ field from the chart's `Chart.yaml` file is `true` |
+| chart.description         | A description line containing the _description_ field from the chart's `Chart.yaml` file, or "" if that field is not set |
+| chart.version             | The _version_ field from the chart's `Chart.yaml` file |
+| chart.versionBadge        | A badge stating the current version of the chart |
+| chart.type                | The _type_ field from the chart's `Chart.yaml` file |
+| chart.typeBadge           | A badge stating the current type of the chart |
+| chart.appVersion          | The _appVersion_ field from the chart's `Chart.yaml` file |
+| chart.appVersionBadge     | A badge stating the current appVersion of the chart |
+| chart.homepage            | The _home_ link from the chart's `Chart.yaml` file, or "" if that field is not set |
+| chart.homepageLine        | A text line stating the current homepage of the chart |
+| chart.maintainersHeader   | The heading for the chart maintainers section |
+| chart.maintainersTable    | A table of the chart's maintainers |
+| chart.maintainersSection  | A section headed by the maintainersHeader from above containing the maintainersTable from above or "" if there are no maintainers |
+| chart.sourcesHeader       | The heading for the chart sources section |
+| chart.sourcesList         | A list of the chart's sources |
+| chart.sourcesSection      | A section headed by the sourcesHeader from above containing the sourcesList from above or "" if there are no sources |
+| chart.kubeVersion         | The _kubeVersion_ field from the chart's `Chart.yaml` file |
+| chart.kubeVersionLine     | A text line stating the required Kubernetes version for the chart |~~~~
+| chart.requirementsHeader  | The heading for the chart requirements section |
+| chart.requirementsTable   | A table of the chart's required sub-charts |
+| chart.requirementsSection | A section headed by the requirementsHeader from above containing the kubeVersionLine and/or the requirementsTable from above or "" if there are no requirements |
+| chart.valuesHeader        | The heading for the chart values section |
+| chart.valuesTable         | A table of the chart's values parsed from the `values.yaml` file (see below) |
+| chart.valuesSection       | A section headed by the valuesHeader from above containing the valuesTable from above or "" if there are no values |
+| chart.valuesTableHtml     | Like `chart.valuesTable` but it is rendered as (X)HTML tags to allow further rendering customization, instead of markdown tables format. |
+| chart.valuesSectionHtml   | Like `chart.valuesSection` but uses `chart.valuesTableHtml` |
+| chart.valueDefaultColumnRender | This is a hook template if you want to redefine how helm-docs render the default values in `chart.valuesTableHtml` mode. This is especially useful when combined with (X)HTML tags, so that you can nicely format multiline default values, like YAML/JSON object tree snippet with codeblock syntax highlighter, which is not possible or difficult when using the markdown table format. It can be redefined in your template file. |
+| helm-docs.versionFooter   | A footer that contains the version of helm docs being used. |
+
+The default internal template mentioned above uses many of these and looks like this:
+```
+{{ template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}
+
 ```
 
-## Contributing & Community
+The tool also includes the [sprig templating library](https://github.com/Masterminds/sprig), so those functions can be used
+in the templates you supply.
 
-### We Welcome Contributors! 🎉
+### values.yaml metadata
+This tool can parse descriptions and defaults of values from `values.yaml` files. The defaults are pulled directly from
+the yaml in the file.
 
-We're always looking for contributors to help improve our charts! Whether you want to:
-- **Become a maintainer** for a specific chart or the entire repository
-- **Submit pull requests** for bug fixes, features, or documentation improvements
-- **Help with testing** and quality assurance
-- **Improve documentation** and examples
-- **Report bugs** or suggest new features
+It was formerly the case that descriptions had to be specified with the full path of the yaml field. This is no longer
+the case, although it is still supported. Where before you would document a values.yaml like so:
 
-**Every contribution is valuable and appreciated!** You don't need to be an expert - we're happy to help you get started.
+```yaml
+controller:
+  publishService:
+    # controller.publishService.enabled -- Whether to expose the ingress controller to the public world
+    enabled: false
 
-### How to Contribute
+  # controller.replicas -- Number of nginx-ingress pods to load balance between.
+  # Do not set this below 2.
+  replicas: 2
+```
 
-1. **Fork the repository** and create a feature branch
-2. **Make your changes** (code, docs, tests, etc.)
-3. **Test your changes** locally (see Development section above)
-4. **Submit a Pull Request** with a clear description of your changes
-5. **Engage in review discussions** - we'll work together to get your changes merged
+You may now equivalently write:
+```yaml
+controller:
+  publishService:
+    # -- Whether to expose the ingress controller to the public world
+    enabled: false
 
-See our [Contributing Guide](CONTRIBUTING.md) for detailed guidelines.
+  # -- Number of nginx-ingress pods to load balance between.
+  # Do not set this below 2.
+  replicas: 2
+```
 
-### Become a Chart Maintainer
+New-style comments are much the same as the old-style comments, except that while old comments for a field could appear
+anywhere in the file, new-style comments must appear **on the line(s) immediately preceding the field being documented.**
 
-Interested in becoming a co-maintainer for one or more charts? We'd love to have you on board!
+I invite you to check out the [example-charts](./example-charts) to see how this is done in practice. The `but-auto-comments`
+examples in particular document the new comment format.
 
-**What we're looking for:**
-- Passion for the specific technology (e.g., PostgreSQL, KubeVirt, Roundcube)
-- Willingness to review PRs and respond to issues
-- Kubernetes and Helm experience
-- Commitment to maintain quality and backwards compatibility
+Note that comments can continue on the next line. In that case leave out the double dash, and the lines will simply be
+appended with a space in-between, as in the `controller.replicas` field in the example above
 
-**How to apply:**
-- Show your interest by contributing PRs and helping in issues/discussions
-- Reach out to us at **oss@encircle360.com** expressing your interest
-- You can co-maintain a single chart or multiple - it's up to you!
+The following rules are used to determine which values will be added to the values table in the README:
 
-We believe in community-driven development and are happy to share maintainer responsibilities with passionate contributors.
+* By default, only _leaf nodes_, that is, fields of type `int`, `string`, `float`, `bool`, empty lists, and empty maps
+  are added as rows in the values table. These fields will be added even if they do not have a description comment
+* Lists and maps which contain elements will not be added as rows in the values table _unless_ they have a description
+  comment which refers to them
+* Adding a description comment for a non-empty list or map in this way makes it so that leaf nodes underneath the
+  described field will _not_ be automatically added to the values table. In order to document both a non-empty list/map
+  _and_ a leaf node within that field, description comments must be added for both
 
-## Support & Professional Services
+e.g. In this case, both `controller.livenessProbe` and `controller.livenessProbe.httpGet.path` will be added as rows in
+the values table, but `controller.livenessProbe.httpGet.port` will not
+```yaml
+controller:
+  # -- Configure the healthcheck for the ingress controller
+  livenessProbe:
+    httpGet:
+      # -- This is the liveness check endpoint
+      path: /healthz
+      port: http
+```
 
-### Community Support
+Results in:
 
-- **Discord Community**: Join our [Discord Server](https://discord.gg/6WWWrhFVf3) to chat with maintainers and other users
-- **Chart Issues**: Create an [Issue](https://github.com/encircle360-oss/helm-charts/issues) for Helm chart bugs and feature requests
-- **General Questions**: Start a [Discussion](https://github.com/encircle360-oss/helm-charts/discussions) for questions and general support
-- **Application Bugs**: For bugs within the applications themselves (not chart-related), please report them to the respective upstream project:
-  - CloudNativePG: [cloudnative-pg/cloudnative-pg](https://github.com/cloudnative-pg/cloudnative-pg/issues)
-  - KubeVirt: [kubevirt/kubevirt](https://github.com/kubevirt/kubevirt/issues)
-  - Roundcube: [roundcube/roundcubemail](https://github.com/roundcube/roundcubemail/issues)
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| controller.livenessProbe | object | `{"httpGet":{"path":"/healthz","port":8080}}` | Configure the healthcheck for the ingress controller |
+| controller.livenessProbe.httpGet.path | string | `"/healthz"` | This is the liveness check endpoint |
 
-### Professional Support
+If we remove the comment for `controller.livenessProbe` however, both leaf nodes `controller.livenessProbe.httpGet.path`
+and `controller.livenessProbe.httpGet.port` will be added to the table, with or without description comments:
 
-For professional support, consulting, custom development, or enterprise solutions, contact us at **hello@encircle360.com**
+```yaml
+controller:
+  livenessProbe:
+    httpGet:
+      # -- This is the liveness check endpoint
+      path: /healthz
+      port: http
+```
 
-## Disclaimer
+Results in:
 
-These Helm charts are provided "AS IS" without warranty of any kind, either express or implied, including but not limited to the implied warranties of merchantability, fitness for a particular purpose, or non-infringement.
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| controller.livenessProbe.httpGet.path | string | `"/healthz"` | This is the liveness check endpoint |
+| controller.livenessProbe.httpGet.port | string | `"http"` | |
 
-While we strive to maintain high-quality charts and test them thoroughly, you acknowledge that:
-- You use these charts at your own risk
-- We recommend thorough testing in non-production environments before production deployment
-- Charts may contain bugs or security vulnerabilities
-- We are not liable for any damages or losses resulting from the use of these charts
 
-For production deployments requiring guaranteed support and SLAs, please contact us about our professional services at **hello@encircle360.com**.
+### nil values
+If you would like to define a key for a value, but leave the default empty, you can still specify a description for it
+as well as a type. This is possible with both the old and the new comment format:
+```yaml
+controller:
+  # -- (int) Number of nginx-ingress pods to load balance between
+  replicas:
 
-## License
+  # controller.image -- (string) Number of nginx-ingress pods to load balance between
+  image:
+```
+This could be useful when wanting to enforce user-defined values for the chart, where there are no sensible defaults.
 
-This repository is licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
+### Default values/column
+In cases where you do not want to include the default value from `values.yaml`, or where the real default is calculated
+inside the chart, you can change the contents of the column like so:
 
-## Maintainers
+```yaml
+service:
+  # -- Add annotations to the service, this is going to be a long comment across multiple lines
+  # but that's fine, these will be concatenated and the @default will be rendered as the default for this field
+  # @default -- the chart will add some internal annotations automatically
+  annotations: []
+```
 
-This project is maintained and sponsored by **[encircle360 GmbH](https://encircle360.com)**, providing enterprise-grade Kubernetes and cloud-native solutions.
+The order is important. The first comment line(s) must be the one specifying the key or using the auto-detection feature and
+the description for the field. The `@default` comment must follow.
 
-## Credits
+See [here](./example-charts/custom-template/values.yaml) for an example.
+### Ignoring values
+In cases you would like to ignore certain values, you can mark it with @ignored tag:
 
-Thanks to all contributors, partners, and the open source community for making this project possible.
+```yaml
+# @ignored
+service:
+  port: 8080
+```
+
+### Spaces and Dots in keys
+In the old-style comment, if a key name contains any "." or " " characters, that section of the path must be quoted in
+description comments e.g.
+
+```yaml
+service:
+  annotations:
+    # service.annotations."external-dns.alpha.kubernetes.io/hostname" -- Hostname to be assigned to the ELB for the service
+    external-dns.alpha.kubernetes.io/hostname: stupidchess.jmn23.com
+
+configMap:
+  # configMap."not real config param" -- A completely fake config parameter for a useful example
+  not real config param: value
+```
+
+### Advanced table rendering
+Some helm chart `values.yaml` uses complicated structure for the key/value
+pairs. For example, it may uses a multiline string of Go template text instead
+of plain strings. Some values might also refer to a certain YAML/JSON object
+structure, like internal k8s value type, or an enum. For these use case,
+a standard markdown table format might be inadequate and you want to use HTML
+tags to render the table.
+
+Some example use case on why you need advanced table rendering:
+
+ - Hyperlinking the value type to an anchor or HTML link somewhere for reference
+ - Collapsible value description using `<summary>` tags to save space
+ - Multiline default values as codeblocks, instead of one line JSON structure for readability
+ - Custom rendering, for colors, actions, bookmarking, cross-reference, etc
+ - Cascading the markdown file generated by helm-docs to be post-processed by Jamstack into a static HTML docs site.
+
+In order to accomodate this, `helm-docs` provides an extensible and flexible way to customize rendering.
+
+1. Use the HTML value renderer instead of the default markdown format
+
+You can use `chart.valuesSectionHtml` to render the values table as HTML tags,
+instead of using `chart.valuesSection`. Using HTML tables provides more
+flexibility because it can be processed by markdown viewer as a nested blocks,
+instead of one row per line. This allows you to customize how each columns in a
+row are rendered.
+
+2. Overriding built-in templates
+
+You can always overrides or redefine built-in templates in your own `_templates.gotmpl` 
+file. The built-in templates can be thought of as a template hook.
+For example, if you need to change the HTML table, for example to add a new
+column, or define maximum width/height, you can override `chart.valuesTableHtml`. Your overrides will then be called by `chart.valuesSectionHtml`.
+
+You can add your own rendering logic for each column. For example, we have `chart.valueDefaultColumnRender` that is used to render "default value" column for each rows. If you want to override how helm-docs render the
+"type" column, just define your own rendering template and call it from
+`chart.valuesTableHtml` for each of the rows.
+
+3. Using the metadata of each rows of values
+
+Custom styling and rendering can be done as flexible as you want, but you
+still need a metadata that describes each rows of values. You can access
+this information from the templates.
+
+When you override `chart.valuesTableHtml`, as you can see in the original
+definition in `func getValuesTableTemplates()` [pkg/document/template.go](pkg/document/template.go), we iterates each row of values.
+For each "Value", it is modeled as a struct defined in `valueRow` struct
+in [pkg/document/model.go](pkg/document/model.go). You can then use the
+fields in your template.
+
+Some fields here are directly referenced from `values.yaml`:
+- `Key`: the full name of the key referenced in `values.yaml`
+- `Type`: the type of the value of the key in `values.yaml`. Can be automatically inferred from YAML structure, or annotated using `# -- (mytype)` where `mytype` can be any string that you refer as the type of the value.
+- `NotationType`: the notation of the type used to render the default value. If `Type` refers to the data type of the value, then `NotationType` refers to **how** this value should be written/rendered by helm-docs. Generally helm-docs only remembers the notation type, but it was the writer's responsibility to make a template tag to render a specific notation type. Annotate the key with `# @notationType -- (mynotation)` where `mynotation` is an identifier to tell the renderer how to write the value.
+- `Default`: this is the default value of the key, found from `values.yaml`. It is either inferred from the YAML structure or defined using `# @default -- my default value` annotation, in case you need to show other example values.
+- `Description`: this is the description of the key/value, taken from the comments found in the `values.yaml` for the referred key.
+- `LineNumber`: this is the line number associated with where the key is declared. You can use this to construct an anchor to the actual `values.yaml` file.
+
+Note that helm-docs only provides these information, but the default behaviour is to always render it in plain Markdown file to be viewed locally.
+
+4. Use markdown files generated by helm-docs as intermediary files to be processed further
+
+Public helm charts sometimes needs to be published as static content
+instead of just stored in a repository. This is needed for helm users to
+be able to view or browse the chart options and dependencies.
+
+It is often more than enough to just browse the chart values options on
+git hosting that is able to render markdown files as a nice HTML page, like GitHub or GitLab.
+However, for a certain use case, you may want to use your own
+documentation generator to host or publish the output of helm-docs.
+
+If you use some kind of Jamstack like Gatsby or Hugo, you can use the
+output of helm-docs as an input for these doc generator. A typical use
+case is to override helm-docs built-in template so that it renders a
+markdown or markdownX files to be processed by Gatsby or Hugo into
+a static Web/Javascript page.
+
+For a more concrete examples on how to do these custom rendering, see [example here](./example-charts/custom-value-notation-type/README.md)
+
+
+## Strict linting
+
+Sometimes you might want to enforce helm-docs to fail when some values are not documented correctly.
+
+By default, this option is turned off:
+
+```shell
+./helm-docs -c  example-charts/helm-3
+INFO[2023-06-29T07:54:29-07:00] Found Chart directories [.]
+INFO[2023-06-29T07:54:29-07:00] Generating README Documentation for chart example-charts/helm-3
+```
+
+but you can use the `-x` flag to turn it on:
+
+```shell
+helm-docs -x -c  example-charts/helm-3
+INFO[2023-06-29T07:55:12-07:00] Found Chart directories [.]
+WARN[2023-06-29T07:55:12-07:00] Error parsing information for chart ., skipping: values without documentation:
+controller
+controller.name
+controller.image
+controller.extraVolumes.[0].name
+controller.extraVolumes.[0].configMap
+controller.extraVolumes.[0].configMap.name
+controller.livenessProbe.httpGet
+controller.livenessProbe.httpGet.port
+controller.publishService
+controller.service
+controller.service.annotations
+controller.service.annotations.external-dns.alpha.kubernetes.io/hostname
+```
+
+The CLI also supports excluding fields by regexp using the `-z` argument
+
+```shell
+helm-docs -x -z="controller.*" -c  example-charts/helm-3
+INFO[2023-06-29T08:18:55-07:00] Found Chart directories [.]
+INFO[2023-06-29T08:18:55-07:00] Generating README Documentation for chart example-charts/helm-3
+```
+
+Multiple regexp can be passed, as in the following example:
+
+```shell
+helm-docs -x -z="controller.image.*" -z="controller.service.*"  -z="controller.extraVolumes.*"  -c  example-charts/helm-3
+INFO[2023-06-29T08:21:04-07:00] Found Chart directories [.]
+WARN[2023-06-29T08:21:04-07:00] Error parsing information for chart ., skipping: values without documentation:
+controller
+controller.name
+controller.livenessProbe.httpGet
+controller.livenessProbe.httpGet.port
+controller.publishService
+```
+
+It is also possible to ignore specific errors using the `-y` argument.
+
+```shell
+helm-docs -x -y="controller.name" -y="controller.service"  -c  example-charts/helm-3
+INFO[2023-06-29T08:23:40-07:00] Found Chart directories [.]
+WARN[2023-06-29T08:23:40-07:00] Error parsing information for chart ., skipping: values without documentation:
+controller
+controller.image
+controller.extraVolumes.[0].name
+controller.extraVolumes.[0].configMap
+controller.extraVolumes.[0].configMap.name
+controller.livenessProbe.httpGet
+controller.livenessProbe.httpGet.port
+controller.publishService
+controller.service.annotations
+controller.service.annotations.external-dns.alpha.kubernetes.io/hostname
+
+```

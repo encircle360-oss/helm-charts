@@ -5,20 +5,16 @@
 global:
   # -- Enable deployment of KubeVirt
   enabled: true
-
 # -- Namespace configuration
 namespace:
   # -- Name of the namespace for KubeVirt installation
   name: kubevirt
-
 # -- KubeVirt Operator configuration
 operator:
   # -- Enable operator deployment
   enabled: true
-
   # -- Number of operator replicas
   replicas: 2
-
   # -- Operator container image configuration
   image:
     # -- Image registry
@@ -26,16 +22,13 @@ operator:
     # -- Image repository
     repository: kubevirt/virt-operator
     # -- Image tag (defaults to chart appVersion)
-    tag: "v1.6.2"
+    tag: "v1.6.3"
     # -- Image pull policy
     pullPolicy: IfNotPresent
-
   # -- Image pull secrets for private registries
   imagePullSecrets: []
-
   # -- Pod annotations (e.g., for OpenShift: openshift.io/required-scc: restricted-v2)
   podAnnotations: {}
-
   # -- Resource limits and requests for operator
   resources:
     requests:
@@ -44,31 +37,24 @@ operator:
     limits:
       cpu: 1000m
       memory: 450Mi
-
   # -- Priority class for operator pods
   priorityClassName: kubevirt-cluster-critical
-
   # -- Node selector for operator pods (default: kubernetes.io/os: linux)
   # Set to {} to use template defaults or override with custom selectors
   nodeSelector: {}
-
   # -- Tolerations for operator pods (default: CriticalAddonsOnly)
   # Set to [] to use template defaults or override with custom tolerations
   tolerations: []
-
   # -- Affinity rules for operator pods
   # Default: pod anti-affinity for better distribution across nodes
   # Set to {} to use template defaults or override with custom affinity
   affinity: {}
-
 # -- KubeVirt CR configuration
 kubevirt:
   # -- Deploy KubeVirt Custom Resource (disable for CI tests or when CRDs don't exist yet)
   deploy: true
-
   # -- Name of the KubeVirt CR
   name: kubevirt
-
   # -- Image configuration for KubeVirt components
   image:
     # -- Custom image registry (leave empty to use default quay.io/kubevirt)
@@ -77,7 +63,6 @@ kubevirt:
     tag: ""
     # -- Image pull policy
     pullPolicy: IfNotPresent
-
   # -- Certificate rotation strategy
   certificateRotateStrategy:
     selfSigned:
@@ -87,7 +72,6 @@ kubevirt:
       certRotateInterval: "168h"
       # -- CA rotation interval
       caRotateInterval: "168h"
-
   # -- Main configuration section
   configuration:
     # -- Developer configuration
@@ -95,153 +79,132 @@ kubevirt:
       # -- Use QEMU software emulation instead of KVM hardware virtualization
       # Useful for testing on non-virtualization-capable nodes
       useEmulation: false
-
       # -- Feature gates configuration
       # Feature gates control optional KubeVirt features
       # See: https://kubevirt.io/user-guide/operations/activating_feature_gates/
       featureGates:
-        # ============================================
-        # ALPHA FEATURES (must be explicitly enabled)
-        # ============================================
+      # ============================================
+      # ALPHA FEATURES (must be explicitly enabled)
+      # ============================================
 
-        # - ExpandDisks              # Enable dynamic disk expansion
-        # - CPUManager               # CPU pinning and NUMA topology
-        # - ExperimentalIgnitionSupport  # Ignition config support for provisioning
-        # - HypervStrictCheck        # Strict Hyper-V feature checking
-        # - Sidecar                  # Sidecar container injection
-        # - HostDevices              # PCI device passthrough
-        # - Snapshot                 # VM snapshot support (Beta since v1.3.0)
-        # - VMExport                 # VM export functionality (Beta since v1.3.0)
-        # - HotplugVolumes           # Hot-plug/unplug volumes
-        # - HostDisk                 # Host disk access
-        # - DownwardMetrics          # Expose metrics to VMs via downward API
-        # - Root                     # Run virt-launcher as root
-        # - WorkloadEncryptionSEV    # AMD SEV memory encryption
-        # - VSOCK                    # AF_VSOCK support for host-guest communication
-        # - KubevirtSeccompProfile   # Custom seccomp profiles
-        # - DisableMDEVConfiguration # Disable automatic MDEV configuration
-        # - PersistentReservation    # SCSI persistent reservations
-        # - MultiArchitecture        # Multi-architecture support
-        # - AlignCPUs                # Align guest and host CPU topology
-        # - NodeRestriction          # Node restriction (Beta since v1.6.0)
-        # - ImageVolume              # Image volume support (Alpha in v1.6.0)
-        # - VirtIOFSConfigVolumesGate    # VirtioFS for config volumes
-        # - VirtIOFSStorageVolumeGate    # VirtioFS for storage volumes
-        # - GPUsWithDRA              # GPU support with Dynamic Resource Allocation (Alpha in v1.6.0)
-        # - HostDevicesWithDRA       # Host devices with DRA (Alpha in v1.6.0)
-        # - DecentralizedLiveMigration   # Decentralized live migration
-        # - ObjectGraph              # Object graph feature (Alpha in v1.6.0)
-        # - DeclarativeHotplugVolumes    # Declarative hotplug volumes
-        # - SecureExecution          # IBM Secure Execution (Alpha in v1.6.0)
-        # - VideoConfig              # Video device configuration (Alpha in v1.6.0)
-        # - PanicDevices             # Panic device support (Alpha in v1.6.0)
-        # - PasstIPStackMigration    # PASST IP stack migration (Alpha in v1.6.0)
+      # - ExpandDisks              # Enable dynamic disk expansion
+      # - CPUManager               # CPU pinning and NUMA topology
+      # - ExperimentalIgnitionSupport  # Ignition config support for provisioning
+      # - HypervStrictCheck        # Strict Hyper-V feature checking
+      # - Sidecar                  # Sidecar container injection
+      # - HostDevices              # PCI device passthrough
+      # - Snapshot                 # VM snapshot support (Beta since v1.3.0)
+      # - VMExport                 # VM export functionality (Beta since v1.3.0)
+      # - HotplugVolumes           # Hot-plug/unplug volumes
+      # - HostDisk                 # Host disk access
+      # - DownwardMetrics          # Expose metrics to VMs via downward API
+      # - Root                     # Run virt-launcher as root
+      # - WorkloadEncryptionSEV    # AMD SEV memory encryption
+      # - VSOCK                    # AF_VSOCK support for host-guest communication
+      # - KubevirtSeccompProfile   # Custom seccomp profiles
+      # - DisableMDEVConfiguration # Disable automatic MDEV configuration
+      # - PersistentReservation    # SCSI persistent reservations
+      # - MultiArchitecture        # Multi-architecture support
+      # - AlignCPUs                # Align guest and host CPU topology
+      # - NodeRestriction          # Node restriction (Beta since v1.6.0)
+      # - ImageVolume              # Image volume support (Alpha in v1.6.0)
+      # - VirtIOFSConfigVolumesGate    # VirtioFS for config volumes
+      # - VirtIOFSStorageVolumeGate    # VirtioFS for storage volumes
+      # - GPUsWithDRA              # GPU support with Dynamic Resource Allocation (Alpha in v1.6.0)
+      # - HostDevicesWithDRA       # Host devices with DRA (Alpha in v1.6.0)
+      # - DecentralizedLiveMigration   # Decentralized live migration
+      # - ObjectGraph              # Object graph feature (Alpha in v1.6.0)
+      # - DeclarativeHotplugVolumes    # Declarative hotplug volumes
+      # - SecureExecution          # IBM Secure Execution (Alpha in v1.6.0)
+      # - VideoConfig              # Video device configuration (Alpha in v1.6.0)
+      # - PanicDevices             # Panic device support (Alpha in v1.6.0)
+      # - PasstIPStackMigration    # PASST IP stack migration (Alpha in v1.6.0)
 
-        # ============================================
-        # GA FEATURES (enabled by default, deprecated to list here)
-        # These features are stable and don't need feature gates anymore:
-        # - LiveMigration, SRIOVLiveMigration, NonRoot, PSA,
-        # - CPUNodeDiscovery, NUMA, GPU, VMLiveUpdateFeatures (GA in v1.5.0)
-        # - CommonInstancetypesDeploymentGate (GA in v1.4.0)
-        # - HotplugNICs (GA in v1.4.0), BochsDisplayForEFIGuests (GA in v1.4.0)
-        # - AutoResourceLimitsGate (GA in v1.5.0), NetworkBindingPlugins (GA in v1.5.0)
-        # - DynamicPodInterfaceNaming (GA in v1.5.0), VolumesUpdateStrategy (GA in v1.5.0)
-        # - VolumeMigration (GA in v1.5.0), InstancetypeReferencePolicy (GA in v1.6.0)
-        # ============================================
-
+      # ============================================
+      # GA FEATURES (enabled by default, deprecated to list here)
+      # These features are stable and don't need feature gates anymore:
+      # - LiveMigration, SRIOVLiveMigration, NonRoot, PSA,
+      # - CPUNodeDiscovery, NUMA, GPU, VMLiveUpdateFeatures (GA in v1.5.0)
+      # - CommonInstancetypesDeploymentGate (GA in v1.4.0)
+      # - HotplugNICs (GA in v1.4.0), BochsDisplayForEFIGuests (GA in v1.4.0)
+      # - AutoResourceLimitsGate (GA in v1.5.0), NetworkBindingPlugins (GA in v1.5.0)
+      # - DynamicPodInterfaceNaming (GA in v1.5.0), VolumesUpdateStrategy (GA in v1.5.0)
+      # - VolumeMigration (GA in v1.5.0), InstancetypeReferencePolicy (GA in v1.6.0)
+      # ============================================
     # -- Default CPU model for VMs when not specified
     # Example: "host-passthrough", "host-model", "Penryn", "IvyBridge", etc.
     cpuModel: ""
-
     # -- Default CPU request for VMs when not specified
     # Example: "100m" or "1" (1 core)
     cpuRequest: ""
-
     # -- Obsolete CPU models that should not be used
     # These CPUs are considered too old and potentially insecure
     obsoleteCPUModels: {}
-      # pentium: true
-      # pentium2: true
-      # pentium3: true
-      # pentiumpro: true
-      # coreduo: true
-      # n270: true
-      # core2duo: true
-      # Conroe: true
-      # Penryn: true
-      # Nehalem: true
-      # Westmere: true
-      # Opteron_G1: true
-      # Opteron_G2: true
+    # pentium: true
+    # pentium2: true
+    # pentium3: true
+    # pentiumpro: true
+    # coreduo: true
+    # n270: true
+    # core2duo: true
+    # Conroe: true
+    # Penryn: true
+    # Nehalem: true
+    # Westmere: true
+    # Opteron_G1: true
+    # Opteron_G2: true
 
     # -- Network configuration
     network:
       # -- Default network interface type
       # Options: "masquerade", "bridge", "slirp"
       defaultNetworkInterface: "masquerade"
-
       # -- Permit bridge interface on pod network
       permitBridgeInterfaceOnPodNetwork: false
-
       # -- Permit SLIRP interface
       permitSlirpInterface: false
-
       # -- Network binding plugins configuration
       binding: {}
-
     # -- Live migration configuration
     migration:
       # -- Disable TLS for migrations (not recommended for production)
       disableTLS: false
-
       # -- Allow auto-converge for slow migrations
       allowAutoConverge: false
-
       # -- Network bandwidth limit per migration
       bandwidthPerGiB: "64Mi"
-
       # -- Migration completion timeout per GiB of memory
       completionTimeoutPerGiB: 800
-
       # -- Progress timeout in seconds
       progressTimeout: 150
-
       # -- Maximum number of parallel migrations in the cluster
       parallelMigrationsPerCluster: 5
-
       # -- Maximum number of parallel outbound migrations per node
       parallelOutboundMigrationsPerNode: 2
-
       # -- Allow post-copy migration (use with caution)
       allowPostCopy: false
-
       # -- Unsafe migration override (allows migrations in unsafe conditions)
       unsafeMigrationOverride: false
-
       # -- Node drain taint key
       nodeDrainTaintKey: "kubevirt.io/drain"
-
       # -- Dedicated migration network (optional)
       # Example: "migration-network"
       network: ""
-
     # -- Storage class for VM state (snapshots, etc.)
     vmStateStorageClass: ""
-
     # -- Permitted host devices for passthrough
     permittedHostDevices:
       # -- PCI host devices
       pciHostDevices: []
-        # - pciVendorSelector: "10DE:1EB8"  # NVIDIA Tesla T4
-        #   resourceName: "nvidia.com/T4"
-        # - pciVendorSelector: "8086:1572"  # Intel X710
-        #   resourceName: "intel.com/X710"
+      # - pciVendorSelector: "10DE:1EB8"  # NVIDIA Tesla T4
+      #   resourceName: "nvidia.com/T4"
+      # - pciVendorSelector: "8086:1572"  # Intel X710
+      #   resourceName: "intel.com/X710"
 
       # -- Mediated devices (vGPU, etc.)
       mediatedDevices: []
-        # - mdevNameSelector: "GRID T4-1Q"
-        #   resourceName: "nvidia.com/GRID_T4-1Q"
-
+      # - mdevNameSelector: "GRID T4-1Q"
+      #   resourceName: "nvidia.com/GRID_T4-1Q"
     # -- Instancetype configuration
     instancetype:
       # -- Reference policy for instance types
@@ -250,125 +213,101 @@ kubevirt:
       # - expand: Expand instancetype into VM spec once
       # - expandAll: Always expand instancetype
       referencePolicy: "reference"
-
     # -- SELinux configuration
     selinuxLauncherType: "virt_launcher.process"
-
     # -- SMBIOS configuration (system information exposed to VMs)
     smbios: {}
-      # manufacturer: "MyCompany"
-      # product: "MyProduct"
-      # version: "1.0"
-      # sku: "SKU123"
-      # family: "MyFamily"
-
+    # manufacturer: "MyCompany"
+    # product: "MyProduct"
+    # version: "1.0"
+    # sku: "SKU123"
+    # family: "MyFamily"
   # -- Workload update strategy
   workloadUpdateStrategy:
     # -- Workload update methods
     # Options: "LiveMigrate", "Evict"
     workloadUpdateMethods: []
-      # - LiveMigrate
-      # - Evict
+    # - LiveMigrate
+    # - Evict
 
     # -- Number of VMs to evict in parallel during updates
     batchEvictionSize: 10
-
     # -- Interval between batch evictions
     batchEvictionInterval: "1m"
-
   # -- Infrastructure components placement (virt-api, virt-controller)
   infra:
     # -- Node placement configuration for infrastructure components
     nodePlacement:
       # -- Node selector
       nodeSelector: {}
-        # node-role.kubernetes.io/control-plane: ""
+      # node-role.kubernetes.io/control-plane: ""
 
       # -- Affinity rules
       affinity: {}
-
       # -- Tolerations
       tolerations: []
-        # - key: node-role.kubernetes.io/control-plane
-        #   effect: NoSchedule
-
+      # - key: node-role.kubernetes.io/control-plane
+      #   effect: NoSchedule
   # -- Workload components placement (virt-handler, virt-launcher)
   workloads:
     # -- Node placement configuration for workload components
     nodePlacement:
       # -- Node selector
       nodeSelector: {}
-        # kubevirt.io/vm-workload: "true"
+      # kubevirt.io/vm-workload: "true"
 
       # -- Affinity rules
       affinity: {}
-
       # -- Tolerations
       tolerations: []
-
   # -- Custom labels for KubeVirt CR
   labels: {}
-
   # -- Custom annotations for KubeVirt CR
   annotations: {}
-
 # -- Monitoring configuration
 monitoring:
   # -- Enable monitoring (ServiceMonitor and PrometheusRule)
   enabled: false
-
   # -- Namespace where Prometheus is installed
   namespace: "monitoring"
-
   # -- ServiceAccount used by Prometheus
   serviceAccount: "prometheus-k8s"
-
   # -- Namespace for ServiceMonitor resource
   # Leave empty to deploy in the same namespace as KubeVirt
   serviceMonitorNamespace: ""
-
   # -- Additional labels for ServiceMonitor
   serviceMonitorLabels: {}
-    # prometheus: kube-prometheus
+  # prometheus: kube-prometheus
 
   # -- Scrape interval for metrics
   scrapeInterval: "30s"
-
   # -- PrometheusRule configuration
   prometheusRule:
     # -- Enable PrometheusRule
     enabled: false
-
     # -- Additional labels for PrometheusRule
     labels: {}
-      # prometheus: kube-prometheus
+    # prometheus: kube-prometheus
 
     # -- Custom alerting rules
     # Add your custom Prometheus alerting rules here
     additionalRules: []
-
 # -- RBAC configuration
 rbac:
   # -- Create RBAC resources
   create: true
-
 # -- Priority class configuration
 priorityClass:
   # -- Create priority class
   create: true
-
   # -- Priority class name
   name: kubevirt-cluster-critical
-
   # -- Priority value (higher = more important)
   value: 1000000000
-
   # -- Global default (not recommended for KubeVirt)
   globalDefault: false
-
   # -- Description
   description: "This priority class should be used for core kubevirt components only."
-
 # Note: KubeVirt CRDs are installed via the crds/ directory (Helm best practice).
 # CRDs are installed before any other resources and remain in the cluster after 'helm uninstall'.
 # This is intentional for data safety - VMs and related resources depend on these CRDs.

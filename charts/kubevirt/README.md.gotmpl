@@ -14,10 +14,10 @@
 
 ## Description
 
-KubeVirt is a Kubernetes add-on that enables you to run and manage virtual machines alongside container workloads. This Helm chart provides a deployment of KubeVirt v1.6.2 with comprehensive configuration options.
+KubeVirt is a Kubernetes add-on that enables you to run and manage virtual machines alongside container workloads. This Helm chart provides a deployment of KubeVirt v1.6.3 with comprehensive configuration options.
 
 **Key Features:**
-- Full KubeVirt v1.6.2 support with all feature gates
+- Full KubeVirt v1.6.3 support with all feature gates
 - Operator-based lifecycle management
 - Comprehensive RBAC configuration
 - Monitoring integration (ServiceMonitor & PrometheusRule)
@@ -106,7 +106,7 @@ helm install kubevirt encircle360-oss/kubevirt \
 | `namespace.name` | Namespace for KubeVirt | `kubevirt` |
 | `namespace.create` | Create the namespace | `true` |
 | `operator.replicas` | Number of operator replicas | `2` |
-| `operator.image.tag` | Operator image tag | `v1.6.2` |
+| `operator.image.tag` | Operator image tag | `v1.6.3` |
 
 ### Feature Gates
 
@@ -115,7 +115,7 @@ KubeVirt uses feature gates to control optional functionality. Feature gates are
 - **Beta**: Features that are stable but may have limitations
 - **GA**: Stable features (enabled by default, no gate needed)
 
-#### Alpha Feature Gates (v1.6.2)
+#### Alpha Feature Gates (v1.6.3)
 
 ```yaml
 kubevirt:
@@ -126,7 +126,7 @@ kubevirt:
         - ExpandDisks              # Dynamic disk expansion
         - HotplugVolumes           # Hot-plug/unplug volumes
         - HostDisk                 # Host disk access
-        - ImageVolume              # Image volume support (New in v1.6.0)
+        - ImageVolume              # Image volume support (New in v1.6.3)
 
         # Performance
         - CPUManager               # CPU pinning and NUMA topology
@@ -134,21 +134,21 @@ kubevirt:
 
         # Hardware
         - HostDevices              # PCI device passthrough
-        - GPUsWithDRA              # GPU with Dynamic Resource Allocation (New in v1.6.0)
-        - HostDevicesWithDRA       # Host devices with DRA (New in v1.6.0)
+        - GPUsWithDRA              # GPU with Dynamic Resource Allocation (New in v1.6.3)
+        - HostDevicesWithDRA       # Host devices with DRA (New in v1.6.3)
 
         # Security
         - WorkloadEncryptionSEV    # AMD SEV memory encryption
         - KubevirtSeccompProfile   # Custom seccomp profiles
-        - SecureExecution          # IBM Secure Execution (New in v1.6.0)
+        - SecureExecution          # IBM Secure Execution (New in v1.6.3)
 
         # Snapshot & Export
-        - Snapshot                 # VM snapshot support (Beta since v1.3.0)
-        - VMExport                 # VM export functionality (Beta since v1.3.0)
+        - Snapshot                 # VM snapshot support (Beta since v1.6.3)
+        - VMExport                 # VM export functionality (Beta since v1.6.3)
 
         # Networking
         - VSOCK                    # AF_VSOCK for host-guest communication
-        - PasstIPStackMigration    # PASST IP stack migration (New in v1.6.0)
+        - PasstIPStackMigration    # PASST IP stack migration (New in v1.6.3)
 
         # Other
         - ExperimentalIgnitionSupport  # Ignition config support
@@ -159,19 +159,19 @@ kubevirt:
         - DisableMDEVConfiguration # Disable automatic MDEV configuration
         - PersistentReservation    # SCSI persistent reservations
         - MultiArchitecture        # Multi-architecture support
-        - NodeRestriction          # Node restriction (Beta since v1.6.0)
+        - NodeRestriction          # Node restriction (Beta since v1.6.3)
         - VirtIOFSConfigVolumesGate    # VirtioFS for config volumes
         - VirtIOFSStorageVolumeGate    # VirtioFS for storage volumes
         - DecentralizedLiveMigration   # Decentralized live migration
-        - ObjectGraph              # Object graph feature (New in v1.6.0)
+        - ObjectGraph              # Object graph feature (New in v1.6.3)
         - DeclarativeHotplugVolumes    # Declarative hotplug volumes
-        - VideoConfig              # Video device configuration (New in v1.6.0)
-        - PanicDevices             # Panic device support (New in v1.6.0)
+        - VideoConfig              # Video device configuration (New in v1.6.3)
+        - PanicDevices             # Panic device support (New in v1.6.3)
 ```
 
 #### GA Feature Gates (No Configuration Needed)
 
-The following features are **stable and enabled by default** in v1.6.2. You do NOT need to specify these in feature gates:
+The following features are **stable and enabled by default** in v1.6.3. You do NOT need to specify these in feature gates:
 
 - `LiveMigration` - Live migration of VMs
 - `SRIOVLiveMigration` - Live migration with SR-IOV
@@ -180,16 +180,16 @@ The following features are **stable and enabled by default** in v1.6.2. You do N
 - `CPUNodeDiscovery` - CPU node discovery
 - `NUMA` - NUMA topology support
 - `GPU` - GPU passthrough
-- `VMLiveUpdateFeatures` - Live update VM features (GA in v1.5.0)
-- `CommonInstancetypesDeploymentGate` - Common instance types (GA in v1.4.0)
-- `HotplugNICs` - Hot-plug network interfaces (GA in v1.4.0)
-- `BochsDisplayForEFIGuests` - Bochs display for EFI (GA in v1.4.0)
-- `AutoResourceLimitsGate` - Automatic resource limits (GA in v1.5.0)
-- `NetworkBindingPlugins` - Network binding plugins (GA in v1.5.0)
-- `DynamicPodInterfaceNaming` - Dynamic pod interface naming (GA in v1.5.0)
-- `VolumesUpdateStrategy` - Volumes update strategy (GA in v1.5.0)
-- `VolumeMigration` - Volume migration (GA in v1.5.0)
-- `InstancetypeReferencePolicy` - Instance type reference policy (GA in v1.6.0)
+- `VMLiveUpdateFeatures` - Live update VM features (GA in v1.6.3)
+- `CommonInstancetypesDeploymentGate` - Common instance types (GA in v1.6.3)
+- `HotplugNICs` - Hot-plug network interfaces (GA in v1.6.3)
+- `BochsDisplayForEFIGuests` - Bochs display for EFI (GA in v1.6.3)
+- `AutoResourceLimitsGate` - Automatic resource limits (GA in v1.6.3)
+- `NetworkBindingPlugins` - Network binding plugins (GA in v1.6.3)
+- `DynamicPodInterfaceNaming` - Dynamic pod interface naming (GA in v1.6.3)
+- `VolumesUpdateStrategy` - Volumes update strategy (GA in v1.6.3)
+- `VolumeMigration` - Volume migration (GA in v1.6.3)
+- `InstancetypeReferencePolicy` - Instance type reference policy (GA in v1.6.3)
 
 ### CPU Configuration
 
@@ -615,7 +615,7 @@ If you're currently using raw KubeVirt manifests:
 
 ## Breaking Changes
 
-### v1.5.0 → v1.6.x
+### v1.6.3 → v1.6.x
 
 - **VirtualMachineInstanceMigration RBAC**: Namespace admins no longer have default permissions to create/edit/delete migrations. Grant explicitly if needed.
 
