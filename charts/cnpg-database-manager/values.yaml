@@ -358,3 +358,11 @@ clusters: {}
   #       # password:
   #       #   name: source-db-replica-user
   #       #   key: password
+
+extraObjects: []
+  #  - apiVersion: onepassword.com/v1
+  #    kind: OnePasswordItem
+  #    metadata:
+  #      name: backup-creds
+  #    spec:
+  #      itemPath: "vaults/Infrastructure/items/backup-creds"
