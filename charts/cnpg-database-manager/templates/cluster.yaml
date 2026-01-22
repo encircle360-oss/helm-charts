@@ -125,20 +125,26 @@ spec:
       {{- end }}
 
       {{- if $cluster.backup.s3 }}
+
+      {{- $s3CredsSecretName := printf "%s-backup-creds" $clusterName -}}
+      {{- if and $cluster.backup.s3.credentials $cluster.backup.s3.credentials.existingSecret }}
+      {{- $s3CredsSecretName = $cluster.backup.s3.credentials.existingSecret -}}
+      {{- end }}
+
       {{- if $cluster.backup.s3.endpoint }}
       endpointURL: {{ $cluster.backup.s3.endpoint }}
       {{- end }}
       s3Credentials:
         {{- if $cluster.backup.s3.region }}
         region:
-          name: {{ $clusterName }}-backup-creds
+          name: {{ $s3CredsSecretName }}
           key: AWS_DEFAULT_REGION
         {{- end }}
         accessKeyId:
-          name: {{ $clusterName }}-backup-creds
+          name: {{ $s3CredsSecretName }}
           key: ACCESS_KEY_ID
         secretAccessKey:
-          name: {{ $clusterName }}-backup-creds
+          name: {{ $s3CredsSecretName }}
           key: AWS_SECRET_ACCESS_KEY
       {{- end }}
 
