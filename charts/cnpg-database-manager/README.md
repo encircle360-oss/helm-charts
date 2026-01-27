@@ -1,6 +1,6 @@
 # cnpg-database-manager
 
-![Version: 0.4.3](https://img.shields.io/badge/Version-0.4.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 0.4.4](https://img.shields.io/badge/Version-0.4.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
 
 Multi-database PostgreSQL management for CloudNativePG with declarative extensions, connection pooling, disaster recovery, and automated backups
 
@@ -931,6 +931,7 @@ To prevent conflicts, **do not** define these fields in `additionalClusterSpec` 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | clusters | object | `{}` (no clusters deployed by default) | PostgreSQL cluster configurations. Each key represents a cluster name. |
+| extraObjects | list | `[]` | Additional Kubernetes objects to deploy (e.g., ExternalSecret, OnePasswordItem for external secret management) |
 | imageCatalogs | object | `{}` (no catalogs deployed by default) | Image catalog configurations. Defines reusable container image references. |
 
 ### Configuration Parameters
