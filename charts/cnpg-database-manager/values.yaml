@@ -359,6 +359,7 @@ clusters: {}
   #       #   name: source-db-replica-user
   #       #   key: password
 
+# -- Additional Kubernetes objects to deploy (e.g., ExternalSecret, OnePasswordItem for external secret management)
 extraObjects: []
   #  - apiVersion: onepassword.com/v1
   #    kind: OnePasswordItem
