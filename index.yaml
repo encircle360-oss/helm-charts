@@ -3,6 +3,46 @@ entries:
   cnpg-database-manager:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: Support for extraObjects to deploy additional resources (ExternalSecret, OnePasswordItem, etc.)
+        - kind: added
+          description: Support for existingSecret in S3 backup credentials configuration
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/recommendations: '- url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg'
+    apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-01-27T22:53:26.526231471Z"
+    description: Multi-database PostgreSQL management for CloudNativePG with declarative
+      extensions, connection pooling, disaster recovery, and automated backups
+    digest: 1330c78daced02a6398f98861c2ac1df5bfc8b14d36d1080b78ca281be6cdfa3
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager
+    icon: https://avatars.githubusercontent.com/u/100373852
+    keywords:
+    - postgresql
+    - database
+    - cloudnative-pg
+    - cnpg
+    - multi-tenant
+    - pgbouncer
+    - backup
+    - recovery
+    - pgvector
+    - extensions
+    - pitr
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: cnpg-database-manager
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://cloudnative-pg.io/
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/cnpg-database-manager-0.4.4/cnpg-database-manager-0.4.4.tgz
+    version: 0.4.4
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: Removed invalid scheduledBackup field from Cluster spec (not part of CloudNativePG API)
         - kind: fixed
@@ -1397,4 +1437,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/yaade-0.1.0/yaade-0.1.0.tgz
     version: 0.1.0
-generated: "2025-10-24T22:01:45.728051592Z"
+generated: "2026-01-27T22:53:26.526409804Z"
