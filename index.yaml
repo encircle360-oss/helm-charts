@@ -648,6 +648,62 @@ entries:
   kubevirt:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          description: Upgrade KubeVirt from v1.6.2 to v1.7.0
+        - kind: changed
+          description: Minimum Kubernetes version bumped to 1.32+
+        - kind: changed
+          description: ClusterRole updated to match official v1.7.0 manifest (1198 lines)
+        - kind: changed
+          description: Role updated with new secret resourceNames for migration and vsock certs
+        - kind: added
+          description: Pod label np.kubevirt.io/allow-access-cluster-services for NetworkPolicy support
+        - kind: added
+          description: Default nodeAffinity prefers control-plane nodes for virt-operator
+        - kind: added
+          description: Default tolerations for control-plane and master node taints
+        - kind: added
+          description: New evacuate/cancel subresources for VMIs and VMs
+        - kind: changed
+          description: CRDs now managed as regular templates instead of crds/ directory (updated on every helm upgrade)
+        - kind: fixed
+          description: Remove duplicate patch verb in kubevirts ClusterRole rule
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "false"
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/kubevirt/kubevirt-operator
+    apiVersion: v2
+    appVersion: v1.7.0
+    created: "2026-02-19T15:03:15.252257688Z"
+    description: KubeVirt - Virtual Machine Management on Kubernetes - Deploy and
+      manage VMs as native Kubernetes resources
+    digest: 4f95d78d5bde5153c2f6de7db53b218456e1677f72931bcdd004fae259ed3de3
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/kubevirt
+    icon: https://raw.githubusercontent.com/kubevirt/kubevirt/main/docs/images/logo.svg
+    keywords:
+    - kubevirt
+    - virtualization
+    - vm
+    - virtual-machine
+    - kvm
+    - qemu
+    - vmi
+    - kubernetes-vms
+    kubeVersion: '>=1.32.0-0'
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: kubevirt
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://github.com/kubevirt/kubevirt
+    - https://kubevirt.io
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/kubevirt-0.2.0/kubevirt-0.2.0.tgz
+    version: 0.2.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: Complete RBAC permissions - ClusterRole now matches official KubeVirt v1.6.2 manifest (1090 lines)
         - kind: fixed
@@ -1437,4 +1493,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/yaade-0.1.0/yaade-0.1.0.tgz
     version: 0.1.0
-generated: "2026-01-27T22:53:26.526409804Z"
+generated: "2026-02-19T15:03:15.252348697Z"
