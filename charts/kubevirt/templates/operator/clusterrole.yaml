@@ -25,7 +25,7 @@ rules:
       - deletecollection
 ---
 # ClusterRole for virt-operator ServiceAccount - all permissions needed by the operator
-# This is extracted from the official kubevirt-operator.yaml v1.6.2
+# This is extracted from the official kubevirt-operator.yaml v1.7.0
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -44,7 +44,6 @@ rules:
   - watch
   - patch
   - update
-  - patch
 - apiGroups:
   - ""
   resources:
@@ -341,6 +340,12 @@ rules:
   verbs:
   - create
   - list
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
   - get
 - apiGroups:
   - ""
@@ -798,6 +803,7 @@ rules:
   - virtualmachineinstances/reset
   - virtualmachineinstances/sev/setupsession
   - virtualmachineinstances/sev/injectlaunchsecret
+  - virtualmachineinstances/evacuate/cancel
   verbs:
   - update
 - apiGroups:
@@ -816,6 +822,7 @@ rules:
   - virtualmachines/addvolume
   - virtualmachines/removevolume
   - virtualmachines/memorydump
+  - virtualmachines/evacuate/cancel
   verbs:
   - update
 - apiGroups:
@@ -956,6 +963,7 @@ rules:
   - virtualmachineinstances/reset
   - virtualmachineinstances/sev/setupsession
   - virtualmachineinstances/sev/injectlaunchsecret
+  - virtualmachineinstances/evacuate/cancel
   verbs:
   - update
 - apiGroups:
@@ -974,8 +982,138 @@ rules:
   - virtualmachines/addvolume
   - virtualmachines/removevolume
   - virtualmachines/memorydump
+  - virtualmachines/evacuate/cancel
   verbs:
   - update
+- apiGroups:
+  - subresources.kubevirt.io
+  resources:
+  - expand-vm-spec
+  verbs:
+  - update
+- apiGroups:
+  - kubevirt.io
+  resources:
+  - virtualmachines
+  - virtualmachineinstances
+  - virtualmachineinstancepresets
+  - virtualmachineinstancereplicasets
+  verbs:
+  - get
+  - delete
+  - create
+  - update
+  - patch
+  - list
+  - watch
+- apiGroups:
+  - kubevirt.io
+  resources:
+  - virtualmachineinstancemigrations
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - snapshot.kubevirt.io
+  resources:
+  - virtualmachinesnapshots
+  - virtualmachinesnapshotcontents
+  - virtualmachinerestores
+  verbs:
+  - get
+  - delete
+  - create
+  - update
+  - patch
+  - list
+  - watch
+- apiGroups:
+  - export.kubevirt.io
+  resources:
+  - virtualmachineexports
+  verbs:
+  - get
+  - delete
+  - create
+  - update
+  - patch
+  - list
+  - watch
+- apiGroups:
+  - clone.kubevirt.io
+  resources:
+  - virtualmachineclones
+  verbs:
+  - get
+  - delete
+  - create
+  - update
+  - patch
+  - list
+  - watch
+- apiGroups:
+  - instancetype.kubevirt.io
+  resources:
+  - virtualmachineinstancetypes
+  - virtualmachineclusterinstancetypes
+  - virtualmachinepreferences
+  - virtualmachineclusterpreferences
+  verbs:
+  - get
+  - delete
+  - create
+  - update
+  - patch
+  - list
+  - watch
+- apiGroups:
+  - pool.kubevirt.io
+  resources:
+  - virtualmachinepools
+  verbs:
+  - get
+  - delete
+  - create
+  - update
+  - patch
+  - list
+  - watch
+- apiGroups:
+  - kubevirt.io
+  resources:
+  - kubevirts
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - migrations.kubevirt.io
+  resources:
+  - migrationpolicies
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - kubevirt.io
+  resources:
+  - kubevirts
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - subresources.kubevirt.io
+  resources:
+  - virtualmachines/expand-spec
+  - virtualmachineinstances/guestosinfo
+  - virtualmachineinstances/filesystemlist
+  - virtualmachineinstances/userlist
+  - virtualmachineinstances/sev/fetchcertchain
+  - virtualmachineinstances/sev/querylaunchmeasurement
+  - virtualmachines/objectgraph
+  - virtualmachineinstances/objectgraph
+  verbs:
+  - get
 - apiGroups:
   - subresources.kubevirt.io
   resources:

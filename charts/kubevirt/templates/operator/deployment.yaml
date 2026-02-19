@@ -23,12 +23,20 @@ spec:
       labels:
         {{- include "kubevirt.operator.selectorLabels" . | nindent 8 }}
         prometheus.kubevirt.io: "true"
+        np.kubevirt.io/allow-access-cluster-services: "true"
         name: virt-operator
     spec:
       affinity:
         {{- if .Values.operator.affinity }}
         {{- toYaml .Values.operator.affinity | nindent 8 }}
         {{- else }}
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: Exists
+              weight: 10
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
             - podAffinityTerm:
@@ -52,6 +60,12 @@ spec:
         {{- toYaml .Values.operator.tolerations | nindent 8 }}
         {{- else }}
         - key: CriticalAddonsOnly
+          operator: Exists
+        - key: node-role.kubernetes.io/control-plane
+          effect: NoSchedule
+          operator: Exists
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
           operator: Exists
         {{- end }}
       {{- if .Values.priorityClass.create }}

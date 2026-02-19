@@ -1,5 +1,5 @@
 # KubeVirt Configuration
-# This chart deploys KubeVirt v1.6.2 for virtual machine management on Kubernetes
+# This chart deploys KubeVirt v1.7.0 for virtual machine management on Kubernetes
 
 # -- Global configuration
 global:
@@ -10,6 +10,11 @@ global:
 namespace:
   # -- Name of the namespace for KubeVirt installation
   name: kubevirt
+
+# -- CRD configuration
+crds:
+  # -- Install CRDs as part of the Helm release (updated on every helm upgrade)
+  install: true
 
 # -- KubeVirt Operator configuration
 operator:
@@ -26,7 +31,7 @@ operator:
     # -- Image repository
     repository: kubevirt/virt-operator
     # -- Image tag (defaults to chart appVersion)
-    tag: "v1.6.2"
+    tag: "v1.7.0"
     # -- Image pull policy
     pullPolicy: IfNotPresent
 
@@ -101,7 +106,7 @@ kubevirt:
       # See: https://kubevirt.io/user-guide/operations/activating_feature_gates/
       featureGates:
         # ============================================
-        # ALPHA FEATURES (must be explicitly enabled)
+        # ALPHA/BETA FEATURES (must be explicitly enabled)
         # ============================================
 
         # - ExpandDisks              # Enable dynamic disk expansion
@@ -110,9 +115,6 @@ kubevirt:
         # - HypervStrictCheck        # Strict Hyper-V feature checking
         # - Sidecar                  # Sidecar container injection
         # - HostDevices              # PCI device passthrough
-        # - Snapshot                 # VM snapshot support (Beta since v1.3.0)
-        # - VMExport                 # VM export functionality (Beta since v1.3.0)
-        # - HotplugVolumes           # Hot-plug/unplug volumes
         # - HostDisk                 # Host disk access
         # - DownwardMetrics          # Expose metrics to VMs via downward API
         # - Root                     # Run virt-launcher as root
@@ -123,22 +125,21 @@ kubevirt:
         # - PersistentReservation    # SCSI persistent reservations
         # - MultiArchitecture        # Multi-architecture support
         # - AlignCPUs                # Align guest and host CPU topology
-        # - NodeRestriction          # Node restriction (Beta since v1.6.0)
-        # - ImageVolume              # Image volume support (Alpha in v1.6.0)
+        # - ImageVolume              # Image volume support (Beta in v1.7.0)
         # - VirtIOFSConfigVolumesGate    # VirtioFS for config volumes
         # - VirtIOFSStorageVolumeGate    # VirtioFS for storage volumes
-        # - GPUsWithDRA              # GPU support with Dynamic Resource Allocation (Alpha in v1.6.0)
-        # - HostDevicesWithDRA       # Host devices with DRA (Alpha in v1.6.0)
+        # - GPUsWithDRA              # GPU support with Dynamic Resource Allocation
+        # - HostDevicesWithDRA       # Host devices with DRA
         # - DecentralizedLiveMigration   # Decentralized live migration
-        # - ObjectGraph              # Object graph feature (Alpha in v1.6.0)
+        # - ObjectGraph              # Object graph feature
         # - DeclarativeHotplugVolumes    # Declarative hotplug volumes
-        # - SecureExecution          # IBM Secure Execution (Alpha in v1.6.0)
-        # - VideoConfig              # Video device configuration (Alpha in v1.6.0)
-        # - PanicDevices             # Panic device support (Alpha in v1.6.0)
-        # - PasstIPStackMigration    # PASST IP stack migration (Alpha in v1.6.0)
+        # - SecureExecution          # IBM Secure Execution
+        # - VideoConfig              # Video device configuration
+        # - PanicDevices             # Panic device support
+        # - PasstIPStackMigration    # PASST IP stack migration
 
         # ============================================
-        # GA FEATURES (enabled by default, deprecated to list here)
+        # GA FEATURES (enabled by default, no gate needed)
         # These features are stable and don't need feature gates anymore:
         # - LiveMigration, SRIOVLiveMigration, NonRoot, PSA,
         # - CPUNodeDiscovery, NUMA, GPU, VMLiveUpdateFeatures (GA in v1.5.0)
@@ -147,6 +148,8 @@ kubevirt:
         # - AutoResourceLimitsGate (GA in v1.5.0), NetworkBindingPlugins (GA in v1.5.0)
         # - DynamicPodInterfaceNaming (GA in v1.5.0), VolumesUpdateStrategy (GA in v1.5.0)
         # - VolumeMigration (GA in v1.5.0), InstancetypeReferencePolicy (GA in v1.6.0)
+        # - Snapshot (GA in v1.7.0), VMExport (GA in v1.7.0)
+        # - HotplugVolumes (GA in v1.7.0), NodeRestriction (GA in v1.7.0)
         # ============================================
 
     # -- Default CPU model for VMs when not specified
@@ -369,7 +372,7 @@ priorityClass:
   # -- Description
   description: "This priority class should be used for core kubevirt components only."
 
-# Note: KubeVirt CRDs are installed via the crds/ directory (Helm best practice).
-# CRDs are installed before any other resources and remain in the cluster after 'helm uninstall'.
-# This is intentional for data safety - VMs and related resources depend on these CRDs.
+# Note: KubeVirt CRDs are managed as regular Helm templates (not via crds/ directory).
+# This ensures CRDs are updated on every 'helm upgrade' (crds/ only works on install).
+# The CRD has 'helm.sh/resource-policy: keep' to prevent deletion on 'helm uninstall'.
 # To manually remove CRDs after uninstall: kubectl delete crd kubevirts.kubevirt.io
