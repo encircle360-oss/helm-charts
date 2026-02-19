@@ -1,6 +1,6 @@
 # kubevirt
 
-![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.6.2](https://img.shields.io/badge/AppVersion-v1.6.2-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.7.0](https://img.shields.io/badge/AppVersion-v1.7.0-informational?style=flat-square)
 
 KubeVirt - Virtual Machine Management on Kubernetes - Deploy and manage VMs as native Kubernetes resources
 
@@ -13,10 +13,10 @@ KubeVirt - Virtual Machine Management on Kubernetes - Deploy and manage VMs as n
 
 ## Description
 
-KubeVirt is a Kubernetes add-on that enables you to run and manage virtual machines alongside container workloads. This Helm chart provides a deployment of KubeVirt v1.6.2 with comprehensive configuration options.
+KubeVirt is a Kubernetes add-on that enables you to run and manage virtual machines alongside container workloads. This Helm chart provides a deployment of KubeVirt v1.7.0 with comprehensive configuration options.
 
 **Key Features:**
-- Full KubeVirt v1.6.2 support with all feature gates
+- Full KubeVirt v1.7.0 support with all feature gates
 - Operator-based lifecycle management
 - Comprehensive RBAC configuration
 - Monitoring integration (ServiceMonitor & PrometheusRule)
@@ -25,7 +25,7 @@ KubeVirt is a Kubernetes add-on that enables you to run and manage virtual machi
 
 ## Prerequisites
 
-- Kubernetes 1.30+ (vanilla Kubernetes, K3s, K0s, or OpenShift)
+- Kubernetes 1.32+ (vanilla Kubernetes, K3s, K0s, or OpenShift)
 - Helm 3.8+
 - Nodes with KVM support (hardware virtualization) OR software emulation enabled
 - Sufficient cluster resources for VM workloads
@@ -105,7 +105,7 @@ helm install kubevirt encircle360-oss/kubevirt \
 | `namespace.name` | Namespace for KubeVirt | `kubevirt` |
 | `namespace.create` | Create the namespace | `true` |
 | `operator.replicas` | Number of operator replicas | `2` |
-| `operator.image.tag` | Operator image tag | `v1.6.2` |
+| `operator.image.tag` | Operator image tag | `v1.7.0` |
 
 ### Feature Gates
 
@@ -114,7 +114,7 @@ KubeVirt uses feature gates to control optional functionality. Feature gates are
 - **Beta**: Features that are stable but may have limitations
 - **GA**: Stable features (enabled by default, no gate needed)
 
-#### Alpha Feature Gates (v1.6.2)
+#### Alpha/Beta Feature Gates (v1.7.0)
 
 ```yaml
 kubevirt:
@@ -123,9 +123,8 @@ kubevirt:
       featureGates:
         # Storage
         - ExpandDisks              # Dynamic disk expansion
-        - HotplugVolumes           # Hot-plug/unplug volumes
         - HostDisk                 # Host disk access
-        - ImageVolume              # Image volume support (New in v1.6.0)
+        - ImageVolume              # Image volume support (Beta in v1.7.0)
 
         # Performance
         - CPUManager               # CPU pinning and NUMA topology
@@ -133,21 +132,17 @@ kubevirt:
 
         # Hardware
         - HostDevices              # PCI device passthrough
-        - GPUsWithDRA              # GPU with Dynamic Resource Allocation (New in v1.6.0)
-        - HostDevicesWithDRA       # Host devices with DRA (New in v1.6.0)
+        - GPUsWithDRA              # GPU with Dynamic Resource Allocation
+        - HostDevicesWithDRA       # Host devices with DRA
 
         # Security
         - WorkloadEncryptionSEV    # AMD SEV memory encryption
         - KubevirtSeccompProfile   # Custom seccomp profiles
-        - SecureExecution          # IBM Secure Execution (New in v1.6.0)
-
-        # Snapshot & Export
-        - Snapshot                 # VM snapshot support (Beta since v1.3.0)
-        - VMExport                 # VM export functionality (Beta since v1.3.0)
+        - SecureExecution          # IBM Secure Execution
 
         # Networking
         - VSOCK                    # AF_VSOCK for host-guest communication
-        - PasstIPStackMigration    # PASST IP stack migration (New in v1.6.0)
+        - PasstIPStackMigration    # PASST IP stack migration
 
         # Other
         - ExperimentalIgnitionSupport  # Ignition config support
@@ -158,19 +153,18 @@ kubevirt:
         - DisableMDEVConfiguration # Disable automatic MDEV configuration
         - PersistentReservation    # SCSI persistent reservations
         - MultiArchitecture        # Multi-architecture support
-        - NodeRestriction          # Node restriction (Beta since v1.6.0)
         - VirtIOFSConfigVolumesGate    # VirtioFS for config volumes
         - VirtIOFSStorageVolumeGate    # VirtioFS for storage volumes
         - DecentralizedLiveMigration   # Decentralized live migration
-        - ObjectGraph              # Object graph feature (New in v1.6.0)
+        - ObjectGraph              # Object graph feature
         - DeclarativeHotplugVolumes    # Declarative hotplug volumes
-        - VideoConfig              # Video device configuration (New in v1.6.0)
-        - PanicDevices             # Panic device support (New in v1.6.0)
+        - VideoConfig              # Video device configuration
+        - PanicDevices             # Panic device support
 ```
 
 #### GA Feature Gates (No Configuration Needed)
 
-The following features are **stable and enabled by default** in v1.6.2. You do NOT need to specify these in feature gates:
+The following features are **stable and enabled by default** in v1.7.0. You do NOT need to specify these in feature gates:
 
 - `LiveMigration` - Live migration of VMs
 - `SRIOVLiveMigration` - Live migration with SR-IOV
@@ -189,6 +183,10 @@ The following features are **stable and enabled by default** in v1.6.2. You do N
 - `VolumesUpdateStrategy` - Volumes update strategy (GA in v1.5.0)
 - `VolumeMigration` - Volume migration (GA in v1.5.0)
 - `InstancetypeReferencePolicy` - Instance type reference policy (GA in v1.6.0)
+- `Snapshot` - VM snapshot support (GA in v1.7.0)
+- `VMExport` - VM export functionality (GA in v1.7.0)
+- `HotplugVolumes` - Hot-plug/unplug volumes (GA in v1.7.0)
+- `NodeRestriction` - Node restriction (GA in v1.7.0)
 
 ### CPU Configuration
 
@@ -585,7 +583,28 @@ helm uninstall kubevirt -n kubevirt
 kubectl delete namespace kubevirt
 ```
 
-**Note:** By default, CRDs are kept on uninstallation to prevent data loss.
+**Note:** By default, CRDs are kept on uninstallation to prevent data loss (`helm.sh/resource-policy: keep`).
+To also remove CRDs: `kubectl delete crd kubevirts.kubevirt.io`
+
+## Upgrading from v0.1.x to v0.2.0
+
+In v0.2.0, CRD management moved from `crds/` directory (install-only) to regular Helm templates (updated on every upgrade). Existing installations need a one-time CRD adoption before upgrading:
+
+```bash
+# Annotate the existing CRD for Helm adoption (one-time, safe, idempotent)
+kubectl annotate crd kubevirts.kubevirt.io \
+  meta.helm.sh/release-name=kubevirt \
+  meta.helm.sh/release-namespace=kubevirt \
+  --overwrite
+kubectl label crd kubevirts.kubevirt.io \
+  app.kubernetes.io/managed-by=Helm \
+  --overwrite
+
+# Then upgrade normally
+helm upgrade kubevirt encircle360-oss/kubevirt -n kubevirt -f values.yaml
+```
+
+Helmfile users can automate this with a `presync` hook (see examples in the repository).
 
 ## Migration from Raw Manifests
 
@@ -613,6 +632,13 @@ If you're currently using raw KubeVirt manifests:
    ```
 
 ## Breaking Changes
+
+### v1.6.x → v1.7.0
+
+- **Minimum Kubernetes version**: Bumped from 1.30 to 1.32
+- **GA Feature Gates**: `Snapshot`, `VMExport`, `HotplugVolumes`, and `NodeRestriction` are now GA. Listing them in featureGates is harmless but unnecessary.
+- **Operator scheduling**: Default affinity now prefers control-plane nodes. Override with `operator.affinity` if needed.
+- **Instancetype API versions**: `v1alpha1` and `v1alpha2` instancetype APIs are removed. Migrate to `v1beta1` or `v1` before upgrading.
 
 ### v1.5.0 → v1.6.x
 
@@ -701,12 +727,14 @@ Use this chart at your own risk. For production-ready virtualization solutions w
 
 ## Requirements
 
-Kubernetes: `>=1.30.0-0`
+Kubernetes: `>=1.32.0-0`
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| crds | object | `{"install":true}` | CRD configuration |
+| crds.install | bool | `true` | Install CRDs as part of the Helm release (updated on every helm upgrade) |
 | global | object | `{"enabled":true}` | Global configuration |
 | global.enabled | bool | `true` | Enable deployment of KubeVirt |
 | kubevirt | object | `{"annotations":{},"certificateRotateStrategy":{"selfSigned":{"caOverlapInterval":"168h","caRotateInterval":"168h","certRotateInterval":"168h"}},"configuration":{"cpuModel":"","cpuRequest":"","developerConfiguration":{"featureGates":null,"useEmulation":false},"instancetype":{"referencePolicy":"reference"},"migration":{"allowAutoConverge":false,"allowPostCopy":false,"bandwidthPerGiB":"64Mi","completionTimeoutPerGiB":800,"disableTLS":false,"network":"","nodeDrainTaintKey":"kubevirt.io/drain","parallelMigrationsPerCluster":5,"parallelOutboundMigrationsPerNode":2,"progressTimeout":150,"unsafeMigrationOverride":false},"network":{"binding":{},"defaultNetworkInterface":"masquerade","permitBridgeInterfaceOnPodNetwork":false,"permitSlirpInterface":false},"obsoleteCPUModels":{},"permittedHostDevices":{"mediatedDevices":[],"pciHostDevices":[]},"selinuxLauncherType":"virt_launcher.process","smbios":{},"vmStateStorageClass":""},"deploy":true,"image":{"pullPolicy":"IfNotPresent","registry":"","tag":""},"infra":{"nodePlacement":{"affinity":{},"nodeSelector":{},"tolerations":[]}},"labels":{},"name":"kubevirt","workloadUpdateStrategy":{"batchEvictionInterval":"1m","batchEvictionSize":10,"workloadUpdateMethods":[]},"workloads":{"nodePlacement":{"affinity":{},"nodeSelector":{},"tolerations":[]}}}` | KubeVirt CR configuration |
@@ -781,14 +809,14 @@ Kubernetes: `>=1.30.0-0`
 | monitoring.serviceMonitorNamespace | string | `""` | Namespace for ServiceMonitor resource Leave empty to deploy in the same namespace as KubeVirt |
 | namespace | object | `{"name":"kubevirt"}` | Namespace configuration |
 | namespace.name | string | `"kubevirt"` | Name of the namespace for KubeVirt installation |
-| operator | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/virt-operator","tag":"v1.6.2"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"priorityClassName":"kubevirt-cluster-critical","replicas":2,"resources":{"limits":{"cpu":"1000m","memory":"450Mi"},"requests":{"cpu":"10m","memory":"450Mi"}},"tolerations":[]}` | KubeVirt Operator configuration |
+| operator | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/virt-operator","tag":"v1.7.0"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"priorityClassName":"kubevirt-cluster-critical","replicas":2,"resources":{"limits":{"cpu":"1000m","memory":"450Mi"},"requests":{"cpu":"10m","memory":"450Mi"}},"tolerations":[]}` | KubeVirt Operator configuration |
 | operator.affinity | object | `{}` | Affinity rules for operator pods Default: pod anti-affinity for better distribution across nodes Set to {} to use template defaults or override with custom affinity |
 | operator.enabled | bool | `true` | Enable operator deployment |
-| operator.image | object | `{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/virt-operator","tag":"v1.6.2"}` | Operator container image configuration |
+| operator.image | object | `{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/virt-operator","tag":"v1.7.0"}` | Operator container image configuration |
 | operator.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | operator.image.registry | string | `"quay.io"` | Image registry |
 | operator.image.repository | string | `"kubevirt/virt-operator"` | Image repository |
-| operator.image.tag | string | `"v1.6.2"` | Image tag (defaults to chart appVersion) |
+| operator.image.tag | string | `"v1.7.0"` | Image tag (defaults to chart appVersion) |
 | operator.imagePullSecrets | list | `[]` | Image pull secrets for private registries |
 | operator.nodeSelector | object | `{}` | Node selector for operator pods (default: kubernetes.io/os: linux) Set to {} to use template defaults or override with custom selectors |
 | operator.podAnnotations | object | `{}` | Pod annotations (e.g., for OpenShift: openshift.io/required-scc: restricted-v2) |
