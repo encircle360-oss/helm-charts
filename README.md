@@ -35,6 +35,7 @@ helm install my-release encircle360-oss/<chart-name>
 
 | Chart | Description | Chart Version | App Version |
 |-------|-------------|---------------|--------------|
+| [cdi](./charts/cdi) | Containerized Data Importer for KubeVirt - Import, clone, and manage VM disk images | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/cdi/Chart.yaml&query=$.version&label=chart&color=blue) | ![AppVersion](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/cdi/Chart.yaml&query=$.appVersion&label=app&color=informational) |
 | [cnpg-database-manager](./charts/cnpg-database-manager) | Multi-database and multi-tenant management for CloudNativePG | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/cnpg-database-manager/Chart.yaml&query=$.version&label=chart&color=blue) | ![AppVersion](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/cnpg-database-manager/Chart.yaml&query=$.appVersion&label=app&color=informational) |
 | [kubevirt](./charts/kubevirt) | Virtual Machine Management on Kubernetes | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/kubevirt/Chart.yaml&query=$.version&label=chart&color=blue) | ![AppVersion](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/kubevirt/Chart.yaml&query=$.appVersion&label=app&color=informational) |
 | [roundcube](./charts/roundcube) | A free and open source webmail solution | ![Version](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/roundcube/Chart.yaml&query=$.version&label=chart&color=blue) | ![AppVersion](https://img.shields.io/badge/dynamic/yaml?url=https://raw.githubusercontent.com/encircle360-oss/helm-charts/main/charts/roundcube/Chart.yaml&query=$.appVersion&label=app&color=informational) |
@@ -87,7 +88,7 @@ See our [Contributing Guide](CONTRIBUTING.md) for detailed guidelines.
 Interested in becoming a co-maintainer for one or more charts? We'd love to have you on board!
 
 **What we're looking for:**
-- Passion for the specific technology (e.g., PostgreSQL, KubeVirt, Roundcube)
+- Passion for the specific technology (e.g., PostgreSQL, KubeVirt, CDI, Roundcube)
 - Willingness to review PRs and respond to issues
 - Kubernetes and Helm experience
 - Commitment to maintain quality and backwards compatibility
@@ -107,6 +108,7 @@ We believe in community-driven development and are happy to share maintainer res
 - **Chart Issues**: Create an [Issue](https://github.com/encircle360-oss/helm-charts/issues) for Helm chart bugs and feature requests
 - **General Questions**: Start a [Discussion](https://github.com/encircle360-oss/helm-charts/discussions) for questions and general support
 - **Application Bugs**: For bugs within the applications themselves (not chart-related), please report them to the respective upstream project:
+  - CDI: [kubevirt/containerized-data-importer](https://github.com/kubevirt/containerized-data-importer/issues)
   - CloudNativePG: [cloudnative-pg/cloudnative-pg](https://github.com/cloudnative-pg/cloudnative-pg/issues)
   - KubeVirt: [kubevirt/kubevirt](https://github.com/kubevirt/kubevirt/issues)
   - Roundcube: [roundcube/roundcubemail](https://github.com/roundcube/roundcubemail/issues)
