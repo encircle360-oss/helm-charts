@@ -1,0 +1,133 @@
+{{- if and .Values.global.enabled .Values.operator.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cdi-operator
+  namespace: {{ include "cdi.namespace" . }}
+  labels:
+    {{- include "cdi.operator.labels" . | nindent 4 }}
+    cdi.kubevirt.io: cdi-operator
+    name: cdi-operator
+    np.kubevirt.io/allow-access-cluster-services: "true"
+    prometheus.cdi.kubevirt.io: "true"
+spec:
+  replicas: {{ .Values.operator.replicas }}
+  selector:
+    matchLabels:
+      {{- include "cdi.operator.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      {{- with .Values.operator.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "cdi.operator.selectorLabels" . | nindent 8 }}
+        cdi.kubevirt.io: cdi-operator
+        np.kubevirt.io/allow-access-cluster-services: "true"
+        prometheus.cdi.kubevirt.io: "true"
+    spec:
+      affinity:
+        {{- if .Values.operator.affinity }}
+        {{- toYaml .Values.operator.affinity | nindent 8 }}
+        {{- else }}
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: cdi.kubevirt.io
+                      operator: In
+                      values:
+                        - cdi-operator
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        {{- end }}
+      nodeSelector:
+        {{- if .Values.operator.nodeSelector }}
+        {{- toYaml .Values.operator.nodeSelector | nindent 8 }}
+        {{- else }}
+        kubernetes.io/os: linux
+        {{- end }}
+      {{- if .Values.operator.tolerations }}
+      tolerations:
+        {{- toYaml .Values.operator.tolerations | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "cdi.operator.serviceAccountName" . }}
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: cdi-operator
+          image: {{ include "cdi.operator.image" . }}
+          imagePullPolicy: {{ .Values.operator.image.pullPolicy }}
+          ports:
+            - name: metrics
+              protocol: TCP
+              containerPort: 8443
+            - name: health
+              protocol: TCP
+              containerPort: 8444
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8444
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8444
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 10
+          resources:
+            {{- if .Values.operator.resources }}
+            {{- toYaml .Values.operator.resources | nindent 12 }}
+            {{- else }}
+            requests:
+              cpu: 100m
+              memory: 150Mi
+            {{- end }}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: FallbackToLogsOnError
+          env:
+            - name: DEPLOY_CLUSTER_RESOURCES
+              value: "true"
+            - name: OPERATOR_VERSION
+              value: {{ .Chart.AppVersion | quote }}
+            - name: CONTROLLER_IMAGE
+              value: {{ include "cdi.componentImage" (dict "registry" .Values.operator.image.registry "component" "controller" "tag" (.Values.operator.image.tag | default .Chart.AppVersion)) }}
+            - name: IMPORTER_IMAGE
+              value: {{ include "cdi.componentImage" (dict "registry" .Values.operator.image.registry "component" "importer" "tag" (.Values.operator.image.tag | default .Chart.AppVersion)) }}
+            - name: CLONER_IMAGE
+              value: {{ include "cdi.componentImage" (dict "registry" .Values.operator.image.registry "component" "cloner" "tag" (.Values.operator.image.tag | default .Chart.AppVersion)) }}
+            - name: OVIRT_POPULATOR_IMAGE
+              value: {{ include "cdi.componentImage" (dict "registry" .Values.operator.image.registry "component" "importer" "tag" (.Values.operator.image.tag | default .Chart.AppVersion)) }}
+            - name: APISERVER_IMAGE
+              value: {{ include "cdi.componentImage" (dict "registry" .Values.operator.image.registry "component" "apiserver" "tag" (.Values.operator.image.tag | default .Chart.AppVersion)) }}
+            - name: UPLOAD_SERVER_IMAGE
+              value: {{ include "cdi.componentImage" (dict "registry" .Values.operator.image.registry "component" "uploadserver" "tag" (.Values.operator.image.tag | default .Chart.AppVersion)) }}
+            - name: UPLOAD_PROXY_IMAGE
+              value: {{ include "cdi.componentImage" (dict "registry" .Values.operator.image.registry "component" "uploadproxy" "tag" (.Values.operator.image.tag | default .Chart.AppVersion)) }}
+            - name: VERBOSITY
+              value: "1"
+            - name: PULL_POLICY
+              value: {{ .Values.operator.image.pullPolicy }}
+            - name: MONITORING_NAMESPACE
+              value: ""
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+      {{- with .Values.operator.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
