@@ -1,0 +1,273 @@
+name: Update CDI Chart
+
+on:
+  schedule:
+    # Täglich um 3 Uhr morgens UTC (1 Stunde nach KubeVirt)
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      force_version:
+        description: 'Force specific version (e.g. v1.64.0)'
+        required: false
+        type: string
+
+jobs:
+  check-update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          # yq for YAML manipulation
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+          # helm-docs
+          curl -sSL https://github.com/norwoodj/helm-docs/releases/download/v1.14.2/helm-docs_1.14.2_Linux_x86_64.tar.gz | tar -xz
+          sudo mv helm-docs /usr/local/bin/
+
+      - name: Get versions
+        id: versions
+        run: |
+          # Current version from Chart
+          CURRENT=$(yq '.appVersion' charts/cdi/Chart.yaml | tr -d '"')
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+
+          # Latest release from GitHub
+          if [[ -n "${{ inputs.force_version }}" ]]; then
+            LATEST="${{ inputs.force_version }}"
+            echo "Using forced version: $LATEST"
+          else
+            LATEST=$(curl -s https://api.github.com/repos/kubevirt/containerized-data-importer/releases/latest | jq -r .tag_name)
+          fi
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+
+          # Check if update needed
+          if [[ "$CURRENT" != "$LATEST" ]]; then
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+            echo "New version available: $CURRENT -> $LATEST"
+          else
+            echo "needs_update=false" >> $GITHUB_OUTPUT
+            echo "Already up to date: $CURRENT"
+          fi
+
+      - name: Update Chart files
+        if: steps.versions.outputs.needs_update == 'true'
+        run: |
+          NEW_VERSION="${{ steps.versions.outputs.latest }}"
+          NEW_VERSION_NO_V="${NEW_VERSION#v}"
+
+          echo "Updating to $NEW_VERSION..."
+
+          # 1. Chart.yaml - Only update appVersion, NOT chart version
+          yq -i '.appVersion = "'$NEW_VERSION'"' charts/cdi/Chart.yaml
+
+          # 2. values.yaml - Image Tag
+          yq -i '.operator.image.tag = "'$NEW_VERSION'"' charts/cdi/values.yaml
+
+          # 3. README.md.gotmpl - Version References
+          sed -i "s/v[0-9]\+\.[0-9]\+\.[0-9]\+/$NEW_VERSION/g" charts/cdi/README.md.gotmpl || true
+
+          # 4. Update CRD from new release
+          echo "Downloading new CDI operator manifest..."
+          curl -sL "https://github.com/kubevirt/containerized-data-importer/releases/download/$NEW_VERSION/cdi-operator.yaml" -o /tmp/cdi-operator.yaml
+
+          # Extract CRD block
+          awk '
+            /^apiVersion: apiextensions.k8s.io/ { found=1 }
+            found { print }
+            found && /^---$/ { exit }
+          ' /tmp/cdi-operator.yaml | head -n -1 > /tmp/cdi-crd-raw.yaml
+
+          # Add helm.sh/resource-policy: keep annotation
+          awk '
+            /^metadata:/ { print; in_meta=1; next }
+            in_meta && /^  annotations:/ { print; in_annotations=1; next }
+            in_meta && in_annotations && /^    / { print; next }
+            in_meta && in_annotations && !/^    / {
+              print "    \"helm.sh/resource-policy\": keep"
+              in_annotations=0
+              print
+              next
+            }
+            in_meta && /^[a-z]/ { in_meta=0; print; next }
+            { print }
+          ' /tmp/cdi-crd-raw.yaml > charts/cdi/files/crds/cdi-crd.yaml
+
+          echo "CRD updated successfully"
+
+      - name: Fetch Release Notes
+        if: steps.versions.outputs.needs_update == 'true'
+        id: release_notes
+        run: |
+          NEW_VERSION="${{ steps.versions.outputs.latest }}"
+
+          # Get release notes
+          RELEASE_DATA=$(curl -s "https://api.github.com/repos/kubevirt/containerized-data-importer/releases/tags/$NEW_VERSION")
+
+          # Extract body and save
+          echo "$RELEASE_DATA" | jq -r '.body' > /tmp/release-notes.md
+
+          # Get release URL
+          RELEASE_URL=$(echo "$RELEASE_DATA" | jq -r '.html_url')
+          echo "release_url=$RELEASE_URL" >> $GITHUB_OUTPUT
+
+      - name: Create PR Body
+        if: steps.versions.outputs.needs_update == 'true'
+        run: |
+          NEW_VERSION="${{ steps.versions.outputs.latest }}"
+          OLD_VERSION="${{ steps.versions.outputs.current }}"
+          RELEASE_URL="${{ steps.release_notes.outputs.release_url }}"
+
+          cat > /tmp/pr-body.md << 'EOF'
+          ## CDI Update: $OLD_VERSION -> $NEW_VERSION
+
+          This PR was automatically created by the CDI update workflow.
+
+          ### Automated Changes
+
+          - [x] Updated Chart.yaml appVersion to `$NEW_VERSION`
+          - [x] Updated operator image tag to `$NEW_VERSION`
+          - [x] Updated CRD from new release manifest
+          - [x] Updated version references in README
+          - [x] Regenerated documentation
+
+          **Note:** Chart version (0.x.y) is NOT automatically updated - it follows independent semantic versioning.
+
+          ### Manual Review Required
+
+          **BEFORE MERGING, you MUST complete these steps:**
+
+          #### 1. Review Release Notes
+          - [ ] Read [$NEW_VERSION Release Notes]($RELEASE_URL)
+          - [ ] Identify breaking changes
+          - [ ] Note new features
+          - [ ] Check deprecations
+
+          #### 2. Check Configuration Changes
+          - [ ] Review CDI CR spec changes
+          - [ ] Check for new/removed config options
+          - [ ] Verify RBAC rules still match official manifests
+
+          #### 3. Test Locally
+          ```bash
+          # Lint
+          helm lint charts/cdi
+
+          # Template validation
+          helm template cdi charts/cdi --validate
+
+          # Dry-run
+          helm install cdi charts/cdi \
+            -f charts/cdi/ci/ci-values.yaml \
+            --dry-run --debug
+
+          # Install in test cluster (recommended)
+          helm install cdi charts/cdi \
+            -f charts/cdi/ci/ci-values.yaml \
+            --namespace cdi --create-namespace
+
+          # Run tests
+          helm test cdi -n cdi
+          ```
+
+          #### 4. Bump Chart Version
+          - [ ] Decide if this is a patch (0.x.y+1), minor (0.x+1.0), or major change
+          - [ ] Update Chart.yaml `version` field manually
+          - [ ] Update `artifacthub.io/changes` annotation with changelog
+
+          #### 5. Verify Templates
+          - [ ] Download and compare official manifests if unsure:
+            ```bash
+            curl -sL https://github.com/kubevirt/containerized-data-importer/releases/download/$NEW_VERSION/cdi-operator.yaml > /tmp/operator.yaml
+            # Compare with templates/operator/
+            ```
+
+          ### Release Information
+
+          <details>
+          <summary>Click to expand CDI $NEW_VERSION release notes</summary>
+
+          EOF
+
+          # Insert variables and remove leading whitespace
+          sed -i "s/\$NEW_VERSION/$NEW_VERSION/g" /tmp/pr-body.md
+          sed -i "s/\$OLD_VERSION/$OLD_VERSION/g" /tmp/pr-body.md
+          sed -i "s|\$RELEASE_URL|$RELEASE_URL|g" /tmp/pr-body.md
+          sed -i 's/^          //g' /tmp/pr-body.md
+
+          # Append release notes
+          cat /tmp/release-notes.md >> /tmp/pr-body.md
+
+          # Close details
+          cat >> /tmp/pr-body.md << 'EOF'
+
+          </details>
+
+          ### Useful Links
+
+          - **Release:** $RELEASE_URL
+          - **Operator Manifest:** https://github.com/kubevirt/containerized-data-importer/releases/download/$NEW_VERSION/cdi-operator.yaml
+          - **Changelog:** https://github.com/kubevirt/containerized-data-importer/blob/main/CHANGELOG.md
+
+          ---
+
+          **WARNING: DO NOT merge without completing the manual checklist above!**
+          EOF
+
+          # Final variable replacement
+          sed -i "s/\$NEW_VERSION/$NEW_VERSION/g" /tmp/pr-body.md
+          sed -i "s|\$RELEASE_URL|$RELEASE_URL|g" /tmp/pr-body.md
+
+      - name: Generate documentation
+        if: steps.versions.outputs.needs_update == 'true'
+        run: |
+          helm-docs --chart-search-root=charts
+
+      - name: Create Pull Request
+        if: steps.versions.outputs.needs_update == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "feat(cdi): update to ${{ steps.versions.outputs.latest }}"
+          branch: automated/cdi-${{ steps.versions.outputs.latest }}
+          delete-branch: true
+          title: "feat(cdi): update to ${{ steps.versions.outputs.latest }}"
+          body-path: /tmp/pr-body.md
+          labels: |
+            automated
+            cdi
+            dependencies
+            needs-review
+          draft: false
+
+      - name: Summary
+        if: steps.versions.outputs.needs_update == 'true'
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          ### CDI Update PR Created
+
+          **Version:** ${{ steps.versions.outputs.current }} -> ${{ steps.versions.outputs.latest }}
+
+          **Next Steps:**
+          1. Review the created PR
+          2. Complete the manual checklist
+          3. Test locally
+          4. Merge when ready
+          EOF
+
+      - name: No update needed
+        if: steps.versions.outputs.needs_update == 'false'
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          ### CDI Chart is up to date
+
+          **Current Version:** ${{ steps.versions.outputs.current }}
+
+          No update needed.
+          EOF

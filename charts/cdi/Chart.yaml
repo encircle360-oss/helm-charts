@@ -1,0 +1,38 @@
+apiVersion: v2
+name: cdi
+description: CDI - Containerized Data Importer for KubeVirt - Import, clone, and manage VM disk images on Kubernetes
+type: application
+version: 0.1.0
+appVersion: "v1.64.0"
+keywords:
+  - cdi
+  - containerized-data-importer
+  - kubevirt
+  - storage
+  - datavolume
+  - vm-disk
+  - data-import
+home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cdi
+sources:
+  - https://github.com/encircle360-oss/helm-charts
+  - https://github.com/kubevirt/containerized-data-importer
+  - https://kubevirt.io
+maintainers:
+  - name: encircle360-oss
+    email: oss@encircle360.com
+icon: https://raw.githubusercontent.com/kubevirt/kubevirt/main/docs/images/logo.svg
+kubeVersion: ">=1.28.0-0"
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/changes: |
+    - kind: added
+      description: Initial CDI Helm chart release
+    - kind: added
+      description: CDI operator deployment with all RBAC resources
+    - kind: added
+      description: CDI Custom Resource with full configuration support
+    - kind: added
+      description: CRDs managed as regular templates (updated on every helm upgrade)
+    - kind: added
+      description: Auto-update workflow for new CDI releases

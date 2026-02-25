@@ -1,0 +1,566 @@
+# cdi
+
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.64.0](https://img.shields.io/badge/AppVersion-v1.64.0-informational?style=flat-square)
+
+CDI - Containerized Data Importer for KubeVirt - Import, clone, and manage VM disk images on Kubernetes
+
+**Homepage:** <https://github.com/encircle360-oss/helm-charts/tree/main/charts/cdi>
+
+> **⚠️ UNDER CONSTRUCTION**
+> This chart is currently under active development and has not been battle-tested in production environments.
+> **NOT PRODUCTION READY** - Use at your own risk and thoroughly test in non-production environments first.
+> CDI is a component of the KubeVirt ecosystem requiring Kubernetes storage knowledge. **Only use this chart if you are an experienced Kubernetes operator.**
+
+## Description
+
+CDI (Containerized Data Importer) is a Kubernetes add-on that provides the ability to import, clone, and manage VM disk images for use with KubeVirt. This Helm chart provides a deployment of CDI v1.64.0 with comprehensive configuration options.
+
+**Key Features:**
+- Full CDI v1.64.0 support with all configuration options
+- Operator-based lifecycle management
+- DataVolume support for importing VM disk images
+- HTTP, S3, registry, and PVC clone sources
+- Scratch space and filesystem overhead configuration
+- Import proxy support for air-gapped environments
+
+## Prerequisites
+
+- Kubernetes 1.28+
+- Helm 3.8+
+- KubeVirt installed in the cluster (recommended)
+- A CSI-compatible StorageClass (e.g., Longhorn, Rook-Ceph)
+
+> **Platform Compatibility:**
+> This chart works on both vanilla Kubernetes (including K3s, K0s) and OpenShift.
+> OpenShift-specific RBAC rules are included but will be safely ignored on non-OpenShift clusters.
+
+## Installation
+
+> **Important: Two-Step First Install**
+> This chart manages the CDI CRD as a regular Helm template (not in `crds/` directory) so it gets updated on every `helm upgrade`. However, Helm cannot validate the CDI Custom Resource on a fresh install because the CRD doesn't exist yet. Therefore, **the first install requires two steps**. Subsequent upgrades work normally with a single command.
+
+### Quick Start (First Install)
+
+```bash
+# Add the Helm repository
+helm repo add encircle360-oss https://encircle360-oss.github.io/helm-charts
+helm repo update
+
+# Step 1: Install operator + CRD only (skip CDI CR)
+helm install cdi encircle360-oss/cdi \
+  --namespace cdi \
+  --create-namespace \
+  --set cdi.deploy=false
+
+# Step 2: Upgrade to enable CDI CR (CRD is now registered)
+helm upgrade cdi encircle360-oss/cdi \
+  --namespace cdi
+
+# Wait for CDI to be ready
+kubectl wait cdi cdi \
+  --for=jsonpath='{.status.phase}'=Deployed \
+  --timeout=10m
+```
+
+### Quick Start with Helmfile
+
+```yaml
+# helmfile.yaml
+releases:
+  - name: cdi
+    namespace: cdi
+    createNamespace: true
+    chart: encircle360-oss/cdi
+    values:
+      - values.yaml
+```
+
+```bash
+# Step 1: Install operator + CRD only
+helmfile sync --set cdi.deploy=false
+
+# Step 2: Enable CDI CR (all subsequent syncs work with just this)
+helmfile sync
+```
+
+### Installation with Custom Values
+
+```bash
+# Step 1
+helm install cdi encircle360-oss/cdi \
+  --namespace cdi \
+  --create-namespace \
+  --set cdi.deploy=false \
+  -f custom-values.yaml
+
+# Step 2
+helm upgrade cdi encircle360-oss/cdi \
+  --namespace cdi \
+  -f custom-values.yaml
+```
+
+### Why Two Steps?
+
+This chart manages the CDI CRD as a regular Helm template instead of placing it in the `crds/` directory. This design choice ensures:
+- CRDs are **updated on every `helm upgrade`** (the `crds/` directory only applies on `helm install`)
+- CRD version upgrades are handled automatically by the auto-update workflow
+- The `helm.sh/resource-policy: keep` annotation prevents CRD deletion on `helm uninstall`
+
+The trade-off is that the first install needs two steps because Helm validates all resources against the Kubernetes API before applying them. Since the CRD doesn't exist yet on a fresh install, Helm can't validate the CDI Custom Resource.
+
+## Configuration
+
+### Basic Configuration
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `global.enabled` | Enable CDI deployment | `true` |
+| `namespace.name` | Namespace for CDI | `cdi` |
+| `operator.replicas` | Number of operator replicas | `1` |
+| `operator.image.tag` | Operator image tag | `v1.64.0` |
+| `cdi.deploy` | Deploy CDI Custom Resource | `true` |
+
+### Feature Gates
+
+CDI uses feature gates to control optional functionality:
+
+```yaml
+cdi:
+  config:
+    featureGates:
+      - HonorWaitForFirstConsumer  # Respect WaitForFirstConsumer binding mode
+```
+
+#### Available Feature Gates (v1.64.0)
+
+- `HonorWaitForFirstConsumer` - Respect WaitForFirstConsumer storage class binding mode
+
+See the [CDI feature gates documentation](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/featuregates.md) for the complete list.
+
+### Scratch Space Configuration
+
+```yaml
+cdi:
+  config:
+    # Storage class for temporary scratch space during imports
+    scratchSpaceStorageClass: "longhorn"
+
+    # Filesystem overhead per storage class
+    filesystemOverhead:
+      global: "0.055"
+      storageClass:
+        longhorn: "0.04"
+```
+
+### Import Proxy Configuration
+
+For environments behind a corporate proxy:
+
+```yaml
+cdi:
+  config:
+    importProxy:
+      HTTPProxy: "http://proxy.example.com:3128"
+      HTTPSProxy: "http://proxy.example.com:3128"
+      noProxy: ".cluster.local,.svc"
+      trustedCAProxy: "my-ca-configmap"
+```
+
+### Node Placement
+
+#### Infrastructure Components (cdi-apiserver, cdi-controller, cdi-uploadproxy)
+
+```yaml
+cdi:
+  infra:
+    nodeSelector:
+      node-role.kubernetes.io/control-plane: ""
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        effect: NoSchedule
+```
+
+#### Workload Components (importer/cloner pods)
+
+```yaml
+cdi:
+  workload:
+    nodeSelector:
+      node-role.kubernetes.io/worker: ""
+```
+
+### Certificate Configuration
+
+```yaml
+cdi:
+  certConfig:
+    ca:
+      duration: 168h
+      renewBefore: 24h
+    server:
+      duration: 48h
+      renewBefore: 24h
+    client:
+      duration: 48h
+      renewBefore: 24h
+```
+
+## Usage Examples
+
+### Import a Cloud Image via HTTP
+
+```yaml
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: ubuntu-cloud-img
+spec:
+  source:
+    http:
+      url: "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: longhorn
+```
+
+### Clone an Existing PVC
+
+```yaml
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: cloned-disk
+spec:
+  source:
+    pvc:
+      namespace: default
+      name: source-pvc
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+```
+
+### Import from Container Registry
+
+```yaml
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: registry-disk
+spec:
+  source:
+    registry:
+      url: "docker://quay.io/kubevirt/cirros-container-disk-demo:latest"
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+```
+
+## Upgrading
+
+```bash
+helm repo update
+helm upgrade cdi encircle360-oss/cdi \
+  --namespace cdi \
+  -f values.yaml
+```
+
+## Frequently Asked Questions (FAQ)
+
+### Does this work on K3s/K0s/vanilla Kubernetes?
+
+**Yes!** This chart is designed to work on:
+- Vanilla Kubernetes (upstream)
+- K3s (lightweight Kubernetes)
+- K0s (zero friction Kubernetes)
+- MicroK8s
+- OpenShift/OKD
+
+The chart includes OpenShift-specific RBAC rules, but these are **safely ignored** on non-OpenShift clusters.
+
+### Why are there OpenShift resources in the RBAC?
+
+CDI officially supports both vanilla Kubernetes and OpenShift. The OpenShift-specific resources (`security.openshift.io/securitycontextconstraints`, `route.openshift.io/routes`) are:
+- **Optional** and only used on OpenShift
+- **Ignored** on vanilla Kubernetes/K3s (API groups don't exist)
+- **Standard practice** in the official CDI manifests
+
+Your K3s cluster will simply skip these rules - no issues!
+
+### Why does the first install require two steps?
+
+This chart manages the CDI CRD as a **regular Helm template** (not in the `crds/` directory). This ensures CRDs are updated on every `helm upgrade`. However, on a fresh install, Helm cannot validate the CDI Custom Resource because the CRD doesn't exist yet. The first step installs the operator + CRD, and the second step adds the CDI CR.
+
+### What storage classes work with CDI?
+
+CDI works with any CSI-compatible StorageClass. Tested and recommended:
+- **Longhorn** - Recommended for K3s clusters
+- **Rook-Ceph** - Recommended for larger clusters
+- **OpenEBS** - Lightweight option
+- **Local Path Provisioner** - For development (no replication)
+
+### What's the difference between CDI and KubeVirt?
+
+- **KubeVirt** manages virtual machines on Kubernetes
+- **CDI** handles the storage side: importing, cloning, and managing VM disk images
+
+CDI is a companion project to KubeVirt. While KubeVirt can run VMs with ephemeral disks, CDI is needed for persistent VM storage via DataVolumes.
+
+## Troubleshooting
+
+### Check Installation Status
+
+```bash
+# Check CDI CR
+kubectl get cdi
+
+# Check all components
+kubectl get pods -n cdi
+
+# Check operator logs
+kubectl logs -n cdi deployment/cdi-operator
+
+# Check import progress
+kubectl get datavolumes -A
+```
+
+### Common Issues
+
+#### 1. Import stuck at 0%
+
+**Solution:** Check if scratch space is available and the source URL is reachable:
+
+```bash
+kubectl describe datavolume <name>
+kubectl logs -n cdi <importer-pod>
+```
+
+#### 2. CDI operator not starting
+
+**Solution:** Verify RBAC and CRDs are installed:
+
+```bash
+kubectl get crd cdis.cdi.kubevirt.io
+kubectl get clusterrole cdi-operator-cluster
+```
+
+#### 3. DataVolume stuck in "WaitForFirstConsumer"
+
+**Solution:** This is expected with `WaitForFirstConsumer` storage classes. The import starts when a Pod (e.g., a VM) is scheduled to use the PVC. Enable the `HonorWaitForFirstConsumer` feature gate:
+
+```yaml
+cdi:
+  config:
+    featureGates:
+      - HonorWaitForFirstConsumer
+```
+
+### Debug Commands
+
+```bash
+# Describe CDI CR
+kubectl describe cdi cdi
+
+# Check CDI config
+kubectl get cdi cdi -o jsonpath='{.spec.config}' | jq .
+
+# Check importer pod logs
+kubectl logs -n cdi <cdi-importer-pod>
+
+# Check events
+kubectl get events -n cdi --sort-by='.lastTimestamp'
+```
+
+## Uninstallation
+
+```bash
+# Delete all DataVolumes first (optional, keeps PVCs)
+kubectl delete datavolumes --all -A
+
+# Uninstall the chart
+helm uninstall cdi -n cdi
+
+# Delete namespace (if desired)
+kubectl delete namespace cdi
+```
+
+**Note:** By default, CRDs are kept on uninstallation to prevent data loss (`helm.sh/resource-policy: keep`).
+To also remove CRDs: `kubectl delete crd cdis.cdi.kubevirt.io`
+
+## Migration from Raw Manifests
+
+If you're currently using raw CDI manifests:
+
+1. **Export current configuration:**
+   ```bash
+   kubectl get cdi cdi -o yaml > current-config.yaml
+   ```
+
+2. **Create values.yaml from current config:**
+   Review your current CDI CR and translate settings to Helm values.
+
+3. **Uninstall existing CDI:**
+   ```bash
+   kubectl delete cdi cdi
+   kubectl delete deployment cdi-operator -n cdi
+   ```
+
+4. **Install using Helm (two-step):**
+   ```bash
+   # Step 1: Install operator + CRD only
+   helm install cdi encircle360-oss/cdi \
+     --namespace cdi \
+     --set cdi.deploy=false \
+     -f values.yaml
+
+   # Step 2: Enable CDI CR
+   helm upgrade cdi encircle360-oss/cdi \
+     --namespace cdi \
+     -f values.yaml
+   ```
+
+## Resources
+
+- [CDI Documentation](https://github.com/kubevirt/containerized-data-importer/tree/main/doc)
+- [CDI Feature Gates](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/featuregates.md)
+- [KubeVirt Documentation](https://kubevirt.io/user-guide/)
+- [Chart Repository](https://github.com/encircle360-oss/helm-charts)
+- [Issue Tracker](https://github.com/encircle360-oss/helm-charts/issues)
+
+## Contributing & Maintainership
+
+### We Welcome Contributors! 🎉
+
+We're actively seeking contributors and co-maintainers for this CDI chart! Whether you want to:
+- **Become a co-maintainer** for this chart
+- **Submit pull requests** for bug fixes, features, or documentation improvements
+- **Help with testing** storage features and data import workloads
+- **Improve documentation** with real-world deployment examples
+- **Share your storage and CDI expertise** with the community
+
+**Your expertise is valuable!** Whether you're a storage expert, a CDI user, or someone passionate about managing VM disk images on Kubernetes - we'd love your contribution.
+
+### Become a Chart Co-Maintainer
+
+Interested in becoming a co-maintainer for this CDI chart? We'd be excited to collaborate!
+
+**What we're looking for:**
+- Experience with Kubernetes storage (CSI, PVCs, StorageClasses)
+- Strong Kubernetes and Helm knowledge
+- Understanding of VM disk management and data import workflows
+- Willingness to review PRs and help with issues
+- Passion for bringing data management to the KubeVirt ecosystem
+
+**How to get involved:**
+- Start by contributing PRs or helping in issues/discussions
+- Reach out to us at **oss@encircle360.com** expressing your interest
+- We'll work together to onboard you as a co-maintainer
+
+We especially welcome storage experts who can help users successfully manage VM disk images on Kubernetes!
+
+## Support & Professional Services
+
+### Community Support
+
+For issues and questions about this Helm chart:
+- Open an issue in [GitHub Issues](https://github.com/encircle360-oss/helm-charts/issues)
+- Start a discussion in [GitHub Discussions](https://github.com/encircle360-oss/helm-charts/discussions)
+
+For CDI specific issues:
+- Visit the [CDI GitHub repository](https://github.com/kubevirt/containerized-data-importer)
+- Check the [CDI documentation](https://github.com/kubevirt/containerized-data-importer/tree/main/doc)
+- Join the [KubeVirt Slack channel](https://kubernetes.slack.com/messages/virtualization)
+
+### Professional Support
+
+For professional support, consulting, custom development, or enterprise solutions, contact **hello@encircle360.com**
+
+## Disclaimer
+
+**⚠️ This chart is under active development and NOT production-ready.**
+
+This Helm chart is provided "AS IS" without warranty of any kind. encircle360 GmbH and the contributors:
+- Make no warranties about the completeness, reliability, or accuracy of this chart
+- Are not liable for any damages arising from the use of this chart
+- **Strongly recommend thorough testing in non-production environments only**
+- Do not recommend this chart for production use at this time
+- **This chart requires expert-level Kubernetes and storage knowledge**
+
+Use this chart at your own risk. For production-ready data import solutions with SLA requirements, contact our professional support services at **hello@encircle360.com**
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| encircle360-oss | <oss@encircle360.com> |  |
+
+## Source Code
+
+* <https://github.com/encircle360-oss/helm-charts>
+* <https://github.com/kubevirt/containerized-data-importer>
+* <https://kubevirt.io>
+
+## Requirements
+
+Kubernetes: `>=1.28.0-0`
+
+## Values
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| cdi | object | `{"annotations":{},"certConfig":{},"cloneStrategyOverride":"","config":{"featureGates":["HonorWaitForFirstConsumer"],"filesystemOverhead":{},"importProxy":{},"insecureRegistries":[],"preallocation":false,"scratchSpaceStorageClass":""},"deploy":true,"imagePullPolicy":"IfNotPresent","infra":{"affinity":{},"nodeSelector":{},"tolerations":[]},"labels":{},"name":"cdi","priorityClass":"","uninstallStrategy":"","workload":{"nodeSelector":{},"tolerations":[]}}` | CDI CR configuration |
+| cdi.annotations | object | `{}` | Custom annotations for CDI CR |
+| cdi.certConfig | object | `{}` | Certificate configuration for CDI components Example:   ca:     duration: 168h     renewBefore: 24h   server:     duration: 48h     renewBefore: 24h   client:     duration: 48h     renewBefore: 24h |
+| cdi.cloneStrategyOverride | string | `""` | Clone strategy override (copy, snapshot, csi-clone) |
+| cdi.config | object | `{"featureGates":["HonorWaitForFirstConsumer"],"filesystemOverhead":{},"importProxy":{},"insecureRegistries":[],"preallocation":false,"scratchSpaceStorageClass":""}` | CDI configuration section |
+| cdi.config.featureGates | list | `["HonorWaitForFirstConsumer"]` | Feature gates for CDI See: https://github.com/kubevirt/containerized-data-importer/blob/main/doc/featuregates.md |
+| cdi.config.filesystemOverhead | object | `{}` | Filesystem overhead settings per storage class Example:   global: "0.055"   storageClass:     mystorageclass: "0.04" |
+| cdi.config.importProxy | object | `{}` | Import proxy configuration for environments behind a proxy Example:   HTTPProxy: "http://proxy:3128"   HTTPSProxy: "http://proxy:3128"   noProxy: ".cluster.local"   trustedCAProxy: "my-ca-configmap" |
+| cdi.config.insecureRegistries | list | `[]` | Insecure registries that CDI can pull from without TLS verification |
+| cdi.config.preallocation | bool | `false` | Enable preallocation of disk images |
+| cdi.config.scratchSpaceStorageClass | string | `""` | Storage class for scratch space used during import Leave empty to use the default storage class |
+| cdi.deploy | bool | `true` | Deploy CDI Custom Resource (disable for CI tests or when CRDs don't exist yet) |
+| cdi.imagePullPolicy | string | `"IfNotPresent"` | Image pull policy for CDI components |
+| cdi.infra | object | `{"affinity":{},"nodeSelector":{},"tolerations":[]}` | Infrastructure components placement (cdi-apiserver, cdi-controller, cdi-uploadproxy) |
+| cdi.infra.affinity | object | `{}` | Affinity rules for infrastructure components |
+| cdi.infra.nodeSelector | object | `{}` | Node selector for infrastructure components |
+| cdi.infra.tolerations | list | `[]` | Tolerations for infrastructure components |
+| cdi.labels | object | `{}` | Custom labels for CDI CR |
+| cdi.name | string | `"cdi"` | Name of the CDI CR |
+| cdi.priorityClass | string | `""` | Priority class for CDI components |
+| cdi.uninstallStrategy | string | `""` | Uninstall strategy for CDI operator Options: "RemoveWorkloads" (removes all CDI workloads on uninstall), "BlockUninstallIfWorkloadsExist" (blocks uninstall if workloads exist) |
+| cdi.workload | object | `{"nodeSelector":{},"tolerations":[]}` | Workload components placement (importer/cloner pods) |
+| cdi.workload.nodeSelector | object | `{}` | Node selector for workload components |
+| cdi.workload.tolerations | list | `[]` | Tolerations for workload components |
+| crds | object | `{"install":true}` | CRD configuration |
+| crds.install | bool | `true` | Install CRDs as part of the Helm release (updated on every helm upgrade) |
+| global | object | `{"enabled":true}` | Global configuration |
+| global.enabled | bool | `true` | Enable deployment of CDI |
+| namespace | object | `{"name":"cdi"}` | Namespace configuration |
+| namespace.name | string | `"cdi"` | Name of the namespace for CDI installation |
+| operator | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/cdi-operator","tag":"v1.64.0"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"replicas":1,"resources":{"limits":{"cpu":"2000m","memory":"600Mi"},"requests":{"cpu":"100m","memory":"150Mi"}},"tolerations":[]}` | CDI Operator configuration |
+| operator.affinity | object | `{}` | Affinity rules for operator pods Default: pod affinity for better placement Set to {} to use template defaults or override with custom affinity |
+| operator.enabled | bool | `true` | Enable operator deployment |
+| operator.image | object | `{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/cdi-operator","tag":"v1.64.0"}` | Operator container image configuration |
+| operator.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| operator.image.registry | string | `"quay.io"` | Image registry |
+| operator.image.repository | string | `"kubevirt/cdi-operator"` | Image repository |
+| operator.image.tag | string | `"v1.64.0"` | Image tag (defaults to chart appVersion) |
+| operator.imagePullSecrets | list | `[]` | Image pull secrets for private registries |
+| operator.nodeSelector | object | `{}` | Node selector for operator pods (default: kubernetes.io/os: linux) Set to {} to use template defaults or override with custom selectors |
+| operator.podAnnotations | object | `{}` | Pod annotations (e.g., for OpenShift: openshift.io/required-scc: restricted-v2) |
+| operator.replicas | int | `1` | Number of operator replicas |
+| operator.resources | object | `{"limits":{"cpu":"2000m","memory":"600Mi"},"requests":{"cpu":"100m","memory":"150Mi"}}` | Resource limits and requests for operator |
+| operator.tolerations | list | `[]` | Tolerations for operator pods Set to [] to use template defaults or override with custom tolerations |
+| rbac | object | `{"create":true}` | RBAC configuration |
+| rbac.create | bool | `true` | Create RBAC resources |

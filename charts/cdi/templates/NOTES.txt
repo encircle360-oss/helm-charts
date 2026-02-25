@@ -1,0 +1,150 @@
+Thank you for installing {{ .Chart.Name }} version {{ .Chart.Version }}!
+
+CDI (Containerized Data Importer) {{ .Chart.AppVersion }} has been deployed to namespace: {{ include "cdi.namespace" . }}
+
+========================================
+⚠️  IMPORTANT WARNING
+========================================
+
+This chart is UNDER ACTIVE DEVELOPMENT and NOT PRODUCTION-READY!
+
+- This chart has NOT been battle-tested in production environments
+- CDI requires KubeVirt to be installed in the cluster
+- Thoroughly test in non-production environments ONLY
+- Use at your own risk
+
+For production support, contact: hello@encircle360.com
+
+{{- if not .Values.cdi.deploy }}
+
+========================================
+FIRST INSTALL - STEP 2 REQUIRED
+========================================
+
+You installed with cdi.deploy=false (operator + CRD only).
+The CRD is now registered. Complete the installation:
+
+  helm upgrade {{ .Release.Name }} encircle360-oss/cdi \
+    --namespace {{ include "cdi.namespace" . }}
+
+Or with Helmfile:
+
+  helmfile sync
+
+{{- end }}
+
+========================================
+INSTALLATION STATUS
+========================================
+
+To check the status of the CDI installation, run:
+
+  kubectl get cdi {{ .Values.cdi.name }}
+
+Wait for the CDI CR to reach the "Deployed" phase:
+
+  kubectl wait cdi {{ .Values.cdi.name }} \
+    --for=jsonpath='{.status.phase}'=Deployed --timeout=10m
+
+Check all CDI components are running:
+
+  kubectl get pods -n {{ include "cdi.namespace" . }}
+
+Expected components:
+  - cdi-operator ({{ .Values.operator.replicas }} replicas)
+  - cdi-apiserver
+  - cdi-controller (deployment)
+  - cdi-uploadproxy
+
+========================================
+GETTING STARTED
+========================================
+
+1. Create a DataVolume to import a VM disk image:
+
+cat <<EOF | kubectl apply -f -
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: my-vm-disk
+spec:
+  source:
+    http:
+      url: "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+EOF
+
+2. Check import progress:
+
+  kubectl get datavolumes
+
+3. Use the DataVolume in a KubeVirt VM:
+
+  volumes:
+    - name: rootdisk
+      dataVolume:
+        name: my-vm-disk
+
+========================================
+FEATURE GATES
+========================================
+{{- if .Values.cdi.config.featureGates }}
+
+Currently enabled feature gates:
+{{- range .Values.cdi.config.featureGates }}
+  - {{ . }}
+{{- end }}
+{{- else }}
+
+No optional feature gates are currently enabled.
+To enable feature gates, update your values.yaml:
+
+  cdi:
+    config:
+      featureGates:
+        - HonorWaitForFirstConsumer
+{{- end }}
+
+========================================
+DOCUMENTATION
+========================================
+
+- CDI Documentation: https://github.com/kubevirt/containerized-data-importer/tree/main/doc
+- Chart Documentation: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cdi
+- KubeVirt Documentation: https://kubevirt.io/user-guide/
+
+========================================
+TROUBLESHOOTING
+========================================
+
+If you encounter issues:
+
+1. Check operator logs:
+   kubectl logs -n {{ include "cdi.namespace" . }} deployment/cdi-operator
+
+2. Check CDI status:
+   kubectl describe cdi {{ .Values.cdi.name }}
+
+3. Check component health:
+   kubectl get pods -n {{ include "cdi.namespace" . }} -o wide
+
+4. Check import progress:
+   kubectl get datavolumes -A
+
+========================================
+SUPPORT
+========================================
+
+Community Support:
+  - GitHub Issues: https://github.com/encircle360-oss/helm-charts/issues
+  - GitHub Discussions: https://github.com/encircle360-oss/helm-charts/discussions
+
+Professional Support:
+  - Contact: hello@encircle360.com
+
+⚠️  REMINDER: This chart is NOT production-ready. Use at your own risk!

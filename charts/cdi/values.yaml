@@ -1,0 +1,163 @@
+# CDI Configuration
+# This chart deploys CDI (Containerized Data Importer) v1.64.0 for VM disk management on Kubernetes
+
+# -- Global configuration
+global:
+  # -- Enable deployment of CDI
+  enabled: true
+
+# -- Namespace configuration
+namespace:
+  # -- Name of the namespace for CDI installation
+  name: cdi
+
+# -- CRD configuration
+crds:
+  # -- Install CRDs as part of the Helm release (updated on every helm upgrade)
+  install: true
+
+# -- CDI Operator configuration
+operator:
+  # -- Enable operator deployment
+  enabled: true
+
+  # -- Number of operator replicas
+  replicas: 1
+
+  # -- Operator container image configuration
+  image:
+    # -- Image registry
+    registry: quay.io
+    # -- Image repository
+    repository: kubevirt/cdi-operator
+    # -- Image tag (defaults to chart appVersion)
+    tag: "v1.64.0"
+    # -- Image pull policy
+    pullPolicy: IfNotPresent
+
+  # -- Image pull secrets for private registries
+  imagePullSecrets: []
+
+  # -- Pod annotations (e.g., for OpenShift: openshift.io/required-scc: restricted-v2)
+  podAnnotations: {}
+
+  # -- Resource limits and requests for operator
+  resources:
+    requests:
+      cpu: 100m
+      memory: 150Mi
+    limits:
+      cpu: 2000m
+      memory: 600Mi
+
+  # -- Node selector for operator pods (default: kubernetes.io/os: linux)
+  # Set to {} to use template defaults or override with custom selectors
+  nodeSelector: {}
+
+  # -- Tolerations for operator pods
+  # Set to [] to use template defaults or override with custom tolerations
+  tolerations: []
+
+  # -- Affinity rules for operator pods
+  # Default: pod affinity for better placement
+  # Set to {} to use template defaults or override with custom affinity
+  affinity: {}
+
+# -- CDI CR configuration
+cdi:
+  # -- Deploy CDI Custom Resource (disable for CI tests or when CRDs don't exist yet)
+  deploy: true
+
+  # -- Name of the CDI CR
+  name: cdi
+
+  # -- Image pull policy for CDI components
+  imagePullPolicy: IfNotPresent
+
+  # -- CDI configuration section
+  config:
+    # -- Feature gates for CDI
+    # See: https://github.com/kubevirt/containerized-data-importer/blob/main/doc/featuregates.md
+    featureGates:
+      - HonorWaitForFirstConsumer
+
+    # -- Storage class for scratch space used during import
+    # Leave empty to use the default storage class
+    scratchSpaceStorageClass: ""
+
+    # -- Filesystem overhead settings per storage class
+    # Example:
+    #   global: "0.055"
+    #   storageClass:
+    #     mystorageclass: "0.04"
+    filesystemOverhead: {}
+
+    # -- Insecure registries that CDI can pull from without TLS verification
+    insecureRegistries: []
+
+    # -- Enable preallocation of disk images
+    preallocation: false
+
+    # -- Import proxy configuration for environments behind a proxy
+    # Example:
+    #   HTTPProxy: "http://proxy:3128"
+    #   HTTPSProxy: "http://proxy:3128"
+    #   noProxy: ".cluster.local"
+    #   trustedCAProxy: "my-ca-configmap"
+    importProxy: {}
+
+  # -- Infrastructure components placement (cdi-apiserver, cdi-controller, cdi-uploadproxy)
+  infra:
+    # -- Node selector for infrastructure components
+    nodeSelector: {}
+    # -- Tolerations for infrastructure components
+    tolerations: []
+    # -- Affinity rules for infrastructure components
+    affinity: {}
+
+  # -- Workload components placement (importer/cloner pods)
+  workload:
+    # -- Node selector for workload components
+    nodeSelector: {}
+    # -- Tolerations for workload components
+    tolerations: []
+
+  # -- Certificate configuration for CDI components
+  # Example:
+  #   ca:
+  #     duration: 168h
+  #     renewBefore: 24h
+  #   server:
+  #     duration: 48h
+  #     renewBefore: 24h
+  #   client:
+  #     duration: 48h
+  #     renewBefore: 24h
+  certConfig: {}
+
+  # -- Priority class for CDI components
+  priorityClass: ""
+
+  # -- Clone strategy override (copy, snapshot, csi-clone)
+  cloneStrategyOverride: ""
+
+  # -- Uninstall strategy for CDI operator
+  # Options: "RemoveWorkloads" (removes all CDI workloads on uninstall),
+  # "BlockUninstallIfWorkloadsExist" (blocks uninstall if workloads exist)
+  uninstallStrategy: ""
+
+  # -- Custom labels for CDI CR
+  labels: {}
+
+  # -- Custom annotations for CDI CR
+  annotations: {}
+
+# -- RBAC configuration
+rbac:
+  # -- Create RBAC resources
+  create: true
+
+# Note: CDI CRDs are managed as regular Helm templates (not via crds/ directory).
+# This ensures CRDs are updated on every 'helm upgrade' (crds/ only works on install).
+# The CRD has 'helm.sh/resource-policy: keep' to prevent deletion on 'helm uninstall'.
+# To manually remove CRDs after uninstall: kubectl delete crd cdis.cdi.kubevirt.io

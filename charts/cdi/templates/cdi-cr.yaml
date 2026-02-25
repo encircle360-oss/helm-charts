@@ -1,0 +1,97 @@
+{{- if and .Values.global.enabled .Values.cdi.deploy }}
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: CDI
+metadata:
+  name: {{ .Values.cdi.name }}
+  labels:
+    {{- include "cdi.labels" . | nindent 4 }}
+    {{- with .Values.cdi.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.cdi.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  imagePullPolicy: {{ .Values.cdi.imagePullPolicy }}
+
+  {{- with .Values.cdi.config }}
+  config:
+    {{- with .featureGates }}
+    featureGates:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+
+    {{- with .scratchSpaceStorageClass }}
+    scratchSpaceStorageClass: {{ . }}
+    {{- end }}
+
+    {{- with .filesystemOverhead }}
+    filesystemOverhead:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+
+    {{- with .insecureRegistries }}
+    insecureRegistries:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+
+    {{- if hasKey . "preallocation" }}
+    preallocation: {{ .preallocation }}
+    {{- end }}
+
+    {{- with .importProxy }}
+    importProxy:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
+
+  {{- with .Values.cdi.certConfig }}
+  certConfig:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+
+  {{- with .Values.cdi.cloneStrategyOverride }}
+  cloneStrategyOverride: {{ . }}
+  {{- end }}
+
+  {{- with .Values.cdi.priorityClass }}
+  priorityClass: {{ . }}
+  {{- end }}
+
+  {{- with .Values.cdi.uninstallStrategy }}
+  uninstallStrategy: {{ . }}
+  {{- end }}
+
+  {{- with .Values.cdi.infra }}
+  {{- if or .nodeSelector .tolerations .affinity }}
+  infra:
+    {{- with .nodeSelector }}
+    nodeSelector:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .affinity }}
+    affinity:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
+
+  {{- with .Values.cdi.workload }}
+  {{- if or .nodeSelector .tolerations }}
+  workload:
+    {{- with .nodeSelector }}
+    nodeSelector:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .tolerations }}
+    tolerations:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
+{{- end }}
