@@ -1,5 +1,49 @@
 apiVersion: v1
 entries:
+  cdi:
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: Initial CDI Helm chart release
+        - kind: added
+          description: CDI operator deployment with all RBAC resources
+        - kind: added
+          description: CDI Custom Resource with full configuration support
+        - kind: added
+          description: CRDs managed as regular templates (updated on every helm upgrade)
+        - kind: added
+          description: Auto-update workflow for new CDI releases
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "false"
+    apiVersion: v2
+    appVersion: v1.64.0
+    created: "2026-02-25T12:32:53.221047856Z"
+    description: CDI - Containerized Data Importer for KubeVirt - Import, clone, and
+      manage VM disk images on Kubernetes
+    digest: 4fd424f5ecd7114bb3738766db7aa39d6e632944bf901eaa3a582fd42752e72c
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cdi
+    icon: https://raw.githubusercontent.com/kubevirt/kubevirt/main/docs/images/logo.svg
+    keywords:
+    - cdi
+    - containerized-data-importer
+    - kubevirt
+    - storage
+    - datavolume
+    - vm-disk
+    - data-import
+    kubeVersion: '>=1.28.0-0'
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: cdi
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://github.com/kubevirt/containerized-data-importer
+    - https://kubevirt.io
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/cdi-0.1.0/cdi-0.1.0.tgz
+    version: 0.1.0
   cnpg-database-manager:
   - annotations:
       artifacthub.io/changes: |
@@ -1493,4 +1537,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/yaade-0.1.0/yaade-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-19T15:03:15.252348697Z"
+generated: "2026-02-25T12:32:53.221162539Z"
