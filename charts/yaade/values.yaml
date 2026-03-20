@@ -5,6 +5,12 @@
 # -- Number of replicas (note: multiple replicas require shared storage)
 replicaCount: 1
 
+# -- Deployment strategy
+# Use "Recreate" when persistence is enabled with RWO volumes to avoid
+# file lock conflicts during rollouts (H2 database only supports single writer)
+strategy:
+  type: Recreate
+
 image:
   # -- Image repository
   repository: esperotech/yaade
