@@ -499,7 +499,7 @@ We believe in community-driven development and are happy to share maintainer res
 ### Community Support
 
 For issues and questions about this Helm chart:
-- **Discord Community**: Join our [Discord Server](https://discord.gg/6WWWrhFVf3) to chat with maintainers and other users
+- **Matrix Community**: Join our [Matrix Chat](https://matrix.to/#/#oss:encircle360.com) to chat with maintainers and other users
 - **Chart Issues**: Create an [Issue](https://github.com/encircle360-oss/helm-charts/issues) for Helm chart bugs and feature requests
 - **General Questions**: Start a [Discussion](https://github.com/encircle360-oss/helm-charts/discussions) for questions and general support
 
