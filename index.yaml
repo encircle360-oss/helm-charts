@@ -1499,6 +1499,39 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: added
+          description: Configurable deployment strategy (defaults to Recreate for H2 database safety)
+      artifacthub.io/license: Apache-2.0
+    apiVersion: v2
+    appVersion: latest
+    created: "2026-03-20T18:08:11.56336321Z"
+    description: Yaade is an open-source, self-hosted, collaborative API development
+      environment
+    digest: 7ed15f616e9dfac03daf71b2b538bfd615445927a73e5754755081c6cb668bf6
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/yaade
+    icon: https://raw.githubusercontent.com/EsperoTech/yaade/main/client/public/favicon.png
+    keywords:
+    - yaade
+    - api
+    - rest
+    - testing
+    - development
+    - postman
+    - collaboration
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: yaade
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://github.com/EsperoTech/yaade
+    - https://docs.yaade.io
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/yaade-0.2.0/yaade-0.2.0.tgz
+    version: 0.2.0
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
           description: Initial release of Yaade Helm chart
         - kind: added
           description: Self-hosted, collaborative API development environment
@@ -1537,4 +1570,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/yaade-0.1.0/yaade-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-25T12:32:53.221162539Z"
+generated: "2026-03-20T18:08:11.563451846Z"
