@@ -2,7 +2,7 @@ apiVersion: v2
 name: cdi
 description: CDI - Containerized Data Importer for KubeVirt - Import, clone, and manage VM disk images on Kubernetes
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "v1.64.0"
 keywords:
   - cdi
