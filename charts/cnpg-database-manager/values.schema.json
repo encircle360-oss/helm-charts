@@ -472,6 +472,16 @@
               }
             }
           },
+          "roleSecrets": {
+            "type": "object",
+            "description": "Per-owner password Secret rendering controls. Set create=false to disable chart rendering — useful in pure-GitOps workflows (ArgoCD) where helm lookup is unreliable. You then provide Secrets named <cluster>-<sanitizedOwner>-password yourself (e.g. via ExternalSecret).",
+            "properties": {
+              "create": {
+                "type": "boolean",
+                "description": "Render password Secrets for each unique owner. Defaults to true."
+              }
+            }
+          },
           "databases": {
             "type": "array",
             "description": "Database and user definitions",

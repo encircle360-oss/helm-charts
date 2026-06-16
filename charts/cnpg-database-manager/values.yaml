@@ -229,6 +229,25 @@ clusters: {}
   #     postInitSQL:
   #       - "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;"
   #   
+  #   # -- Per-owner password Secret rendering. The chart derives a unique
+  #   #    owner from each database's `owner:` field and renders one
+  #   #    `<cluster>-<sanitizedOwner>-password` Secret for each. The Secret
+  #   #    is populated with a 32-char random password on first install
+  #   #    and the value is preserved across upgrades by reading the
+  #   #    existing live Secret (`helm lookup`).
+  #   #
+  #   #    Set `roleSecrets.create: false` to disable that rendering. The
+  #   #    chart then expects you to provide the matching Secrets yourself
+  #   #    (typically via an ExternalSecret in pure-GitOps workflows where
+  #   #    `helm lookup` is not reliable — ArgoCD runs `helm template`,
+  #   #    which returns nothing from `lookup` and would regenerate the
+  #   #    Secret on every sync). The Cluster manifest's
+  #   #    `managed.roles[].passwordSecret.name` still points at
+  #   #    `<cluster>-<sanitizedOwner>-password`, so the Secrets you create
+  #   #    must use that exact name (key `password`, optional `username`).
+  #   roleSecrets:
+  #     create: true
+  #
   #   # -- Database and user definitions
   #   databases:
   #     - # -- Database name
