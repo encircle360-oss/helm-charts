@@ -26,7 +26,7 @@ maintainers:
 icon: https://avatars.githubusercontent.com/u/100373852
 annotations:
   artifacthub.io/license: Apache-2.0
-  artifacthub.io/prerelease: true
+  artifacthub.io/prerelease: "true"
   artifacthub.io/changes: |
     - kind: added
       description: clusters.<name>.roleSecrets.create flag to disable chart rendering of role password Secrets — for pure-GitOps workflows where helm lookup is unreliable (ArgoCD runs helm template) and Secrets are provided externally (e.g. via ExternalSecret)
