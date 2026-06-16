@@ -10,8 +10,13 @@ image:
   repository: roundcube/roundcubemail
   # Image pull policy
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  # Image tag. The roundcube/roundcubemail registry does NOT publish a
+  # bare semver tag — every published tag carries a variant suffix
+  # (`-apache`, `-apache-nonroot`, `-fpm`, `-fpm-alpine`, ...). Keep
+  # the suffix here and bump the version part on upgrades. The chart
+  # falls back to `.Chart.AppVersion` only when this is empty, which is
+  # almost never what you want for this image.
+  tag: "1.6.16-apache"
 
 # Image pull secrets
 imagePullSecrets: []

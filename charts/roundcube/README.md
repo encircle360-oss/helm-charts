@@ -342,7 +342,7 @@ With this configuration:
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"roundcube/roundcubemail"` |  |
-| image.tag | string | `""` |  |
+| image.tag | string | `"1.6.16-apache"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
