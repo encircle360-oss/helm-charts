@@ -30,10 +30,10 @@ clusters: {}
   # main:
   #   # -- Enable or disable this cluster
   #   enabled: true
-  #   
+  #
   #   # -- Number of PostgreSQL instances in the cluster (replicas)
   #   instances: 3
-  #   
+  #
   #   # -- PostgreSQL container image (direct reference)
   #   imageName: ghcr.io/cloudnative-pg/postgresql:17.2
   #
@@ -43,7 +43,7 @@ clusters: {}
   #     kind: ImageCatalog
   #     name: postgresql
   #     major: 17
-  #   
+  #
   #   # -- Storage configuration
   #   storage:
   #     # -- Size of the persistent volume
@@ -86,7 +86,7 @@ clusters: {}
   #     limits:
   #       memory: "4Gi"
   #       cpu: "2000m"
-  #   
+  #
   #   # -- PostgreSQL tuning parameters (overrides defaults)
   #   maxConnections: "200"
   #   sharedBuffers: "256MB"
@@ -100,12 +100,12 @@ clusters: {}
   #   workMem: "4MB"
   #   minWalSize: "1GB"
   #   maxWalSize: "4GB"
-  #   
+  #
   #   # -- Additional custom PostgreSQL parameters
   #   parameters:
   #     log_statement: "all"
   #     log_min_duration_statement: "1000"
-  #   
+  #
   #   # -- Monitoring configuration
   #   monitoring:
   #     # -- Enable Prometheus monitoring
@@ -130,7 +130,7 @@ clusters: {}
   #         #   for: 5m
   #         #   labels:
   #         #     severity: warning
-  #   
+  #
   #   # -- Backup configuration
   #   backup:
   #     # -- Enable automated backups
@@ -223,12 +223,12 @@ clusters: {}
   #       gkeEnvironment: false
   #       # -- Application credentials JSON (alternative to Workload Identity)
   #       applicationCredentials: ""
-  #   
+  #
   #   # -- Custom initdb SQL statements
   #   initdb:
   #     postInitSQL:
   #       - "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;"
-  #   
+  #
   #   # -- Per-owner password Secret rendering. The chart derives a unique
   #   #    owner from each database's `owner:` field and renders one
   #   #    `<cluster>-<sanitizedOwner>-password` Secret for each. The Secret
