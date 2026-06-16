@@ -419,7 +419,7 @@ With this configuration:
 | securityContext.readOnlyRootFilesystem | bool | `false` |  |
 | service.annotations | object | `{}` |  |
 | service.port | int | `80` |  |
-| service.targetPort | int | `8080` |  |
+| service.targetPort | int | `8000` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |

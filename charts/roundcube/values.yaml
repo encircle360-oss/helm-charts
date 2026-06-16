@@ -16,8 +16,8 @@ image:
   # `-apache-nonroot` variant is the right default because the chart
   # ships with `runAsNonRoot: true` + `capabilities.drop: [ALL]`; that
   # combination prevents the regular `-apache` variant from binding to
-  # the privileged port 80. The nonroot variant binds to 8080 instead,
-  # which is why service.targetPort below also defaults to 8080.
+  # the privileged port 80. The nonroot variant binds to 8000 instead,
+  # which is why service.targetPort below also defaults to 8000.
   tag: "1.6.16-apache-nonroot"
 
 # Image pull secrets
@@ -60,10 +60,10 @@ service:
   # Service port (external port, not bound by the container)
   port: 80
   # Container target port. Matches Apache's bind port inside the image.
-  # The default image (`-apache-nonroot`) listens on 8080 because it
+  # The default image (`-apache-nonroot`) listens on 8000 because it
   # cannot bind privileged ports. Set this to 80 only if you switch
   # `image.tag` to a root-capable variant (e.g. `-apache`).
-  targetPort: 8080
+  targetPort: 8000
   # Annotations
   annotations: {}
 
