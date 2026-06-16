@@ -12,11 +12,13 @@ image:
   pullPolicy: IfNotPresent
   # Image tag. The roundcube/roundcubemail registry does NOT publish a
   # bare semver tag — every published tag carries a variant suffix
-  # (`-apache`, `-apache-nonroot`, `-fpm`, `-fpm-alpine`, ...). Keep
-  # the suffix here and bump the version part on upgrades. The chart
-  # falls back to `.Chart.AppVersion` only when this is empty, which is
-  # almost never what you want for this image.
-  tag: "1.6.16-apache"
+  # (`-apache`, `-apache-nonroot`, `-fpm`, `-fpm-alpine`, ...). The
+  # `-apache-nonroot` variant is the right default because the chart
+  # ships with `runAsNonRoot: true` + `capabilities.drop: [ALL]`; that
+  # combination prevents the regular `-apache` variant from binding to
+  # the privileged port 80. The nonroot variant binds to 8080 instead,
+  # which is why service.targetPort below also defaults to 8080.
+  tag: "1.6.16-apache-nonroot"
 
 # Image pull secrets
 imagePullSecrets: []
@@ -55,10 +57,13 @@ securityContext:
 service:
   # Service type
   type: ClusterIP
-  # Service port
+  # Service port (external port, not bound by the container)
   port: 80
-  # Target port
-  targetPort: 80
+  # Container target port. Matches Apache's bind port inside the image.
+  # The default image (`-apache-nonroot`) listens on 8080 because it
+  # cannot bind privileged ports. Set this to 80 only if you switch
+  # `image.tag` to a root-capable variant (e.g. `-apache`).
+  targetPort: 8080
   # Annotations
   annotations: {}
 

@@ -342,7 +342,7 @@ With this configuration:
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"roundcube/roundcubemail"` |  |
-| image.tag | string | `"1.6.16-apache"` |  |
+| image.tag | string | `"1.6.16-apache-nonroot"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
@@ -419,7 +419,7 @@ With this configuration:
 | securityContext.readOnlyRootFilesystem | bool | `false` |  |
 | service.annotations | object | `{}` |  |
 | service.port | int | `80` |  |
-| service.targetPort | int | `80` |  |
+| service.targetPort | int | `8080` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
