@@ -808,8 +808,8 @@ Kubernetes: `>=1.32.0-0`
 | monitoring.serviceAccount | string | `"prometheus-k8s"` | ServiceAccount used by Prometheus |
 | monitoring.serviceMonitorLabels | object | `{}` | Additional labels for ServiceMonitor |
 | monitoring.serviceMonitorNamespace | string | `""` | Namespace for ServiceMonitor resource Leave empty to deploy in the same namespace as KubeVirt |
-| namespace | object | `{"name":"kubevirt"}` | Namespace configuration |
-| namespace.name | string | `"kubevirt"` | Name of the namespace for KubeVirt installation |
+| namespace | object | `{"name":""}` | Namespace configuration |
+| namespace.name | string | `""` | Name of the namespace for KubeVirt installation. Defaults to the    Helm release namespace when left empty, which is the natural fit    for most installs and is required for `helm install --create-namespace`    and chart-testing workflows to work without an extra namespace    override. Set this only when you want KubeVirt managed-resources    to live somewhere other than the release namespace. |
 | operator | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/virt-operator","tag":"v1.7.0"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"priorityClassName":"kubevirt-cluster-critical","replicas":2,"resources":{"limits":{"cpu":"1000m","memory":"450Mi"},"requests":{"cpu":"10m","memory":"450Mi"}},"tolerations":[]}` | KubeVirt Operator configuration |
 | operator.affinity | object | `{}` | Affinity rules for operator pods Default: pod anti-affinity for better distribution across nodes Set to {} to use template defaults or override with custom affinity |
 | operator.enabled | bool | `true` | Enable operator deployment |

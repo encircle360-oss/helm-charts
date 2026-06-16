@@ -3,7 +3,7 @@ name: roundcube
 description: A free and open source webmail solution with a desktop-like user interface
 type: application
 version: 0.8.2
-appVersion: "1.6.11"
+appVersion: "1.6.16"
 keywords:
   - roundcube
   - webmail

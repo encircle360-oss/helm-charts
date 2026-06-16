@@ -75,7 +75,7 @@ Create the name of the service account to use for the operator
 Create the namespace
 */}}
 {{- define "cdi.namespace" -}}
-{{- default "cdi" .Values.namespace.name }}
+{{- default .Release.Namespace .Values.namespace.name }}
 {{- end }}
 
 {{/*

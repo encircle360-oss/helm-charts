@@ -74,7 +74,7 @@ Create the name of the service account to use for the operator
 Create the namespace
 */}}
 {{- define "kubevirt.namespace" -}}
-{{- default "kubevirt" .Values.namespace.name }}
+{{- default .Release.Namespace .Values.namespace.name }}
 {{- end }}
 
 {{/*

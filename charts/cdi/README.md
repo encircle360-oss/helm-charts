@@ -547,8 +547,8 @@ Kubernetes: `>=1.28.0-0`
 | crds.install | bool | `true` | Install CRDs as part of the Helm release (updated on every helm upgrade) |
 | global | object | `{"enabled":true}` | Global configuration |
 | global.enabled | bool | `true` | Enable deployment of CDI |
-| namespace | object | `{"name":"cdi"}` | Namespace configuration |
-| namespace.name | string | `"cdi"` | Name of the namespace for CDI installation |
+| namespace | object | `{"name":""}` | Namespace configuration |
+| namespace.name | string | `""` | Name of the namespace for CDI installation. Defaults to the Helm    release namespace when left empty, which is the natural fit for    most installs and is required for `helm install --create-namespace`    and chart-testing workflows to work without an extra namespace    override. Set this only when you want CDI managed-resources to    live somewhere other than the release namespace. |
 | operator | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/cdi-operator","tag":"v1.64.0"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"replicas":1,"resources":{"limits":{"cpu":"2000m","memory":"600Mi"},"requests":{"cpu":"100m","memory":"150Mi"}},"tolerations":[]}` | CDI Operator configuration |
 | operator.affinity | object | `{}` | Affinity rules for operator pods Default: pod affinity for better placement Set to {} to use template defaults or override with custom affinity |
 | operator.enabled | bool | `true` | Enable operator deployment |

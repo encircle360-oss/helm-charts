@@ -8,8 +8,13 @@ global:
 
 # -- Namespace configuration
 namespace:
-  # -- Name of the namespace for KubeVirt installation
-  name: kubevirt
+  # -- Name of the namespace for KubeVirt installation. Defaults to the
+  #    Helm release namespace when left empty, which is the natural fit
+  #    for most installs and is required for `helm install --create-namespace`
+  #    and chart-testing workflows to work without an extra namespace
+  #    override. Set this only when you want KubeVirt managed-resources
+  #    to live somewhere other than the release namespace.
+  name: ""
 
 # -- CRD configuration
 crds:
