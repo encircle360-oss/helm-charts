@@ -688,8 +688,9 @@ We especially welcome virtualization experts who can help users successfully run
 ### Community Support
 
 For issues and questions about this Helm chart:
-- Open an issue in [GitHub Issues](https://github.com/encircle360-oss/helm-charts/issues)
-- Start a discussion in [GitHub Discussions](https://github.com/encircle360-oss/helm-charts/discussions)
+- **Matrix Community**: Join our [Matrix Chat](https://matrix.to/#/#oss:encircle360.com) to chat with maintainers and other users
+- **Chart Issues**: Create an [Issue](https://github.com/encircle360-oss/helm-charts/issues) for Helm chart bugs and feature requests
+- **General Questions**: Start a [Discussion](https://github.com/encircle360-oss/helm-charts/discussions) for questions and general support
 
 For KubeVirt specific issues:
 - Visit the [KubeVirt GitHub repository](https://github.com/kubevirt/kubevirt)
