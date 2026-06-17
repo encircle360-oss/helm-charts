@@ -10,8 +10,15 @@ image:
   repository: roundcube/roundcubemail
   # Image pull policy
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  # Image tag. The roundcube/roundcubemail registry does NOT publish a
+  # bare semver tag — every published tag carries a variant suffix
+  # (`-apache`, `-apache-nonroot`, `-fpm`, `-fpm-alpine`, ...). The
+  # `-apache-nonroot` variant is the right default because the chart
+  # ships with `runAsNonRoot: true` + `capabilities.drop: [ALL]`; that
+  # combination prevents the regular `-apache` variant from binding to
+  # the privileged port 80. The nonroot variant binds to 8000 instead,
+  # which is why service.targetPort below also defaults to 8000.
+  tag: "1.6.16-apache-nonroot"
 
 # Image pull secrets
 imagePullSecrets: []
@@ -50,10 +57,13 @@ securityContext:
 service:
   # Service type
   type: ClusterIP
-  # Service port
+  # Service port (external port, not bound by the container)
   port: 80
-  # Target port
-  targetPort: 80
+  # Container target port. Matches Apache's bind port inside the image.
+  # The default image (`-apache-nonroot`) listens on 8000 because it
+  # cannot bind privileged ports. Set this to 80 only if you switch
+  # `image.tag` to a root-capable variant (e.g. `-apache`).
+  targetPort: 8000
   # Annotations
   annotations: {}
 
@@ -179,7 +189,7 @@ roundcube:
   # Plugin-specific configurations
   # Each plugin can have its own config.inc.php file that will be directly mounted
   # Key = plugin name, Value = PHP configuration content
-  # 
+  #
   # IMPORTANT: For secrets, use getenv() in PHP and provide secrets via extraEnvVars
   # This follows standard Kubernetes patterns (ConfigMap for config, Secret for secrets)
   pluginConfigs: {}
@@ -189,7 +199,7 @@ roundcube:
     #   $config['identity_from_directory_ldap_host'] = ['ldap://localhost:389'];
     #   $config['identity_from_directory_ldap_base_dn'] = 'dc=example,dc=com';
     #   $config['identity_from_directory_ldap_bind_pass'] = getenv('LDAP_BIND_PASSWORD');
-    # 
+    #
     # Then provide the secret via extraEnvVars:
     # extraEnvVars:
     #   - name: LDAP_BIND_PASSWORD

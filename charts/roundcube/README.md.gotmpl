@@ -310,6 +310,18 @@ With this configuration:
 - Users accessing different domains get their specific configuration
 - Fallback to default settings if domain is not configured
 
+**Note:** When `multiDomain.enabled: true`, the chart deliberately omits the
+`ROUNDCUBEMAIL_DEFAULT_HOST`, `ROUNDCUBEMAIL_DEFAULT_PORT`,
+`ROUNDCUBEMAIL_SMTP_SERVER`, `ROUNDCUBEMAIL_SMTP_PORT`,
+`ROUNDCUBEMAIL_SMTP_USER`, and `ROUNDCUBEMAIL_SMTP_PASS` environment
+variables. The upstream entrypoint translates those into
+`config.docker.inc.php`, which Roundcube loads **after** the
+multi-domain `config.inc.php`. If they were set, every login would
+silently bypass the per-domain switch and hit the default host. The
+fallback in `roundcube.defaultHost` / `roundcube.smtpServer` is still
+rendered into the multi-domain `config.inc.php`, so unmatched hosts
+continue to fall through to the chart's default values.
+
 {{ template "chart.maintainersSection" . }}
 
 {{ template "chart.sourcesSection" . }}

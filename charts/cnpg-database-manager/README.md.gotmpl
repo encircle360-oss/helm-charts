@@ -1002,6 +1002,12 @@ The chart uses a dynamic configuration structure where each PostgreSQL cluster i
 | `clusters.<name>.databases[].extensions[].version` | string | No | - | Extension version (uses default if not specified) |
 | `clusters.<name>.databases[].extensions[].schema` | string | No | - | Schema for extension installation (uses current default) |
 
+#### Role Password Secrets
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `clusters.<name>.roleSecrets.create` | bool | No | `true` | Whether the chart should render the per-owner password Secrets. See [Role Password Secrets](#role-password-secrets-1) below for the GitOps workflow when this is `false`. |
+
 #### ImageCatalog Configuration
 
 | Parameter | Type | Required | Default | Description |
@@ -1053,6 +1059,75 @@ The chart generates **only** the secrets required by CloudNativePG for managed r
 - Created in the same namespace as the Helm chart
 - Used by CloudNativePG's `spec.managed.roles.passwordSecret`
 - Shared across multiple databases with the same owner
+
+### Role Password Secrets
+
+By default (`clusters.<name>.roleSecrets.create: true`), the chart renders one
+`kubernetes.io/basic-auth` Secret per unique owner, named
+`<cluster>-<sanitizedOwner>-password`. On first install the password is a
+32-char `randAlphaNum` value; on subsequent upgrades the chart uses `helm lookup`
+to read the live Secret and re-emit the same value, so role passwords stay
+stable across `helm upgrade` runs.
+
+#### When to disable rendering
+
+`helm lookup` only resolves against the live cluster during `helm install` and
+`helm upgrade`. Pure-GitOps tools that drive the chart through `helm template`
+(notably **ArgoCD**) get an empty `lookup` result and the chart would generate
+a fresh random password on every sync — the CloudNativePG operator would then
+rotate the PostgreSQL role to that new password, breaking any client that
+still holds the old one.
+
+Set `clusters.<name>.roleSecrets.create: false` to disable the chart's Secret
+rendering and provide the Secrets yourself:
+
+```yaml
+clusters:
+  main:
+    enabled: true
+    roleSecrets:
+      create: false
+    databases:
+      - name: keycloak
+        owner: keycloak
+```
+
+You then materialise one Secret per owner — for example via the
+[External Secrets Operator](https://external-secrets.io):
+
+```yaml
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: main-keycloak-password
+  namespace: cnpg-databases
+spec:
+  refreshInterval: 1h
+  secretStoreRef: { name: my-secret-store, kind: ClusterSecretStore }
+  target:
+    name: main-keycloak-password
+    creationPolicy: Owner
+    template:
+      type: kubernetes.io/basic-auth
+      data:
+        username: keycloak
+        password: "{{ "{{" }} .password {{ "}}" }}"
+  data:
+    - secretKey: password
+      remoteRef: { key: /cnpg/main/keycloak }
+```
+
+Naming and key conventions must match what the Cluster manifest still emits in
+`spec.managed.roles[].passwordSecret.name`:
+
+- Secret name: `<cluster>-<sanitizedOwner>-password`
+- Type: `kubernetes.io/basic-auth`
+- Required key: `password`
+- `username` is recommended but not strictly required for CNPG
+
+Make sure the Secret exists before the Cluster reconciles — in ArgoCD this is
+typically done with a sync-wave annotation on the ExternalSecret that is
+lower (i.e. runs earlier) than the wave on the chart Application.
 
 ### Application Credentials
 

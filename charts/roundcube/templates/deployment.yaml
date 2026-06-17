@@ -75,6 +75,13 @@ spec:
               containerPort: {{ .Values.service.targetPort }}
               protocol: TCP
           env:
+            {{- if not .Values.roundcube.multiDomain.enabled }}
+            # When multiDomain is enabled, these env vars are omitted on purpose.
+            # The roundcube/roundcubemail entrypoint translates them into
+            # config.docker.inc.php, which Roundcube loads AFTER config.inc.php
+            # (the multi-domain ConfigMap mount). Setting them would override
+            # the per-domain switch and silently send every login to the
+            # default host — see issue #20.
             - name: ROUNDCUBEMAIL_DEFAULT_HOST
               value: {{ .Values.roundcube.defaultHost | quote }}
             - name: ROUNDCUBEMAIL_DEFAULT_PORT
@@ -87,6 +94,7 @@ spec:
               value: {{ .Values.roundcube.smtpUser | quote }}
             - name: ROUNDCUBEMAIL_SMTP_PASS
               value: {{ .Values.roundcube.smtpPass | quote }}
+            {{- end }}
             - name: ROUNDCUBEMAIL_PLUGINS
               value: {{ join "," .Values.roundcube.plugins | quote }}
             {{- if .Values.roundcube.composerPlugins }}

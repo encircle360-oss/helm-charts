@@ -1,6 +1,6 @@
 # kubevirt
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.7.0](https://img.shields.io/badge/AppVersion-v1.7.0-informational?style=flat-square)
+![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.7.0](https://img.shields.io/badge/AppVersion-v1.7.0-informational?style=flat-square)
 
 KubeVirt - Virtual Machine Management on Kubernetes - Deploy and manage VMs as native Kubernetes resources
 
@@ -688,8 +688,9 @@ We especially welcome virtualization experts who can help users successfully run
 ### Community Support
 
 For issues and questions about this Helm chart:
-- Open an issue in [GitHub Issues](https://github.com/encircle360-oss/helm-charts/issues)
-- Start a discussion in [GitHub Discussions](https://github.com/encircle360-oss/helm-charts/discussions)
+- **Matrix Community**: Join our [Matrix Chat](https://matrix.to/#/#oss:encircle360.com) to chat with maintainers and other users
+- **Chart Issues**: Create an [Issue](https://github.com/encircle360-oss/helm-charts/issues) for Helm chart bugs and feature requests
+- **General Questions**: Start a [Discussion](https://github.com/encircle360-oss/helm-charts/discussions) for questions and general support
 
 For KubeVirt specific issues:
 - Visit the [KubeVirt GitHub repository](https://github.com/kubevirt/kubevirt)
@@ -807,8 +808,8 @@ Kubernetes: `>=1.32.0-0`
 | monitoring.serviceAccount | string | `"prometheus-k8s"` | ServiceAccount used by Prometheus |
 | monitoring.serviceMonitorLabels | object | `{}` | Additional labels for ServiceMonitor |
 | monitoring.serviceMonitorNamespace | string | `""` | Namespace for ServiceMonitor resource Leave empty to deploy in the same namespace as KubeVirt |
-| namespace | object | `{"name":"kubevirt"}` | Namespace configuration |
-| namespace.name | string | `"kubevirt"` | Name of the namespace for KubeVirt installation |
+| namespace | object | `{"name":""}` | Namespace configuration |
+| namespace.name | string | `""` | Name of the namespace for KubeVirt installation. Defaults to the    Helm release namespace when left empty, which is the natural fit    for most installs and is required for `helm install --create-namespace`    and chart-testing workflows to work without an extra namespace    override. Set this only when you want KubeVirt managed-resources    to live somewhere other than the release namespace. |
 | operator | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/virt-operator","tag":"v1.7.0"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"priorityClassName":"kubevirt-cluster-critical","replicas":2,"resources":{"limits":{"cpu":"1000m","memory":"450Mi"},"requests":{"cpu":"10m","memory":"450Mi"}},"tolerations":[]}` | KubeVirt Operator configuration |
 | operator.affinity | object | `{}` | Affinity rules for operator pods Default: pod anti-affinity for better distribution across nodes Set to {} to use template defaults or override with custom affinity |
 | operator.enabled | bool | `true` | Enable operator deployment |

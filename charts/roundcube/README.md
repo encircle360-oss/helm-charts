@@ -1,6 +1,6 @@
 # roundcube
 
-![Version: 0.8.1](https://img.shields.io/badge/Version-0.8.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.11](https://img.shields.io/badge/AppVersion-1.6.11-informational?style=flat-square)
+![Version: 0.8.3](https://img.shields.io/badge/Version-0.8.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.16](https://img.shields.io/badge/AppVersion-1.6.16-informational?style=flat-square)
 
 A free and open source webmail solution with a desktop-like user interface
 
@@ -309,6 +309,18 @@ With this configuration:
 - Users accessing different domains get their specific configuration
 - Fallback to default settings if domain is not configured
 
+**Note:** When `multiDomain.enabled: true`, the chart deliberately omits the
+`ROUNDCUBEMAIL_DEFAULT_HOST`, `ROUNDCUBEMAIL_DEFAULT_PORT`,
+`ROUNDCUBEMAIL_SMTP_SERVER`, `ROUNDCUBEMAIL_SMTP_PORT`,
+`ROUNDCUBEMAIL_SMTP_USER`, and `ROUNDCUBEMAIL_SMTP_PASS` environment
+variables. The upstream entrypoint translates those into
+`config.docker.inc.php`, which Roundcube loads **after** the
+multi-domain `config.inc.php`. If they were set, every login would
+silently bypass the per-domain switch and hit the default host. The
+fallback in `roundcube.defaultHost` / `roundcube.smtpServer` is still
+rendered into the multi-domain `config.inc.php`, so unmatched hosts
+continue to fall through to the chart's default values.
+
 ## Maintainers
 
 | Name | Email | Url |
@@ -342,7 +354,7 @@ With this configuration:
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"roundcube/roundcubemail"` |  |
-| image.tag | string | `""` |  |
+| image.tag | string | `"1.6.16-apache-nonroot"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
@@ -419,7 +431,7 @@ With this configuration:
 | securityContext.readOnlyRootFilesystem | bool | `false` |  |
 | service.annotations | object | `{}` |  |
 | service.port | int | `80` |  |
-| service.targetPort | int | `80` |  |
+| service.targetPort | int | `8000` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
@@ -560,8 +572,9 @@ You don't need to commit full-time - even occasional help is valuable and apprec
 ### Community Support
 
 For issues and questions about this Helm chart:
-- Open an issue in [GitHub Issues](https://github.com/encircle360-oss/helm-charts/issues)
-- Start a discussion in [GitHub Discussions](https://github.com/encircle360-oss/helm-charts/discussions)
+- **Matrix Community**: Join our [Matrix Chat](https://matrix.to/#/#oss:encircle360.com) to chat with maintainers and other users
+- **Chart Issues**: Create an [Issue](https://github.com/encircle360-oss/helm-charts/issues) for Helm chart bugs and feature requests
+- **General Questions**: Start a [Discussion](https://github.com/encircle360-oss/helm-charts/discussions) for questions and general support
 
 For Roundcube specific issues:
 - Visit the [Roundcube GitHub repository](https://github.com/roundcube/roundcubemail)

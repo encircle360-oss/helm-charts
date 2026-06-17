@@ -41,8 +41,15 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         run: ct lint --target-branch ${{ github.event.repository.default_branch }}
 
+      # The chart READMEs are kept in sync by sync-readmes.yaml on push to
+      # main — that workflow runs helm-docs and auto-commits any drift back
+      # to main. This step here only emits a warning if it finds drift on
+      # a PR; it does not fail the job. Authors are still encouraged to run
+      # helm-docs locally and include the diff in their PR, but a missed
+      # regen on a sibling chart no longer blocks merge.
       - name: Check documentation
         if: steps.list-changed.outputs.changed == 'true'
+        continue-on-error: true
         run: |
           # Install helm-docs
           curl -sSL https://github.com/norwoodj/helm-docs/releases/download/v1.14.2/helm-docs_1.14.2_Linux_x86_64.tar.gz | tar -xz
@@ -51,6 +58,6 @@ jobs:
           # Check if documentation is up to date
           helm-docs --chart-search-root=charts
           if [ -n "$(git status --porcelain)" ]; then
-            echo "Documentation is not up to date. Please run 'helm-docs' and commit changes."
-            exit 1
+            echo "::warning::Documentation drift detected. sync-readmes.yaml will auto-fix on merge to main. To pre-empt: run 'helm-docs --chart-search-root=charts' locally and commit."
+            git --no-pager diff --stat
           fi

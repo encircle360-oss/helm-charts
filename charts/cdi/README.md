@@ -1,6 +1,6 @@
 # cdi
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.64.0](https://img.shields.io/badge/AppVersion-v1.64.0-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.64.0](https://img.shields.io/badge/AppVersion-v1.64.0-informational?style=flat-square)
 
 CDI - Containerized Data Importer for KubeVirt - Import, clone, and manage VM disk images on Kubernetes
 
@@ -473,8 +473,9 @@ We especially welcome storage experts who can help users successfully manage VM 
 ### Community Support
 
 For issues and questions about this Helm chart:
-- Open an issue in [GitHub Issues](https://github.com/encircle360-oss/helm-charts/issues)
-- Start a discussion in [GitHub Discussions](https://github.com/encircle360-oss/helm-charts/discussions)
+- **Matrix Community**: Join our [Matrix Chat](https://matrix.to/#/#oss:encircle360.com) to chat with maintainers and other users
+- **Chart Issues**: Create an [Issue](https://github.com/encircle360-oss/helm-charts/issues) for Helm chart bugs and feature requests
+- **General Questions**: Start a [Discussion](https://github.com/encircle360-oss/helm-charts/discussions) for questions and general support
 
 For CDI specific issues:
 - Visit the [CDI GitHub repository](https://github.com/kubevirt/containerized-data-importer)
@@ -546,8 +547,8 @@ Kubernetes: `>=1.28.0-0`
 | crds.install | bool | `true` | Install CRDs as part of the Helm release (updated on every helm upgrade) |
 | global | object | `{"enabled":true}` | Global configuration |
 | global.enabled | bool | `true` | Enable deployment of CDI |
-| namespace | object | `{"name":"cdi"}` | Namespace configuration |
-| namespace.name | string | `"cdi"` | Name of the namespace for CDI installation |
+| namespace | object | `{"name":""}` | Namespace configuration |
+| namespace.name | string | `""` | Name of the namespace for CDI installation. Defaults to the Helm    release namespace when left empty, which is the natural fit for    most installs and is required for `helm install --create-namespace`    and chart-testing workflows to work without an extra namespace    override. Set this only when you want CDI managed-resources to    live somewhere other than the release namespace. |
 | operator | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/cdi-operator","tag":"v1.64.0"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"replicas":1,"resources":{"limits":{"cpu":"2000m","memory":"600Mi"},"requests":{"cpu":"100m","memory":"150Mi"}},"tolerations":[]}` | CDI Operator configuration |
 | operator.affinity | object | `{}` | Affinity rules for operator pods Default: pod affinity for better placement Set to {} to use template defaults or override with custom affinity |
 | operator.enabled | bool | `true` | Enable operator deployment |
