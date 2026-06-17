@@ -17,6 +17,49 @@ entries:
       artifacthub.io/prerelease: "false"
     apiVersion: v2
     appVersion: v1.64.0
+    created: "2026-06-17T04:32:39.430405702Z"
+    description: CDI - Containerized Data Importer for KubeVirt - Import, clone, and
+      manage VM disk images on Kubernetes
+    digest: 843f3d7cd0e3be2ff8b04222e1d9f7140fa8982de2e2864839d34ec1798776a7
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cdi
+    icon: https://raw.githubusercontent.com/kubevirt/kubevirt/main/docs/images/logo.svg
+    keywords:
+    - cdi
+    - containerized-data-importer
+    - kubevirt
+    - storage
+    - datavolume
+    - vm-disk
+    - data-import
+    kubeVersion: '>=1.28.0-0'
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: cdi
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://github.com/kubevirt/containerized-data-importer
+    - https://kubevirt.io
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/cdi-0.1.1/cdi-0.1.1.tgz
+    version: 0.1.1
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: Initial CDI Helm chart release
+        - kind: added
+          description: CDI operator deployment with all RBAC resources
+        - kind: added
+          description: CDI Custom Resource with full configuration support
+        - kind: added
+          description: CRDs managed as regular templates (updated on every helm upgrade)
+        - kind: added
+          description: Auto-update workflow for new CDI releases
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "false"
+    apiVersion: v2
+    appVersion: v1.64.0
     created: "2026-02-25T12:32:53.221047856Z"
     description: CDI - Containerized Data Importer for KubeVirt - Import, clone, and
       manage VM disk images on Kubernetes
@@ -45,6 +88,45 @@ entries:
     - https://github.com/encircle360-oss/helm-charts/releases/download/cdi-0.1.0/cdi-0.1.0.tgz
     version: 0.1.0
   cnpg-database-manager:
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: clusters.<name>.roleSecrets.create flag to disable chart rendering of role password Secrets — for pure-GitOps workflows where helm lookup is unreliable (ArgoCD runs helm template) and Secrets are provided externally (e.g. via ExternalSecret)
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "true"
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/cloudnative-pg/cloudnative-pg
+    apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-06-17T04:32:39.571508928Z"
+    description: Multi-database PostgreSQL management for CloudNativePG with declarative
+      extensions, connection pooling, disaster recovery, and automated backups
+    digest: 582027f07b5b69eea5dbffe21a593af2ac3499bfb997100f0333987932c71976
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/cnpg-database-manager
+    icon: https://avatars.githubusercontent.com/u/100373852
+    keywords:
+    - postgresql
+    - database
+    - cloudnative-pg
+    - cnpg
+    - multi-tenant
+    - pgbouncer
+    - backup
+    - recovery
+    - pgvector
+    - extensions
+    - pitr
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: cnpg-database-manager
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://cloudnative-pg.io/
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/cnpg-database-manager-0.5.0/cnpg-database-manager-0.5.0.tgz
+    version: 0.5.0
   - annotations:
       artifacthub.io/changes: |
         - kind: added
@@ -718,6 +800,62 @@ entries:
         - url: https://artifacthub.io/packages/helm/kubevirt/kubevirt-operator
     apiVersion: v2
     appVersion: v1.7.0
+    created: "2026-06-17T04:32:39.744468098Z"
+    description: KubeVirt - Virtual Machine Management on Kubernetes - Deploy and
+      manage VMs as native Kubernetes resources
+    digest: 4f207e43c5025a614d9c162c7a9c7c8afa0af1d98da8f8aa76e88ea23bfb75dc
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/kubevirt
+    icon: https://raw.githubusercontent.com/kubevirt/kubevirt/main/docs/images/logo.svg
+    keywords:
+    - kubevirt
+    - virtualization
+    - vm
+    - virtual-machine
+    - kvm
+    - qemu
+    - vmi
+    - kubernetes-vms
+    kubeVersion: '>=1.32.0-0'
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: kubevirt
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://github.com/kubevirt/kubevirt
+    - https://kubevirt.io
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/kubevirt-0.2.1/kubevirt-0.2.1.tgz
+    version: 0.2.1
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: changed
+          description: Upgrade KubeVirt from v1.6.2 to v1.7.0
+        - kind: changed
+          description: Minimum Kubernetes version bumped to 1.32+
+        - kind: changed
+          description: ClusterRole updated to match official v1.7.0 manifest (1198 lines)
+        - kind: changed
+          description: Role updated with new secret resourceNames for migration and vsock certs
+        - kind: added
+          description: Pod label np.kubevirt.io/allow-access-cluster-services for NetworkPolicy support
+        - kind: added
+          description: Default nodeAffinity prefers control-plane nodes for virt-operator
+        - kind: added
+          description: Default tolerations for control-plane and master node taints
+        - kind: added
+          description: New evacuate/cancel subresources for VMIs and VMs
+        - kind: changed
+          description: CRDs now managed as regular templates instead of crds/ directory (updated on every helm upgrade)
+        - kind: fixed
+          description: Remove duplicate patch verb in kubevirts ClusterRole rule
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/prerelease: "false"
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/kubevirt/kubevirt-operator
+    apiVersion: v2
+    appVersion: v1.7.0
     created: "2026-02-19T15:03:15.252257688Z"
     description: KubeVirt - Virtual Machine Management on Kubernetes - Deploy and
       manage VMs as native Kubernetes resources
@@ -845,6 +983,46 @@ entries:
     - https://github.com/encircle360-oss/helm-charts/releases/download/kubevirt-0.1.1/kubevirt-0.1.1.tgz
     version: 0.1.1
   roundcube:
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: fixed
+          description: "multiDomain: omit ROUNDCUBEMAIL_DEFAULT_HOST/SMTP_* env vars so the docker entrypoint does not write config.docker.inc.php and silently override the per-domain switch (issue #20)"
+        - kind: fixed
+          description: "Switch default image tag to 1.6.16-apache-nonroot and targetPort to 8000 so the chart's runAsNonRoot+capabilities.drop[ALL] securityContext is consistent with the image (the regular -apache variant needs root to bind :80)"
+        - kind: fixed
+          description: CRITICAL - Plugin configs now mounted to temp location to prevent blocking Composer extraction
+        - kind: fixed
+          description: Restored v0.3.3 working implementation with postStart hook for config copying after Composer
+        - kind: changed
+          description: Reverted from direct plugin directory mounts back to temp mounts + lifecycle hook pattern
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/recommendations: |
+        - url: https://artifacthub.io/packages/helm/bitnami/postgresql
+        - url: https://artifacthub.io/packages/helm/bitnami/mariadb
+    apiVersion: v2
+    appVersion: 1.6.16
+    created: "2026-06-17T04:32:39.878752114Z"
+    description: A free and open source webmail solution with a desktop-like user
+      interface
+    digest: d0a383cdec653a1bc75c45c9629e38ab4eef44db4a3e4c770520accb94fb3bdd
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/roundcube
+    icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/elastic/images/logo.svg
+    keywords:
+    - roundcube
+    - webmail
+    - email
+    - mail
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: roundcube
+    sources:
+    - https://github.com/roundcube/roundcubemail
+    - https://github.com/encircle360-oss/helm-charts
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/roundcube-0.8.3/roundcube-0.8.3.tgz
+    version: 0.8.3
   - annotations:
       artifacthub.io/changes: |
         - kind: fixed
@@ -1503,6 +1681,39 @@ entries:
       artifacthub.io/license: Apache-2.0
     apiVersion: v2
     appVersion: latest
+    created: "2026-06-17T04:32:40.023731606Z"
+    description: Yaade is an open-source, self-hosted, collaborative API development
+      environment
+    digest: aa88538d37279f308e06680e9d51f2a86441e5a61da6a87b01ba25c235b0f510
+    home: https://github.com/encircle360-oss/helm-charts/tree/main/charts/yaade
+    icon: https://raw.githubusercontent.com/EsperoTech/yaade/main/client/public/favicon.png
+    keywords:
+    - yaade
+    - api
+    - rest
+    - testing
+    - development
+    - postman
+    - collaboration
+    maintainers:
+    - email: oss@encircle360.com
+      name: encircle360-oss
+    name: yaade
+    sources:
+    - https://github.com/encircle360-oss/helm-charts
+    - https://github.com/EsperoTech/yaade
+    - https://docs.yaade.io
+    type: application
+    urls:
+    - https://github.com/encircle360-oss/helm-charts/releases/download/yaade-0.2.1/yaade-0.2.1.tgz
+    version: 0.2.1
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: Configurable deployment strategy (defaults to Recreate for H2 database safety)
+      artifacthub.io/license: Apache-2.0
+    apiVersion: v2
+    appVersion: latest
     created: "2026-03-20T18:08:11.56336321Z"
     description: Yaade is an open-source, self-hosted, collaborative API development
       environment
@@ -1570,4 +1781,4 @@ entries:
     urls:
     - https://github.com/encircle360-oss/helm-charts/releases/download/yaade-0.1.0/yaade-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-20T18:08:11.563451846Z"
+generated: "2026-06-17T04:32:40.023892308Z"
