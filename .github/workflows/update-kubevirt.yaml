@@ -27,9 +27,12 @@ jobs:
           sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
 
-          # helm-docs
-          curl -sSL https://github.com/norwoodj/helm-docs/releases/download/v1.14.2/helm-docs_1.14.2_Linux_x86_64.tar.gz | tar -xz
-          sudo mv helm-docs /usr/local/bin/
+          # helm-docs — extract to /tmp to avoid clobbering the repo's
+          # LICENSE / README.md / CHANGELOG.md (which sit at the same
+          # paths inside the release tarball).
+          curl -sSL https://github.com/norwoodj/helm-docs/releases/download/v1.14.2/helm-docs_1.14.2_Linux_x86_64.tar.gz \
+            | tar -xz -C /tmp helm-docs
+          sudo mv /tmp/helm-docs /usr/local/bin/
 
       - name: Get versions
         id: versions
