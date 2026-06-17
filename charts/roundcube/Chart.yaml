@@ -2,7 +2,7 @@ apiVersion: v2
 name: roundcube
 description: A free and open source webmail solution with a desktop-like user interface
 type: application
-version: 0.8.2
+version: 0.8.3
 appVersion: "1.6.16"
 keywords:
   - roundcube
@@ -20,6 +20,10 @@ icon: https://raw.githubusercontent.com/roundcube/roundcubemail/master/skins/ela
 annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/changes: |
+    - kind: fixed
+      description: "multiDomain: omit ROUNDCUBEMAIL_DEFAULT_HOST/SMTP_* env vars so the docker entrypoint does not write config.docker.inc.php and silently override the per-domain switch (issue #20)"
+    - kind: fixed
+      description: "Switch default image tag to 1.6.16-apache-nonroot and targetPort to 8000 so the chart's runAsNonRoot+capabilities.drop[ALL] securityContext is consistent with the image (the regular -apache variant needs root to bind :80)"
     - kind: fixed
       description: CRITICAL - Plugin configs now mounted to temp location to prevent blocking Composer extraction
     - kind: fixed

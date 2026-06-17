@@ -1,6 +1,6 @@
 # roundcube
 
-![Version: 0.8.2](https://img.shields.io/badge/Version-0.8.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.16](https://img.shields.io/badge/AppVersion-1.6.16-informational?style=flat-square)
+![Version: 0.8.3](https://img.shields.io/badge/Version-0.8.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.16](https://img.shields.io/badge/AppVersion-1.6.16-informational?style=flat-square)
 
 A free and open source webmail solution with a desktop-like user interface
 
@@ -308,6 +308,18 @@ With this configuration:
 - Full control over IMAP, SMTP, ManageSieve, OAuth, plugins, etc.
 - Users accessing different domains get their specific configuration
 - Fallback to default settings if domain is not configured
+
+**Note:** When `multiDomain.enabled: true`, the chart deliberately omits the
+`ROUNDCUBEMAIL_DEFAULT_HOST`, `ROUNDCUBEMAIL_DEFAULT_PORT`,
+`ROUNDCUBEMAIL_SMTP_SERVER`, `ROUNDCUBEMAIL_SMTP_PORT`,
+`ROUNDCUBEMAIL_SMTP_USER`, and `ROUNDCUBEMAIL_SMTP_PASS` environment
+variables. The upstream entrypoint translates those into
+`config.docker.inc.php`, which Roundcube loads **after** the
+multi-domain `config.inc.php`. If they were set, every login would
+silently bypass the per-domain switch and hit the default host. The
+fallback in `roundcube.defaultHost` / `roundcube.smtpServer` is still
+rendered into the multi-domain `config.inc.php`, so unmatched hosts
+continue to fall through to the chart's default values.
 
 ## Maintainers
 
