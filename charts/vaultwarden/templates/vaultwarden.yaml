@@ -1,0 +1,114 @@
+{{- if .Values.persistence.createClaim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.name }}-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.storageSize }}
+{{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  replicas: {{ .Values.replicas }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+        release: {{ .Release.Name }}
+    spec:
+      volumes:
+        - name: {{ .Values.name }}-pv
+          persistentVolumeClaim:
+            claimName: {{ .Values.name }}-pvc
+      containers:
+        - name: {{ .Values.name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          env:
+            {{- if or $.Values.env $.Values.envSecrets }}
+            {{- range $key, $value := $.Values.env }}
+          - name: {{ $key }}
+            value: {{ $value | quote }}
+            {{- end }}
+            {{- range $key, $secret := $.Values.envSecrets }}
+          - name: {{ $key }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ $secret }}
+                key: {{ $key | quote }}
+            {{- end }}
+            {{- end }}
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: "0.7Gi"
+            requests:
+              cpu: "0.1"
+              memory: "0.2Gi"
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - mountPath: /data
+              name: {{ .Values.name }}-pv
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.name }}
+    release: {{ .Release.Name }}
+spec:
+  ports:
+    - port: 80
+      name: web
+      targetPort: 80
+  selector:
+    app: {{ .Values.name }}
+
+{{- if .Values.ingress.enabled }}
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-production"
+spec:
+  ingressClassName: "nginx"
+  tls:
+    - hosts:
+        - {{ .Values.host }}
+      secretName: {{ .Values.name }}-tls
+  rules:
+    - host: {{ .Values.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.name }}
+                port:
+                  number: 80
+{{- end }}

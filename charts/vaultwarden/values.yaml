@@ -1,0 +1,13 @@
+name: bitwarden
+host: bitwarden.encircle360.io
+namespace: bitwarden-prod
+image:
+  repository: vaultwarden/server
+  tag: 1.22.2-alpine
+replicas: 1
+storageClass: l-slow-replicated-high-b48h
+storageSize: 10G
+persistence:
+  createClaim: false
+env:
+envSecrets:
