@@ -42,20 +42,35 @@ jobs:
 
       - name: Install helm-docs
         run: |
-          curl -sSL https://github.com/norwoodj/helm-docs/releases/download/v1.14.2/helm-docs_1.14.2_Linux_x86_64.tar.gz | tar -xz
-          sudo mv helm-docs /usr/local/bin/
+          # Extract into /tmp, NOT into the repo. The release tarball
+          # contains LICENSE / README.md / CHANGELOG.md at its root, and
+          # a previous version of this step streamed it into the repo
+          # root with `tar -xz`, silently clobbering the actual project
+          # LICENSE/README.md and dropping a stray CHANGELOG.md — which
+          # then made `git status --porcelain` non-empty on every run.
+          curl -sSL https://github.com/norwoodj/helm-docs/releases/download/v1.14.2/helm-docs_1.14.2_Linux_x86_64.tar.gz \
+            | tar -xz -C /tmp helm-docs
+          sudo mv /tmp/helm-docs /usr/local/bin/
 
       - name: Regenerate READMEs
         run: helm-docs --chart-search-root=charts
 
       - name: Commit + push drift, if any
         run: |
-          if [ -z "$(git status --porcelain)" ]; then
+          # Only react to drift inside charts/ — any other workspace
+          # changes (e.g. workflow scratch files) are deliberately
+          # ignored. `git add charts/` below is the source of truth for
+          # what we ever try to commit.
+          if [ -z "$(git status --porcelain -- charts/)" ]; then
             echo "No README drift — nothing to commit."
             exit 0
           fi
           git config user.name "encircle360-oss-bot"
           git config user.email "oss+bot@encircle360.com"
           git add charts/
+          if git diff --cached --quiet; then
+            echo "Drift was outside charts/ — nothing staged, nothing to commit."
+            exit 0
+          fi
           git commit -m "docs(charts): regenerate READMEs via helm-docs"
           git push origin main
