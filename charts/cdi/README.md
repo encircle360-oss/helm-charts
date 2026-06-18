@@ -1,6 +1,6 @@
 # cdi
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.64.0](https://img.shields.io/badge/AppVersion-v1.64.0-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.65.0](https://img.shields.io/badge/AppVersion-v1.65.0-informational?style=flat-square)
 
 CDI - Containerized Data Importer for KubeVirt - Import, clone, and manage VM disk images on Kubernetes
 
@@ -13,10 +13,10 @@ CDI - Containerized Data Importer for KubeVirt - Import, clone, and manage VM di
 
 ## Description
 
-CDI (Containerized Data Importer) is a Kubernetes add-on that provides the ability to import, clone, and manage VM disk images for use with KubeVirt. This Helm chart provides a deployment of CDI v1.64.0 with comprehensive configuration options.
+CDI (Containerized Data Importer) is a Kubernetes add-on that provides the ability to import, clone, and manage VM disk images for use with KubeVirt. This Helm chart provides a deployment of CDI v1.65.0 with comprehensive configuration options.
 
 **Key Features:**
-- Full CDI v1.64.0 support with all configuration options
+- Full CDI v1.65.0 support with all configuration options
 - Operator-based lifecycle management
 - DataVolume support for importing VM disk images
 - HTTP, S3, registry, and PVC clone sources
@@ -117,7 +117,7 @@ The trade-off is that the first install needs two steps because Helm validates a
 | `global.enabled` | Enable CDI deployment | `true` |
 | `namespace.name` | Namespace for CDI | `cdi` |
 | `operator.replicas` | Number of operator replicas | `1` |
-| `operator.image.tag` | Operator image tag | `v1.64.0` |
+| `operator.image.tag` | Operator image tag | `v1.65.0` |
 | `cdi.deploy` | Deploy CDI Custom Resource | `true` |
 
 ### Feature Gates
@@ -131,7 +131,7 @@ cdi:
       - HonorWaitForFirstConsumer  # Respect WaitForFirstConsumer binding mode
 ```
 
-#### Available Feature Gates (v1.64.0)
+#### Available Feature Gates (v1.65.0)
 
 - `HonorWaitForFirstConsumer` - Respect WaitForFirstConsumer storage class binding mode
 
@@ -549,14 +549,14 @@ Kubernetes: `>=1.28.0-0`
 | global.enabled | bool | `true` | Enable deployment of CDI |
 | namespace | object | `{"name":""}` | Namespace configuration |
 | namespace.name | string | `""` | Name of the namespace for CDI installation. Defaults to the Helm    release namespace when left empty, which is the natural fit for    most installs and is required for `helm install --create-namespace`    and chart-testing workflows to work without an extra namespace    override. Set this only when you want CDI managed-resources to    live somewhere other than the release namespace. |
-| operator | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/cdi-operator","tag":"v1.64.0"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"replicas":1,"resources":{"limits":{"cpu":"2000m","memory":"600Mi"},"requests":{"cpu":"100m","memory":"150Mi"}},"tolerations":[]}` | CDI Operator configuration |
+| operator | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/cdi-operator","tag":"v1.65.0"},"imagePullSecrets":[],"nodeSelector":{},"podAnnotations":{},"replicas":1,"resources":{"limits":{"cpu":"2000m","memory":"600Mi"},"requests":{"cpu":"100m","memory":"150Mi"}},"tolerations":[]}` | CDI Operator configuration |
 | operator.affinity | object | `{}` | Affinity rules for operator pods Default: pod affinity for better placement Set to {} to use template defaults or override with custom affinity |
 | operator.enabled | bool | `true` | Enable operator deployment |
-| operator.image | object | `{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/cdi-operator","tag":"v1.64.0"}` | Operator container image configuration |
+| operator.image | object | `{"pullPolicy":"IfNotPresent","registry":"quay.io","repository":"kubevirt/cdi-operator","tag":"v1.65.0"}` | Operator container image configuration |
 | operator.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | operator.image.registry | string | `"quay.io"` | Image registry |
 | operator.image.repository | string | `"kubevirt/cdi-operator"` | Image repository |
-| operator.image.tag | string | `"v1.64.0"` | Image tag (defaults to chart appVersion) |
+| operator.image.tag | string | `"v1.65.0"` | Image tag (defaults to chart appVersion) |
 | operator.imagePullSecrets | list | `[]` | Image pull secrets for private registries |
 | operator.nodeSelector | object | `{}` | Node selector for operator pods (default: kubernetes.io/os: linux) Set to {} to use template defaults or override with custom selectors |
 | operator.podAnnotations | object | `{}` | Pod annotations (e.g., for OpenShift: openshift.io/required-scc: restricted-v2) |

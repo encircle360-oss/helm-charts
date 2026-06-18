@@ -14,10 +14,10 @@
 
 ## Description
 
-CDI (Containerized Data Importer) is a Kubernetes add-on that provides the ability to import, clone, and manage VM disk images for use with KubeVirt. This Helm chart provides a deployment of CDI v1.64.0 with comprehensive configuration options.
+CDI (Containerized Data Importer) is a Kubernetes add-on that provides the ability to import, clone, and manage VM disk images for use with KubeVirt. This Helm chart provides a deployment of CDI v1.65.0 with comprehensive configuration options.
 
 **Key Features:**
-- Full CDI v1.64.0 support with all configuration options
+- Full CDI v1.65.0 support with all configuration options
 - Operator-based lifecycle management
 - DataVolume support for importing VM disk images
 - HTTP, S3, registry, and PVC clone sources
@@ -118,7 +118,7 @@ The trade-off is that the first install needs two steps because Helm validates a
 | `global.enabled` | Enable CDI deployment | `true` |
 | `namespace.name` | Namespace for CDI | `cdi` |
 | `operator.replicas` | Number of operator replicas | `1` |
-| `operator.image.tag` | Operator image tag | `v1.64.0` |
+| `operator.image.tag` | Operator image tag | `v1.65.0` |
 | `cdi.deploy` | Deploy CDI Custom Resource | `true` |
 
 ### Feature Gates
@@ -132,7 +132,7 @@ cdi:
       - HonorWaitForFirstConsumer  # Respect WaitForFirstConsumer binding mode
 ```
 
-#### Available Feature Gates (v1.64.0)
+#### Available Feature Gates (v1.65.0)
 
 - `HonorWaitForFirstConsumer` - Respect WaitForFirstConsumer storage class binding mode
 
