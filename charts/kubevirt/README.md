@@ -1,6 +1,6 @@
 # kubevirt
 
-![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.6.2](https://img.shields.io/badge/AppVersion-v1.6.2-informational?style=flat-square)
+![Version: 0.1.3](https://img.shields.io/badge/Version-0.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.6.2](https://img.shields.io/badge/AppVersion-v1.6.2-informational?style=flat-square)
 
 KubeVirt - Virtual Machine Management on Kubernetes - Deploy and manage VMs as native Kubernetes resources
 
@@ -709,7 +709,7 @@ Kubernetes: `>=1.30.0-0`
 |-----|------|---------|-------------|
 | global | object | `{"enabled":true}` | Global configuration |
 | global.enabled | bool | `true` | Enable deployment of KubeVirt |
-| kubevirt | object | `{"annotations":{},"certificateRotateStrategy":{"selfSigned":{"caOverlapInterval":"168h","caRotateInterval":"168h","certRotateInterval":"168h"}},"configuration":{"cpuModel":"","cpuRequest":"","developerConfiguration":{"featureGates":null,"useEmulation":false},"instancetype":{"referencePolicy":"reference"},"migration":{"allowAutoConverge":false,"allowPostCopy":false,"bandwidthPerGiB":"64Mi","completionTimeoutPerGiB":800,"disableTLS":false,"network":"","nodeDrainTaintKey":"kubevirt.io/drain","parallelMigrationsPerCluster":5,"parallelOutboundMigrationsPerNode":2,"progressTimeout":150,"unsafeMigrationOverride":false},"network":{"binding":{},"defaultNetworkInterface":"masquerade","permitBridgeInterfaceOnPodNetwork":false,"permitSlirpInterface":false},"obsoleteCPUModels":{},"permittedHostDevices":{"mediatedDevices":[],"pciHostDevices":[]},"selinuxLauncherType":"virt_launcher.process","smbios":{},"vmStateStorageClass":""},"deploy":true,"image":{"pullPolicy":"IfNotPresent","registry":"","tag":""},"infra":{"nodePlacement":{"affinity":{},"nodeSelector":{},"tolerations":[]}},"labels":{},"name":"kubevirt","workloadUpdateStrategy":{"batchEvictionInterval":"1m","batchEvictionSize":10,"workloadUpdateMethods":[]},"workloads":{"nodePlacement":{"affinity":{},"nodeSelector":{},"tolerations":[]}}}` | KubeVirt CR configuration |
+| kubevirt | object | `{"annotations":{},"certificateRotateStrategy":{"selfSigned":{"caOverlapInterval":"168h","caRotateInterval":"168h","certRotateInterval":"168h"}},"configuration":{"cpuModel":"","cpuRequest":"","developerConfiguration":{"featureGates":null,"useEmulation":false},"instancetype":{"referencePolicy":"reference"},"migration":{"allowAutoConverge":false,"allowPostCopy":false,"bandwidthPerGiB":"64Mi","completionTimeoutPerGiB":800,"disableTLS":false,"network":"","nodeDrainTaintKey":"kubevirt.io/drain","parallelMigrationsPerCluster":5,"parallelOutboundMigrationsPerNode":2,"progressTimeout":150,"unsafeMigrationOverride":false},"network":{"binding":{},"defaultNetworkInterface":"masquerade","permitBridgeInterfaceOnPodNetwork":false,"permitSlirpInterface":false},"obsoleteCPUModels":{},"permittedHostDevices":{"mediatedDevices":[],"pciHostDevices":[]},"selinuxLauncherType":"virt_launcher.process","smbios":{},"vmStateStorageClass":""},"deploy":true,"image":{"pullPolicy":"IfNotPresent","registry":"","tag":""},"imagePullSecrets":[],"infra":{"nodePlacement":{"affinity":{},"nodeSelector":{},"tolerations":[]}},"labels":{},"name":"kubevirt","workloadUpdateStrategy":{"batchEvictionInterval":"1m","batchEvictionSize":10,"workloadUpdateMethods":[]},"workloads":{"nodePlacement":{"affinity":{},"nodeSelector":{},"tolerations":[]}}}` | KubeVirt CR configuration |
 | kubevirt.annotations | object | `{}` | Custom annotations for KubeVirt CR |
 | kubevirt.certificateRotateStrategy | object | `{"selfSigned":{"caOverlapInterval":"168h","caRotateInterval":"168h","certRotateInterval":"168h"}}` | Certificate rotation strategy |
 | kubevirt.certificateRotateStrategy.selfSigned.caOverlapInterval | string | `"168h"` | CA overlap interval (duration the old CA is kept) |
@@ -752,6 +752,7 @@ Kubernetes: `>=1.30.0-0`
 | kubevirt.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | kubevirt.image.registry | string | `""` | Custom image registry (leave empty to use default quay.io/kubevirt) |
 | kubevirt.image.tag | string | `""` | Custom image tag (leave empty to use operator's default) |
+| kubevirt.imagePullSecrets | list | `[]` | Image pull secrets for KubeVirt-managed component images, including virt-launcher |
 | kubevirt.infra | object | `{"nodePlacement":{"affinity":{},"nodeSelector":{},"tolerations":[]}}` | Infrastructure components placement (virt-api, virt-controller) |
 | kubevirt.infra.nodePlacement | object | `{"affinity":{},"nodeSelector":{},"tolerations":[]}` | Node placement configuration for infrastructure components |
 | kubevirt.infra.nodePlacement.affinity | object | `{}` | Affinity rules |

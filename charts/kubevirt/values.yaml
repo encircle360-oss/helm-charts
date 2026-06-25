@@ -78,6 +78,9 @@ kubevirt:
     # -- Image pull policy
     pullPolicy: IfNotPresent
 
+  # -- Image pull secrets for KubeVirt-managed component images, including virt-launcher
+  imagePullSecrets: []
+
   # -- Certificate rotation strategy
   certificateRotateStrategy:
     selfSigned:

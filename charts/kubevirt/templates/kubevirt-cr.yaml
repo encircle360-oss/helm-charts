@@ -23,6 +23,10 @@ spec:
   {{- end }}
   {{- end }}
   imagePullPolicy: {{ .Values.kubevirt.image.pullPolicy }}
+  {{- with .Values.kubevirt.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 
   {{- with .Values.kubevirt.certificateRotateStrategy }}
   certificateRotateStrategy:

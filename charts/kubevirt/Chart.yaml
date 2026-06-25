@@ -2,7 +2,7 @@ apiVersion: v2
 name: kubevirt
 description: KubeVirt - Virtual Machine Management on Kubernetes - Deploy and manage VMs as native Kubernetes resources
 type: application
-version: 0.1.2
+version: 0.1.3
 appVersion: "v1.6.2"
 keywords:
   - kubevirt
@@ -27,6 +27,8 @@ annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/prerelease: "true"
   artifacthub.io/changes: |
+    - kind: fixed
+      description: Render KubeVirt CR imagePullSecrets for private registries
     - kind: fixed
       description: Complete RBAC permissions - ClusterRole now matches official KubeVirt v1.6.2 manifest (1090 lines)
     - kind: fixed
